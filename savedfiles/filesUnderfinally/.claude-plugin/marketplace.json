@@ -1,0 +1,18 @@
+{
+  "name": "sherwood-tools",
+  "owner": {
+    "name": "Sherwood Zern",
+    "email": "sherwood.zern@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "independent-reviewer",
+      "source": "./independent-reviewer",
+      "description": "Review changes since last commit and write results to a file named planning/REVIEW.md",
+      "version": "1.0.0",
+      "author": {
+        "name": "Sherwood Zern"
+      }
+    }
+  ]
+}

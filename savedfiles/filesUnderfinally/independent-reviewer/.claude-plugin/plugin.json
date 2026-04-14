@@ -1,0 +1,5 @@
+{
+  "name": "independent-reviewer",
+  "description": "Review changes since last commit and write results to a file named planning/REVIEW.md",
+  "version": "1.0.0"
+}
