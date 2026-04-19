@@ -34,7 +34,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. On startup, a single shared `PriceCache` is constructed, a market data source is selected from `MASSIVE_API_KEY` and started, and the `create_stream_router(cache)` SSE router is mounted at `/api/stream/prices`.
   3. A real browser opening `/api/stream/prices` via `EventSource` receives price update events within a few hundred ms and continues to receive ticks as the cache version advances.
   4. The process reads `OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, and `LLM_MOCK` from `.env` at startup (missing values do not crash startup — the simulator is used when `MASSIVE_API_KEY` is absent).
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 01-01-lifespan-PLAN.md — Add python-dotenv and create the FastAPI lifespan that wires PriceCache + market source + SSE router
+- [ ] 01-02-main-app-PLAN.md — Create backend/app/main.py with /api/health, lifespan binding, and .env loading
+- [ ] 01-03-tests-PLAN.md — Add httpx + asgi-lifespan dev deps and write end-to-end pytest coverage for /api/health, lifespan, and SSE
 
 ### Phase 2: Database Foundation
 **Goal**: An empty Docker volume becomes a fully seeded SQLite database on first startup, and that database survives container restarts.
