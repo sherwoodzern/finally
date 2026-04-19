@@ -127,52 +127,52 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| APP-01 | TBD | Pending |
-| APP-02 | TBD | Pending |
-| APP-03 | TBD | Pending |
-| APP-04 | TBD | Pending |
-| DB-01 | TBD | Pending |
-| DB-02 | TBD | Pending |
-| DB-03 | TBD | Pending |
-| PORT-01 | TBD | Pending |
-| PORT-02 | TBD | Pending |
-| PORT-03 | TBD | Pending |
-| PORT-04 | TBD | Pending |
-| PORT-05 | TBD | Pending |
-| WATCH-01 | TBD | Pending |
-| WATCH-02 | TBD | Pending |
-| WATCH-03 | TBD | Pending |
-| CHAT-01 | TBD | Pending |
-| CHAT-02 | TBD | Pending |
-| CHAT-03 | TBD | Pending |
-| CHAT-04 | TBD | Pending |
-| CHAT-05 | TBD | Pending |
-| CHAT-06 | TBD | Pending |
-| FE-01 | TBD | Pending |
-| FE-02 | TBD | Pending |
-| FE-03 | TBD | Pending |
-| FE-04 | TBD | Pending |
-| FE-05 | TBD | Pending |
-| FE-06 | TBD | Pending |
-| FE-07 | TBD | Pending |
-| FE-08 | TBD | Pending |
-| FE-09 | TBD | Pending |
-| FE-10 | TBD | Pending |
-| FE-11 | TBD | Pending |
-| OPS-01 | TBD | Pending |
-| OPS-02 | TBD | Pending |
-| OPS-03 | TBD | Pending |
-| OPS-04 | TBD | Pending |
-| TEST-01 | TBD | Pending |
-| TEST-02 | TBD | Pending |
-| TEST-03 | TBD | Pending |
-| TEST-04 | TBD | Pending |
+| APP-01 | Phase 1 | Pending |
+| APP-02 | Phase 8 | Pending |
+| APP-03 | Phase 1 | Pending |
+| APP-04 | Phase 1 | Pending |
+| DB-01 | Phase 2 | Pending |
+| DB-02 | Phase 2 | Pending |
+| DB-03 | Phase 2 | Pending |
+| PORT-01 | Phase 3 | Pending |
+| PORT-02 | Phase 3 | Pending |
+| PORT-03 | Phase 3 | Pending |
+| PORT-04 | Phase 3 | Pending |
+| PORT-05 | Phase 3 | Pending |
+| WATCH-01 | Phase 4 | Pending |
+| WATCH-02 | Phase 4 | Pending |
+| WATCH-03 | Phase 4 | Pending |
+| CHAT-01 | Phase 5 | Pending |
+| CHAT-02 | Phase 5 | Pending |
+| CHAT-03 | Phase 5 | Pending |
+| CHAT-04 | Phase 5 | Pending |
+| CHAT-05 | Phase 5 | Pending |
+| CHAT-06 | Phase 5 | Pending |
+| FE-01 | Phase 6 | Pending |
+| FE-02 | Phase 6 | Pending |
+| FE-03 | Phase 7 | Pending |
+| FE-04 | Phase 7 | Pending |
+| FE-05 | Phase 8 | Pending |
+| FE-06 | Phase 8 | Pending |
+| FE-07 | Phase 7 | Pending |
+| FE-08 | Phase 7 | Pending |
+| FE-09 | Phase 8 | Pending |
+| FE-10 | Phase 7 | Pending |
+| FE-11 | Phase 8 | Pending |
+| OPS-01 | Phase 9 | Pending |
+| OPS-02 | Phase 9 | Pending |
+| OPS-03 | Phase 9 | Pending |
+| OPS-04 | Phase 9 | Pending |
+| TEST-01 | Phase 5 | Pending |
+| TEST-02 | Phase 8 | Pending |
+| TEST-03 | Phase 10 | Pending |
+| TEST-04 | Phase 10 | Pending |
 
 **Coverage:**
 - v1 requirements: 40 total
-- Mapped to phases: 0 (pending roadmap creation)
-- Unmapped: 40 — will be resolved by `gsd-roadmapper`
+- Mapped to phases: 40 (100%)
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-19 after initial definition*
+*Last updated: 2026-04-19 after roadmap creation*
