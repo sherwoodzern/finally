@@ -1,5 +1,7 @@
 """SQLite schema for FinAlly - six tables per planning/PLAN.md section 7."""
 
+from __future__ import annotations
+
 # users_profile - single-user cash balance state
 USERS_PROFILE = """
 CREATE TABLE IF NOT EXISTS users_profile (

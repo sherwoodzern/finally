@@ -7,6 +7,8 @@ Public API:
     get_watchlist_tickers   - Return the default user's watchlist ticker list.
 """
 
+from __future__ import annotations
+
 from .connection import open_database
 from .seed import (
     DEFAULT_CASH_BALANCE,
