@@ -54,6 +54,7 @@ def seed_defaults(conn: sqlite3.Connection) -> None:
                 "VALUES (?, ?, ?, ?)",
                 (str(uuid.uuid4()), DEFAULT_USER_ID, ticker, now),
             )
+        logger.info("Seeded default watchlist with %d tickers", len(SEED_PRICES))
 
     conn.commit()
 
