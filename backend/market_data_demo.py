@@ -178,12 +178,12 @@ def print_summary(cache: PriceCache) -> None:
     table.add_column("Session Change", justify="right", width=14)
 
     for ticker in TICKERS:
-        seed = SEED_PRICES.get(ticker, 0)
+        seed = SEED_PRICES[ticker]
         update = cache.get(ticker)
         if update is None:
             continue
         final = update.price
-        session_change = ((final - seed) / seed) * 100 if seed else 0
+        session_change = ((final - seed) / seed) * 100
 
         if session_change > 0:
             color = "green"
