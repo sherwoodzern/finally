@@ -51,7 +51,7 @@ Plans:
   4. Running the process with `db/finally.db` on a mounted path persists data across restarts (stopping and re-starting the process preserves `cash_balance` and `watchlist`).
 **Plans**: 3 plans
 Plans:
-- [ ] 02-01-db-package-PLAN.md — Create backend/app/db/ sub-package (schema, connection, seed) and unit tests for DB-01/DB-02/DB-03
+- [x] 02-01-db-package-PLAN.md — Create backend/app/db/ sub-package (schema, connection, seed) and unit tests for DB-01/DB-02/DB-03
 - [ ] 02-02-lifespan-wiring-PLAN.md — Wire DB open/init/seed/close into backend/app/lifespan.py + integration tests
 - [ ] 02-03-demo-refactor-PLAN.md — Refactor backend/market_data_demo.py to reuse list(SEED_PRICES.keys()) (D-06)
 
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. App Shell & Config | 3/3 | Complete | 2026-04-20 |
-| 2. Database Foundation | 0/3 | Not started | - |
+| 2. Database Foundation | 1/3 | In progress | - |
 | 3. Portfolio & Trading API | 0/TBD | Not started | - |
 | 4. Watchlist API | 0/TBD | Not started | - |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
