@@ -12,7 +12,7 @@ FinAlly starts with a solid but isolated market-data subsystem (73 passing tests
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: App Shell & Config** - Mount FastAPI, wire the PriceCache singleton, expose browser-reachable SSE, load `.env`
+- [x] **Phase 1: App Shell & Config** - Mount FastAPI, wire the PriceCache singleton, expose browser-reachable SSE, load `.env` (completed 2026-04-20)
 - [ ] **Phase 2: Database Foundation** - SQLite schema, lazy init with default seed, Docker-volume persistence
 - [ ] **Phase 3: Portfolio & Trading API** - `/api/portfolio`, `/api/portfolio/trade`, `/api/portfolio/history`, validation, snapshot recording
 - [ ] **Phase 4: Watchlist API** - `/api/watchlist` GET/POST/DELETE wired to the price cache's dynamic ticker lifecycle
@@ -38,7 +38,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 - [x] 01-01-lifespan-PLAN.md — Add python-dotenv and create the FastAPI lifespan that wires PriceCache + market source + SSE router (completed 2026-04-19)
 - [x] 01-02-main-app-PLAN.md — Create backend/app/main.py with /api/health, lifespan binding, and .env loading (completed 2026-04-20)
-- [ ] 01-03-tests-PLAN.md — Add httpx + asgi-lifespan dev deps and write end-to-end pytest coverage for /api/health, lifespan, and SSE
+- [x] 01-03-tests-PLAN.md — Add httpx + asgi-lifespan dev deps and write end-to-end pytest coverage for /api/health, lifespan, and SSE (completed 2026-04-20)
 
 ### Phase 2: Database Foundation
 **Goal**: An empty Docker volume becomes a fully seeded SQLite database on first startup, and that database survives container restarts.
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. App Shell & Config | 2/3 | In progress | - |
+| 1. App Shell & Config | 3/3 | Complete | 2026-04-20 |
 | 2. Database Foundation | 0/TBD | Not started | - |
 | 3. Portfolio & Trading API | 0/TBD | Not started | - |
 | 4. Watchlist API | 0/TBD | Not started | - |

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Plan 01-02 complete (main.py entrypoint + /api/health + .env loading)
-last_updated: "2026-04-20T13:00:31Z"
-last_activity: 2026-04-20 -- Plan 01-02 (main-app) complete
+status: verifying
+stopped_at: Completed 01-03-tests-PLAN.md (APP-04 SSE verified end-to-end)
+last_updated: "2026-04-20T14:00:51.326Z"
+last_activity: 2026-04-20
 progress:
   total_phases: 10
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 7
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 1 of 10 (App Shell & Config)
-Plan: 2 of 3 complete (next: 01-03-tests)
-Status: Executing
-Last activity: 2026-04-20 -- Plan 01-02 (main-app) complete
+Plan: 3 of 3 complete (next: 01-03-tests)
+Status: Phase complete — ready for verification
+Last activity: 2026-04-20
 
 Progress: [#░░░░░░░░░] 7%
 
@@ -52,6 +52,7 @@ Progress: [#░░░░░░░░░] 7%
 - Trend: Stable (fine-granularity single-task plans).
 
 *Updated after each plan completion*
+| Phase 01 P03 | 60min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,10 @@ Recent decisions affecting current work:
 - D-04 (Plan 01-02): `/api/health` defined inline in `main.py` returning `{"status": "ok"}`; SSE router is mounted by the lifespan, NOT by `main.py`.
 - Plan 01-02: `load_dotenv()` runs at line 16 of `main.py` BEFORE `app = FastAPI(lifespan=lifespan)` at line 20 — load order is load-bearing (factory reads `MASSIVE_API_KEY` at lifespan entry).
 - Plan 01-02: Health endpoint kept trivial (no `"source"` enrichment) because source is attached to `app.state` AFTER construction; ops visibility is a deferred idea.
+- [Phase ?]: D-05 (01-03): SSE tests use a real in-process uvicorn server (not ASGITransport) — httpx ASGITransport buffers the full ASGI response and cannot drain infinite SSE generators.
+- [Phase ?]: D-06 (01-03): create_stream_router builds a fresh APIRouter per call — pre-existing module-level router accumulated duplicate /prices routes across factory calls (Rule 1 auto-fix).
+- [Phase ?]: 01-03: httpx and asgi-lifespan declared in [project.optional-dependencies].dev (not PEP 735 [dependency-groups]) to match uv sync --extra dev.
+- [Phase ?]: 01-03: Fresh FastAPI(lifespan=lifespan) per test (via _build_app helper) — avoids shared state on module-level app.main.app across tests.
 
 ### Pending Todos
 
@@ -97,6 +102,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-20T13:00:31Z
-Stopped at: Completed 01-02-main-app-PLAN.md
-Resume file: .planning/phases/01-app-shell-config/01-03-tests-PLAN.md
+Last session: 2026-04-20T14:00:51.323Z
+Stopped at: Completed 01-03-tests-PLAN.md (APP-04 SSE verified end-to-end)
+Resume file: None
