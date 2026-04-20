@@ -22,9 +22,9 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### App Shell & Integration
 
-- [x] **APP-01**: FastAPI application with `lifespan` startup that constructs the shared `PriceCache`, selects and starts the market data source, initializes SQLite, and exposes `/api/health` _(lifespan + PriceCache + market source + SSE router wired in Plan 01-01; SQLite and `/api/health` come in Plans 01-02 and Phase 2)_
+- [x] **APP-01**: FastAPI application with `lifespan` startup that constructs the shared `PriceCache`, selects and starts the market data source, initializes SQLite, and exposes `/api/health` _(lifespan + PriceCache + market source + SSE router wired in Plan 01-01; FastAPI `app` instance and `/api/health` landed in Plan 01-02; SQLite init comes in Phase 2)_
 - [ ] **APP-02**: FastAPI serves the Next.js static export from `/` on the same port as the API (no CORS, single origin)
-- [x] **APP-03**: `.env` loading at startup for `OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, and `LLM_MOCK` _(python-dotenv dependency added in Plan 01-01; `load_dotenv()` call site lands in Plan 01-02)_
+- [x] **APP-03**: `.env` loading at startup for `OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, and `LLM_MOCK` _(python-dotenv dependency added in Plan 01-01; `load_dotenv()` call site landed in Plan 01-02 `backend/app/main.py`)_
 - [ ] **APP-04**: Browser-consumable SSE confirmed end-to-end — a real `EventSource` client receives ticks from the mounted `/api/stream/prices` endpoint
 
 ### Database
@@ -127,9 +127,9 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| APP-01 | Phase 1 | Complete (01-01) |
+| APP-01 | Phase 1 | Complete (01-01, 01-02) |
 | APP-02 | Phase 8 | Pending |
-| APP-03 | Phase 1 | Complete (01-01) |
+| APP-03 | Phase 1 | Complete (01-01, 01-02) |
 | APP-04 | Phase 1 | Pending |
 | DB-01 | Phase 2 | Pending |
 | DB-02 | Phase 2 | Pending |
@@ -175,4 +175,4 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-19 after roadmap creation*
+*Last updated: 2026-04-20 after Plan 01-02 completion (APP-01, APP-03 verified)*
