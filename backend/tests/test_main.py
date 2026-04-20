@@ -91,14 +91,14 @@ async def _run_uvicorn(app_: FastAPI, port: int) -> AsyncIterator[None]:
 class TestHealth:
     """GET /api/health - the one inline route in main.py (D-04)."""
 
-    async def test_health_returns_ok(self):
+    async def test_health_returns_ok(self, db_path):
         """Returns HTTP 200 with body {'status': 'ok'}.
 
         Uses ASGITransport for speed - /api/health is a finite response so the
         transport's buffer-until-complete semantics are fine here.
         """
         app = _build_app()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with LifespanManager(app):
                 transport = ASGITransport(app=app)
                 async with AsyncClient(transport=transport, base_url="http://test") as client:
@@ -112,7 +112,7 @@ class TestSSEStream:
     """End-to-end proof of APP-04: a real EventSource-equivalent client receives
     ticks from the lifespan-mounted /api/stream/prices."""
 
-    async def test_sse_emits_at_least_one_data_frame(self):
+    async def test_sse_emits_at_least_one_data_frame(self, db_path):
         """A streaming GET on /api/stream/prices yields >= 1 'data:' frame within 5s.
 
         Proves the full Phase 1 wiring end-to-end: lifespan started, PriceCache
@@ -122,7 +122,7 @@ class TestSSEStream:
         """
         app = _build_app()
         port = _free_port()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with _run_uvicorn(app, port):
                 async with httpx.AsyncClient(
                     base_url=f"http://127.0.0.1:{port}", timeout=5.0
@@ -136,7 +136,7 @@ class TestSSEStream:
                                 break
         assert saw_data, "no 'data:' frame received within 5s"
 
-    async def test_sse_continues_emitting_as_cache_version_advances(self):
+    async def test_sse_continues_emitting_as_cache_version_advances(self, db_path):
         """The stream keeps emitting as the simulator advances the cache version.
 
         Mirrors backend/tests/market/test_simulator_source.py::test_prices_update_over_time
@@ -144,7 +144,7 @@ class TestSSEStream:
         """
         app = _build_app()
         port = _free_port()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with _run_uvicorn(app, port):
                 async with httpx.AsyncClient(
                     base_url=f"http://127.0.0.1:{port}", timeout=5.0
