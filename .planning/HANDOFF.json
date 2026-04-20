@@ -1,30 +1,48 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-20T14:30:44.866Z",
-  "phase": "01",
-  "phase_name": "app-shell-config",
-  "phase_dir": ".planning/phases/01-app-shell-config",
+  "timestamp": "2026-04-20T21:29:23.368Z",
+  "phase": "03",
+  "phase_name": "portfolio-trading-api",
+  "phase_dir": ".planning/phases/03-portfolio-trading-api",
+  "workflow": "discuss-phase",
   "plan": null,
   "task": null,
   "total_tasks": 0,
-  "status": "phase_complete",
+  "status": "paused",
   "completed_tasks": [
-    {"id": "01-01", "name": "Lifespan + python-dotenv", "status": "done", "commits": ["09fed01", "25bff00", "66adfc9"]},
-    {"id": "01-02", "name": "FastAPI entrypoint main.py + /api/health", "status": "done", "commits": ["d1ce0e8", "deab684"]},
-    {"id": "01-03", "name": "httpx + asgi-lifespan tests (health, lifespan, SSE)", "status": "done", "commits": ["1ef1e4d", "3595f5a", "704525d", "d4a5500", "a7a35e1"]},
-    {"id": "01-REVIEW", "name": "Code review (standard)", "status": "done", "commits": ["8ed1965"]},
-    {"id": "01-VERIFICATION", "name": "Phase verification 12/12 passed", "status": "done"}
+    {"id": "03-discuss-01", "name": "Load prior context (ROADMAP, REQUIREMENTS, STATE, Phase 1/2 CONTEXT)", "status": "done"},
+    {"id": "03-discuss-02", "name": "Scout codebase (lifespan, db package, market package, tests)", "status": "done"},
+    {"id": "03-discuss-03", "name": "Identify and present 4 gray areas to user", "status": "done"},
+    {"id": "03-discuss-04", "name": "Deep-dive all 4 gray areas (14 sub-questions, all Recommended selected)", "status": "done"},
+    {"id": "03-discuss-05", "name": "Write 03-CONTEXT.md with 16 decisions (D-01..D-16)", "status": "done", "commit": "0feee40"},
+    {"id": "03-discuss-06", "name": "Write 03-DISCUSSION-LOG.md audit trail", "status": "done", "commit": "0feee40"}
   ],
   "remaining_tasks": [
-    {"id": "phase-2", "name": "Phase 2 — Database & Models (SQLite schema, lazy init, seed defaults)", "status": "not_started"}
+    {"id": "03-state-sync", "name": "Update .planning/STATE.md to reflect Phase 3 context gathered", "status": "not_started"},
+    {"id": "03-plan", "name": "Run /gsd-plan-phase 3 to produce RESEARCH.md + PLAN.md", "status": "not_started"}
   ],
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "D-05 (01-03): SSE tests use real in-process uvicorn server on random port", "rationale": "httpx.ASGITransport buffers the full ASGI response and cannot drain infinite SSE generators — proven with a reproduction before fixing.", "phase": "01"},
-    {"decision": "D-06 (01-03): create_stream_router builds a fresh APIRouter per call", "rationale": "Pre-existing shared-state bug — module-level APIRouter accumulated duplicate /prices routes across factory calls. Fixed in commit 704525d.", "phase": "01"}
+    {"decision": "D-01: app/portfolio/ sub-package (routes.py + service.py + models.py)", "rationale": "Mirrors Phase 1/2 pattern; public surface via __init__.py", "phase": "03"},
+    {"decision": "D-02: Pure functions taking (conn, cache, ...) for the trade service", "rationale": "Framework-agnostic so Phase 5 chat auto-exec can import and call directly", "phase": "03"},
+    {"decision": "D-03: Pydantic v2 BaseModel for request and response models", "rationale": "Auto-OpenAPI, auto-validation at the edge", "phase": "03"},
+    {"decision": "D-04: Tick-observer callback (register_tick_observer) added to MarketDataSource ABC + both impls", "rationale": "PLAN.md forbids a separate background task; observer piggybacks on existing tick loop without breaking module boundary", "phase": "03"},
+    {"decision": "D-05: Observer registered in lifespan after source.start(tickers)", "rationale": "Keeps module boundary — portfolio code owns the snapshot, market code owns the tick", "phase": "03"},
+    {"decision": "D-06: app.state.last_snapshot_at float tracks 60s snapshot clock", "rationale": "Consistent with Phase 1 D-02 (no module-level singletons)", "phase": "03"},
+    {"decision": "D-07: Trade snapshot resets the 60s clock", "rationale": "Avoids back-to-back near-duplicate snapshots around trade times", "phase": "03"},
+    {"decision": "D-09: Domain exceptions (InsufficientCash / InsufficientShares / UnknownTicker / PriceUnavailable) subclass TradeValidationError", "rationale": "Service stays FastAPI-agnostic; Phase 5 chat catches and formats into chat reply", "phase": "03"},
+    {"decision": "D-10/D-11: 400 Bad Request with {detail: {error: <code>, message: <human>}}; 422 reserved for pydantic", "rationale": "Machine-readable code + human message; clean separation of business-rule vs schema failure", "phase": "03"},
+    {"decision": "D-13: Reject trade with 400 price_unavailable when cache.get_price returns None", "rationale": "No silent fallback to seed prices; client retries if race window hits", "phase": "03"},
+    {"decision": "D-14: Reject trade with 400 unknown_ticker when ticker not in watchlist table", "rationale": "Watchlist set = cache set (PLAN.md §6); clean Phase 3 / Phase 4 boundary", "phase": "03"},
+    {"decision": "D-15: DELETE positions row when sell zeros out quantity (epsilon abs(new_qty) < 1e-9)", "rationale": "Idiomatic 'current holdings'; re-buy gets fresh avg_cost; epsilon handles float residuals", "phase": "03"},
+    {"decision": "D-16: Weighted avg_cost on BUY adding to existing position", "rationale": "(old_qty*old_avg + buy_qty*buy_price) / (old_qty + buy_qty) — standard brokerage math", "phase": "03"}
   ],
-  "uncommitted_files": ["CLAUDE.md (pre-existing, out of scope)"],
-  "next_action": "Run `/gsd-discuss-phase 2` to begin Phase 2 (Database & Models) with adaptive context gathering, OR `/gsd-plan-phase 2` to skip discussion and go straight to planning.",
-  "context_notes": "Phase 1 complete and verified (12/12 must-haves). Full backend test suite: 83 passing, ruff clean. APP-01, APP-03, APP-04 all marked complete in REQUIREMENTS.md. Code review found 2 warnings (WR-01 router re-entry latent-risk, WR-02 misleading docstring in test_main.py) and 4 info items — all advisory, none blocking. Next phase is Phase 2 (Database & Models): SQLite schema, lazy init in lifespan, seed default watchlist + users_profile. See .planning/codebase/CONCERNS.md — Phase 2 DB seed must pick single source of truth for ticker list (currently duplicated between seed_prices.py and market_data_demo.py)."
+  "uncommitted_files": [
+    {"path": ".planning/STATE.md", "status": "modified", "notes": "Partial edits present — status flipped to 'planning', percent changed from 20 to 100. Needs review; pause-work does not own STATE.md updates."},
+    {"path": "CLAUDE.md", "status": "modified", "notes": "Appended GSD stack/convention blocks; unrelated to phase-3 discuss-phase work."},
+    {"path": ".claude/scheduled_tasks.lock", "status": "untracked", "notes": "Runtime lock file; gitignore candidate."}
+  ],
+  "next_action": "Run /gsd-plan-phase 3 — 03-CONTEXT.md is ready for the planner to consume.",
+  "context_notes": "Phase 3 (Portfolio & Trading API) discuss-phase completed cleanly. 14 gray-area questions answered, all Recommended options selected. Key architectural note: introduces tick-observer callback (register_tick_observer) onto the already-Validated MarketDataSource ABC — the planner and executor must extend the ABC and both implementations (SimulatorDataSource, MassiveDataSource) as a scoped change, with observer failures isolated via try/except + logger.exception so a bad callback can't kill the tick loop. Phase 5 (chat) will reuse the pure-function trade service directly by catching domain exceptions (InsufficientCash, InsufficientShares, UnknownTicker, PriceUnavailable) — that is why the service must not raise HTTPException."
 }
