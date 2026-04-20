@@ -14,14 +14,19 @@ from .cache import PriceCache
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/stream", tags=["streaming"])
-
 
 def create_stream_router(price_cache: PriceCache) -> APIRouter:
     """Create the SSE streaming router with a reference to the price cache.
 
     This factory pattern lets us inject the PriceCache without globals.
+    A fresh APIRouter is constructed per call so repeated calls (e.g. one per
+    test-spawned FastAPI app) do not accumulate duplicate /prices routes on a
+    shared module-level router. Accumulated duplicates would each close over
+    the PriceCache from their own call site; Starlette dispatches the first
+    match, so a stale route from a torn-down lifespan would serve requests
+    against a dead cache.
     """
+    router = APIRouter(prefix="/api/stream", tags=["streaming"])
 
     @router.get("/prices")
     async def stream_prices(request: Request) -> StreamingResponse:
