@@ -54,7 +54,6 @@ def format_price(price: float) -> str:
 def build_table(
     cache: PriceCache,
     history: dict[str, deque],
-    elapsed: float,
 ) -> Table:
     """Build the price table."""
     table = Table(
@@ -153,7 +152,7 @@ def build_dashboard(
     # Body: price table
     layout["body"].update(
         Panel(
-            build_table(cache, history, elapsed),
+            build_table(cache, history),
             title="[bold bright_white]Live Prices[/]",
             border_style="bright_black",
         )
