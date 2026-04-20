@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-04-20T14:30:44.866Z",
+  "phase": "01",
+  "phase_name": "app-shell-config",
+  "phase_dir": ".planning/phases/01-app-shell-config",
+  "plan": null,
+  "task": null,
+  "total_tasks": 0,
+  "status": "phase_complete",
+  "completed_tasks": [
+    {"id": "01-01", "name": "Lifespan + python-dotenv", "status": "done", "commits": ["09fed01", "25bff00", "66adfc9"]},
+    {"id": "01-02", "name": "FastAPI entrypoint main.py + /api/health", "status": "done", "commits": ["d1ce0e8", "deab684"]},
+    {"id": "01-03", "name": "httpx + asgi-lifespan tests (health, lifespan, SSE)", "status": "done", "commits": ["1ef1e4d", "3595f5a", "704525d", "d4a5500", "a7a35e1"]},
+    {"id": "01-REVIEW", "name": "Code review (standard)", "status": "done", "commits": ["8ed1965"]},
+    {"id": "01-VERIFICATION", "name": "Phase verification 12/12 passed", "status": "done"}
+  ],
+  "remaining_tasks": [
+    {"id": "phase-2", "name": "Phase 2 — Database & Models (SQLite schema, lazy init, seed defaults)", "status": "not_started"}
+  ],
+  "blockers": [],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "D-05 (01-03): SSE tests use real in-process uvicorn server on random port", "rationale": "httpx.ASGITransport buffers the full ASGI response and cannot drain infinite SSE generators — proven with a reproduction before fixing.", "phase": "01"},
+    {"decision": "D-06 (01-03): create_stream_router builds a fresh APIRouter per call", "rationale": "Pre-existing shared-state bug — module-level APIRouter accumulated duplicate /prices routes across factory calls. Fixed in commit 704525d.", "phase": "01"}
+  ],
+  "uncommitted_files": ["CLAUDE.md (pre-existing, out of scope)"],
+  "next_action": "Run `/gsd-discuss-phase 2` to begin Phase 2 (Database & Models) with adaptive context gathering, OR `/gsd-plan-phase 2` to skip discussion and go straight to planning.",
+  "context_notes": "Phase 1 complete and verified (12/12 must-haves). Full backend test suite: 83 passing, ruff clean. APP-01, APP-03, APP-04 all marked complete in REQUIREMENTS.md. Code review found 2 warnings (WR-01 router re-entry latent-risk, WR-02 misleading docstring in test_main.py) and 4 info items — all advisory, none blocking. Next phase is Phase 2 (Database & Models): SQLite schema, lazy init in lifespan, seed default watchlist + users_profile. See .planning/codebase/CONCERNS.md — Phase 2 DB seed must pick single source of truth for ticker list (currently duplicated between seed_prices.py and market_data_demo.py)."
+}
