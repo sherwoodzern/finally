@@ -19,6 +19,8 @@ dev = [
     "pytest-asyncio>=0.24.0",
     "pytest-cov>=5.0.0",
     "ruff>=0.7.0",
+    "httpx>=0.28.1",
+    "asgi-lifespan>=2.1.0",
 ]
 
 [build-system]
@@ -57,3 +59,4 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+
