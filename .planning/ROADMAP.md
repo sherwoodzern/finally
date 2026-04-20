@@ -49,7 +49,11 @@ Plans:
   2. After init, `users_profile` contains one row with `id="default"` and `cash_balance=10000.0`, and `watchlist` contains the 10 default tickers (AAPL, GOOGL, MSFT, AMZN, TSLA, NVDA, META, JPM, V, NFLX).
   3. Restarting the process against an already-seeded DB is a no-op — no duplicate seed rows, no schema errors.
   4. Running the process with `db/finally.db` on a mounted path persists data across restarts (stopping and re-starting the process preserves `cash_balance` and `watchlist`).
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 02-01-db-package-PLAN.md — Create backend/app/db/ sub-package (schema, connection, seed) and unit tests for DB-01/DB-02/DB-03
+- [ ] 02-02-lifespan-wiring-PLAN.md — Wire DB open/init/seed/close into backend/app/lifespan.py + integration tests
+- [ ] 02-03-demo-refactor-PLAN.md — Refactor backend/market_data_demo.py to reuse list(SEED_PRICES.keys()) (D-06)
 
 ### Phase 3: Portfolio & Trading API
 **Goal**: The user can query their portfolio, place buy and sell market orders via HTTP, and see P&L history accumulate as trades execute and time passes.
@@ -153,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. App Shell & Config | 3/3 | Complete | 2026-04-20 |
-| 2. Database Foundation | 0/TBD | Not started | - |
+| 2. Database Foundation | 0/3 | Not started | - |
 | 3. Portfolio & Trading API | 0/TBD | Not started | - |
 | 4. Watchlist API | 0/TBD | Not started | - |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
