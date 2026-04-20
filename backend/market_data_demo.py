@@ -260,6 +260,7 @@ async def run() -> None:
                 live.update(build_dashboard(cache, history, events, start_time))
 
     except KeyboardInterrupt:
+        # User hit Ctrl+C - fall through to print_summary in the finally block.
         pass
     finally:
         await source.stop()
