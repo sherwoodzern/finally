@@ -36,7 +36,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. The process reads `OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, and `LLM_MOCK` from `.env` at startup (missing values do not crash startup — the simulator is used when `MASSIVE_API_KEY` is absent).
 **Plans**: 3 plans
 Plans:
-- [ ] 01-01-lifespan-PLAN.md — Add python-dotenv and create the FastAPI lifespan that wires PriceCache + market source + SSE router
+- [x] 01-01-lifespan-PLAN.md — Add python-dotenv and create the FastAPI lifespan that wires PriceCache + market source + SSE router (completed 2026-04-19)
 - [ ] 01-02-main-app-PLAN.md — Create backend/app/main.py with /api/health, lifespan binding, and .env loading
 - [ ] 01-03-tests-PLAN.md — Add httpx + asgi-lifespan dev deps and write end-to-end pytest coverage for /api/health, lifespan, and SSE
 
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. App Shell & Config | 0/TBD | Not started | - |
+| 1. App Shell & Config | 1/3 | In progress | - |
 | 2. Database Foundation | 0/TBD | Not started | - |
 | 3. Portfolio & Trading API | 0/TBD | Not started | - |
 | 4. Watchlist API | 0/TBD | Not started | - |

@@ -22,9 +22,9 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### App Shell & Integration
 
-- [ ] **APP-01**: FastAPI application with `lifespan` startup that constructs the shared `PriceCache`, selects and starts the market data source, initializes SQLite, and exposes `/api/health`
+- [x] **APP-01**: FastAPI application with `lifespan` startup that constructs the shared `PriceCache`, selects and starts the market data source, initializes SQLite, and exposes `/api/health` _(lifespan + PriceCache + market source + SSE router wired in Plan 01-01; SQLite and `/api/health` come in Plans 01-02 and Phase 2)_
 - [ ] **APP-02**: FastAPI serves the Next.js static export from `/` on the same port as the API (no CORS, single origin)
-- [ ] **APP-03**: `.env` loading at startup for `OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, and `LLM_MOCK`
+- [x] **APP-03**: `.env` loading at startup for `OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, and `LLM_MOCK` _(python-dotenv dependency added in Plan 01-01; `load_dotenv()` call site lands in Plan 01-02)_
 - [ ] **APP-04**: Browser-consumable SSE confirmed end-to-end — a real `EventSource` client receives ticks from the mounted `/api/stream/prices` endpoint
 
 ### Database
@@ -127,9 +127,9 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| APP-01 | Phase 1 | Pending |
+| APP-01 | Phase 1 | Complete (01-01) |
 | APP-02 | Phase 8 | Pending |
-| APP-03 | Phase 1 | Pending |
+| APP-03 | Phase 1 | Complete (01-01) |
 | APP-04 | Phase 1 | Pending |
 | DB-01 | Phase 2 | Pending |
 | DB-02 | Phase 2 | Pending |

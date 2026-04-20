@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 1 context gathered
-last_updated: "2026-04-19T23:51:06.789Z"
-last_activity: 2026-04-19 -- Phase 01 planning complete
+stopped_at: Plan 01-01 complete (lifespan + python-dotenv)
+last_updated: "2026-04-19T23:58:48Z"
+last_activity: 2026-04-19 -- Plan 01-01 (lifespan) complete
 progress:
   total_phases: 10
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 3
 ---
 
 # Project State
@@ -26,29 +26,29 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 1 of 10 (App Shell & Config)
-Plan: 0 of TBD in current phase
-Status: Ready to execute
-Last activity: 2026-04-19 -- Phase 01 planning complete
+Plan: 1 of 3 complete (next: 01-02-main-app)
+Status: Executing
+Last activity: 2026-04-19 -- Plan 01-01 (lifespan) complete
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [#░░░░░░░░░] 3%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0.0 hours
+- Total plans completed: 1
+- Average duration: 3min
+- Total execution time: 0.05 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 1 (App Shell) | 1 | 3min | 3min |
 
 **Recent Trend:**
 
-- Last 5 plans: —
+- Last 5 plans: 01-01 (3min)
 - Trend: —
 
 *Updated after each plan completion*
@@ -63,6 +63,11 @@ Recent decisions affecting current work:
 - Adopt `planning/PLAN.md` wholesale as v1 scope — all 40 Active requirements mapped to 10 phases.
 - Market-data subsystem (MARKET-01..06) treated as Validated and inherited — not planned.
 - Granularity is "fine" (10 phases; 3–6 requirements each); workflow flags enabled: research, plan_check, verifier, nyquist_validation, ui_phase, ai_integration_phase.
+- D-02 (Plan 01-01): PriceCache is constructed inside the lifespan and attached to `app.state` — no module-level singletons.
+- D-04 (Plan 01-01): SSE router `create_stream_router(cache)` is mounted during lifespan startup (before `yield`) so `/api/stream/prices` is live for the app's lifetime.
+- Plan 01-01: python-dotenv chosen over pydantic-settings / manual `os.environ` — smallest dependency that satisfies APP-03 and the "missing values must not crash startup" constraint.
+- Plan 01-01: `.env` loading happens in Plan 02's `main.py` BEFORE the app is constructed — not in the lifespan, so the factory sees env vars at construction time.
+- Plan 01-01: Missing `OPENROUTER_API_KEY` logs a single warning but does NOT raise; Phase 5 will fail loud when `/api/chat` is hit.
 
 ### Pending Todos
 
@@ -87,6 +92,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-19T19:39:55.289Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-app-shell-config/01-CONTEXT.md
+Last session: 2026-04-19T23:58:48Z
+Stopped at: Completed 01-01-lifespan-PLAN.md
+Resume file: .planning/phases/01-app-shell-config/01-02-main-app-PLAN.md
