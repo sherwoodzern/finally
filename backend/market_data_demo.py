@@ -26,8 +26,8 @@ from app.market.simulator import SimulatorDataSource
 # Sparkline characters, low to high
 SPARK_CHARS = "▁▂▃▄▅▆▇█"
 
-# Ordered ticker list matching the default watchlist
-TICKERS = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA", "NVDA", "META", "JPM", "V", "NFLX"]
+# Ordered ticker list matching the default watchlist (source of truth: SEED_PRICES)
+TICKERS = list(SEED_PRICES.keys())
 
 DURATION = 60  # seconds
 
