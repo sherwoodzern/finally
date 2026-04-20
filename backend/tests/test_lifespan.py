@@ -28,51 +28,51 @@ class TestLifespan:
     """The lifespan wires PriceCache + market source + SSE router on entry,
     and cleanly stops the source on exit."""
 
-    async def test_attaches_price_cache_to_app_state(self):
+    async def test_attaches_price_cache_to_app_state(self, db_path):
         """Entering the lifespan attaches a PriceCache to app.state.price_cache."""
         app = _build_app()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with LifespanManager(app):
                 assert isinstance(app.state.price_cache, PriceCache)
 
-    async def test_attaches_market_source_to_app_state(self):
+    async def test_attaches_market_source_to_app_state(self, db_path):
         """Entering the lifespan attaches a started MarketDataSource to app.state."""
         app = _build_app()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with LifespanManager(app):
                 assert isinstance(app.state.market_source, MarketDataSource)
                 assert set(app.state.market_source.get_tickers()) == set(SEED_PRICES)
 
-    async def test_uses_simulator_when_massive_api_key_absent(self):
+    async def test_uses_simulator_when_massive_api_key_absent(self, db_path):
         """With no MASSIVE_API_KEY, the factory selects SimulatorDataSource."""
         app = _build_app()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with LifespanManager(app):
                 assert isinstance(app.state.market_source, SimulatorDataSource)
 
-    async def test_seeds_cache_immediately_on_startup(self):
+    async def test_seeds_cache_immediately_on_startup(self, db_path):
         """All SEED_PRICES tickers are present in the cache before any test code runs.
 
         This is the contract that makes /api/stream/prices have data on first connect
         (mirrors backend/tests/market/test_simulator_source.py::test_start_populates_cache).
         """
         app = _build_app()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with LifespanManager(app):
                 cache: PriceCache = app.state.price_cache
                 for ticker in SEED_PRICES:
                     assert cache.get(ticker) is not None, ticker
 
-    async def test_includes_sse_router_during_startup(self):
+    async def test_includes_sse_router_during_startup(self, db_path):
         """app.include_router(create_stream_router(cache)) ran in lifespan startup,
         so /api/stream/prices is registered on the app while the lifespan is active."""
         app = _build_app()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with LifespanManager(app):
                 paths = {getattr(r, "path", None) for r in app.router.routes}
                 assert "/api/stream/prices" in paths, paths
 
-    async def test_missing_openrouter_key_logs_warning_and_proceeds(self, caplog):
+    async def test_missing_openrouter_key_logs_warning_and_proceeds(self, caplog, db_path):
         """Missing OPENROUTER_API_KEY does not raise - only a single warning is logged.
 
         Implements CONTEXT.md missing-env policy: Phase 5 will fail loud when chat is
@@ -80,19 +80,66 @@ class TestLifespan:
         """
         caplog.set_level(logging.WARNING, logger="app.lifespan")
         app = _build_app()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with LifespanManager(app):
                 pass
         messages = [rec.message for rec in caplog.records]
         assert any("OPENROUTER_API_KEY" in m for m in messages), messages
 
-    async def test_stops_source_on_shutdown(self):
+    async def test_stops_source_on_shutdown(self, db_path):
         """Exiting the lifespan awaits source.stop() - background task is no longer running."""
         app = _build_app()
-        with patch.dict(os.environ, {}, clear=True):
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
             async with LifespanManager(app):
                 source = app.state.market_source
             # After exit, the simulator's _task is None or done (mirrors
             # SimulatorDataSource.stop semantics in backend/app/market/simulator.py:231-240).
             task = getattr(source, "_task", None)
             assert task is None or task.done()
+
+    async def test_attaches_db_to_app_state(self, db_path):
+        """lifespan attaches a seeded sqlite3.Connection to app.state.db."""
+        app = _build_app()
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
+            async with LifespanManager(app):
+                conn = app.state.db
+                row = conn.execute(
+                    "SELECT cash_balance FROM users_profile WHERE id = 'default'"
+                ).fetchone()
+                assert row is not None
+                assert row["cash_balance"] == 10000.0
+
+    async def test_tickers_come_from_db_watchlist(self, db_path):
+        """source.start(tickers) is driven by the DB watchlist, not SEED_PRICES directly (D-05).
+
+        On a fresh DB the seed produces exactly set(SEED_PRICES.keys()), so the
+        ticker set must equal SEED_PRICES - this is a *derived* equivalence via
+        the DB, not a direct import from seed_prices.
+        """
+        app = _build_app()
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
+            async with LifespanManager(app):
+                tickers = set(app.state.market_source.get_tickers())
+                # Count-only sanity: 10 tickers seeded.
+                assert len(tickers) == 10
+                assert tickers == set(SEED_PRICES)
+
+    async def test_second_startup_is_no_op(self, db_path):
+        """Restarting the lifespan against the same DB_PATH adds no duplicate rows (DB-03)."""
+        app1 = _build_app()
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
+            async with LifespanManager(app1):
+                pass
+
+        app2 = _build_app()
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
+            async with LifespanManager(app2):
+                conn = app2.state.db
+                user_count = conn.execute(
+                    "SELECT COUNT(*) FROM users_profile"
+                ).fetchone()[0]
+                wl_count = conn.execute(
+                    "SELECT COUNT(*) FROM watchlist"
+                ).fetchone()[0]
+                assert user_count == 1
+                assert wl_count == 10
