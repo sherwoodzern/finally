@@ -13,7 +13,7 @@ FinAlly starts with a solid but isolated market-data subsystem (73 passing tests
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: App Shell & Config** - Mount FastAPI, wire the PriceCache singleton, expose browser-reachable SSE, load `.env` (completed 2026-04-20)
-- [ ] **Phase 2: Database Foundation** - SQLite schema, lazy init with default seed, Docker-volume persistence
+- [x] **Phase 2: Database Foundation** - SQLite schema, lazy init with default seed, Docker-volume persistence (completed 2026-04-20)
 - [ ] **Phase 3: Portfolio & Trading API** - `/api/portfolio`, `/api/portfolio/trade`, `/api/portfolio/history`, validation, snapshot recording
 - [ ] **Phase 4: Watchlist API** - `/api/watchlist` GET/POST/DELETE wired to the price cache's dynamic ticker lifecycle
 - [ ] **Phase 5: AI Chat Integration** - `/api/chat` with LiteLLM → OpenRouter (Cerebras), structured outputs, auto-exec of trades + watchlist changes, mock mode, full backend test suite
@@ -157,7 +157,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. App Shell & Config | 3/3 | Complete | 2026-04-20 |
-| 2. Database Foundation | 3/3 | Pending verification | - |
+| 2. Database Foundation | 3/3 | Complete | 2026-04-20 |
 | 3. Portfolio & Trading API | 0/TBD | Not started | - |
 | 4. Watchlist API | 0/TBD | Not started | - |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
