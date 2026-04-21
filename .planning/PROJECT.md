@@ -20,33 +20,27 @@ A user runs one Docker command, opens `http://localhost:8000`, and within second
 - ✓ **MARKET-04**: FastAPI `APIRouter` factory `create_stream_router(cache)` that exposes the SSE `/api/stream/prices` generator — `backend/app/market/stream.py` (existing, not yet mounted)
 - ✓ **MARKET-05**: Dynamic ticker lifecycle (`add_ticker` / `remove_ticker` idempotent) with seed-price onboarding for unknown symbols — `backend/app/market/simulator.py`, `massive_client.py` (existing)
 - ✓ **MARKET-06**: Market-data test suite (73 tests, `pytest-asyncio`) covering math, concurrency, interface conformance, and cache semantics — `backend/tests/market/` (existing)
+- ✓ **APP-01**: FastAPI application instance with `lifespan` startup that initializes `PriceCache`, selects and starts the market data source, initializes SQLite, and exposes `/api/health` — Phase 1
+- ✓ **APP-03**: Unified configuration loading from `.env` (`OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, `LLM_MOCK`) — Phase 1
+- ✓ **APP-04**: Browser-consumable SSE verified end-to-end — mounted `/api/stream/prices` delivers ticks to a real `EventSource` client — Phase 1
+- ✓ **DB-01**: SQLite schema for `users_profile`, `watchlist`, `positions`, `trades`, `portfolio_snapshots`, `chat_messages` with `user_id` columns defaulting to `"default"` — Phase 2
+- ✓ **DB-02**: Lazy initialization on startup — creates tables and seeds the default user and 10 default watchlist tickers if the DB is empty — Phase 2
+- ✓ **DB-03**: Volume-mounted SQLite file at `db/finally.db` persists across container restarts — Phase 2
+- ✓ **PORT-01**: `GET /api/portfolio` returns positions, cash, total value, and per-position unrealized P&L, reading live prices from the cache with graceful fallback — Phase 3
+- ✓ **PORT-02**: `POST /api/portfolio/trade` executes market orders (buy/sell, fractional), updates cash, positions, appends `trades` row — Phase 3
+- ✓ **PORT-03**: Trade validation — reject buys without sufficient cash, reject sells exceeding held quantity — Phase 3
+- ✓ **PORT-04**: `GET /api/portfolio/history` returns `portfolio_snapshots` time-series for the P&L chart — Phase 3
+- ✓ **PORT-05**: Snapshot recording on every trade, plus 60-second cadence piggybacked on the price-update loop — Phase 3
+- ✓ **WATCH-01**: `GET /api/watchlist` returns current watchlist with latest prices from the cache — Phase 4
+- ✓ **WATCH-02**: `POST /api/watchlist` adds a ticker; unknown symbols are onboarded into the market data source on the next tick — Phase 4
+- ✓ **WATCH-03**: `DELETE /api/watchlist/{ticker}` removes a ticker and stops tracking in the cache — Phase 4
 
 ### Active
 
 <!-- v1 scope. Hypotheses until shipped and validated. Organized by subsystem. -->
 
 **Integration & app shell**
-- [ ] **APP-01**: FastAPI application instance with `lifespan` startup that initializes `PriceCache`, selects and starts the market data source, initializes SQLite, and exposes `/api/health`
 - [ ] **APP-02**: Static frontend mounting — FastAPI serves the Next.js `output: 'export'` build from `/` on the same port as the API
-- [ ] **APP-03**: Unified configuration loading from `.env` (`OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, `LLM_MOCK`)
-- [ ] **APP-04**: Browser-consumable SSE verified end-to-end — mounted `/api/stream/prices` delivers ticks to a real `EventSource` client
-
-**Database & persistence**
-- [ ] **DB-01**: SQLite schema for `users_profile`, `watchlist`, `positions`, `trades`, `portfolio_snapshots`, `chat_messages` with `user_id` columns defaulting to `"default"`
-- [ ] **DB-02**: Lazy initialization on startup — creates tables and seeds the default user (`cash_balance=10000.0`) and the 10 default watchlist tickers if the DB is empty
-- [ ] **DB-03**: Volume-mounted SQLite file at `db/finally.db` persists across container restarts
-
-**Portfolio & trading**
-- [ ] **PORT-01**: `GET /api/portfolio` returns positions, cash, total value, and per-position unrealized P&L, reading live prices from the in-memory cache with graceful fallback when the cache has no tick yet
-- [ ] **PORT-02**: `POST /api/portfolio/trade` executes market orders (buy/sell, fractional quantities), updates cash, positions, and appends an immutable `trades` row — instant fill at the cached price, no fees, no confirmation
-- [ ] **PORT-03**: Trade validation — reject buys without sufficient cash, reject sells exceeding held quantity; surface structured errors
-- [ ] **PORT-04**: `GET /api/portfolio/history` returns `portfolio_snapshots` time-series for the P&L chart
-- [ ] **PORT-05**: Snapshot recording on every trade, plus a 60-second cadence piggybacked on the existing price-update loop (no separate background task)
-
-**Watchlist**
-- [ ] **WATCH-01**: `GET /api/watchlist` returns current watchlist with latest prices from the cache
-- [ ] **WATCH-02**: `POST /api/watchlist` adds a ticker; unknown symbols are onboarded into the market data source on the next tick
-- [ ] **WATCH-03**: `DELETE /api/watchlist/{ticker}` removes a ticker and stops tracking in the cache
 
 **AI chat**
 - [ ] **CHAT-01**: `POST /api/chat` — synchronous (non-streaming) request/response flow. Returns the complete LLM reply plus executed actions in one JSON payload
@@ -148,4 +142,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-19 after initialization*
+*Last updated: 2026-04-21 after Phase 4 (Watchlist API)*
