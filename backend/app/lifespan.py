@@ -11,6 +11,7 @@ from fastapi import FastAPI
 from .db import get_watchlist_tickers, init_database, open_database, seed_defaults
 from .market import PriceCache, create_market_data_source, create_stream_router
 from .portfolio import create_portfolio_router, make_snapshot_observer
+from .watchlist import create_watchlist_router
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +65,7 @@ async def lifespan(app: FastAPI):
     source.register_tick_observer(make_snapshot_observer(app.state))   # D-05
     app.include_router(create_stream_router(cache))
     app.include_router(create_portfolio_router(conn, cache))
+    app.include_router(create_watchlist_router(conn, cache, source))   # D-13
 
     logger.info(
         "App started: db=%s tickers=%d source=%s",

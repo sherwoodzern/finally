@@ -170,6 +170,15 @@ class TestLifespan:
                 assert "/api/portfolio/trade" in paths, paths
                 assert "/api/portfolio/history" in paths, paths
 
+    async def test_includes_watchlist_router_during_startup(self, db_path):
+        """app.include_router(create_watchlist_router(conn, cache, source)) runs in lifespan (D-13)."""
+        app = _build_app()
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
+            async with LifespanManager(app):
+                paths = {getattr(r, "path", None) for r in app.router.routes}
+                assert "/api/watchlist" in paths, paths
+                assert "/api/watchlist/{ticker}" in paths, paths
+
     async def test_registers_snapshot_observer_on_market_source(self, db_path):
         """Phase 3 D-05: source.register_tick_observer(make_snapshot_observer(app.state))
         runs in startup, and the boot-time first tick advances last_snapshot_at > 0.0."""
