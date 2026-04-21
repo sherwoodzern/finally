@@ -1,10 +1,11 @@
 """Watchlist subsystem for FinAlly.
 
-Public API (Plan 04-01 — HTTP router lands in Plan 04-02):
+Public API:
     Models: WatchlistAddRequest, WatchlistItem, WatchlistResponse,
             WatchlistMutationResponse, normalize_ticker
     Service: get_watchlist, add_ticker, remove_ticker, AddResult, RemoveResult,
              DEFAULT_USER_ID
+    Router: create_watchlist_router
 """
 
 from __future__ import annotations
@@ -16,6 +17,7 @@ from .models import (
     WatchlistResponse,
     normalize_ticker,
 )
+from .routes import create_watchlist_router
 from .service import (
     DEFAULT_USER_ID,
     AddResult,
@@ -34,6 +36,7 @@ __all__ = [
     "WatchlistMutationResponse",
     "WatchlistResponse",
     "add_ticker",
+    "create_watchlist_router",
     "get_watchlist",
     "normalize_ticker",
     "remove_ticker",
