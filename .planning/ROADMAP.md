@@ -64,7 +64,11 @@ Plans:
   2. `POST /api/portfolio/trade` executes a market order with fractional quantities at the cached price, debiting/crediting cash, updating the `positions` row, and appending to the `trades` log — with no fees and no confirmation step.
   3. Buys without sufficient cash and sells exceeding held quantity are rejected with a structured 400-level error and leave the DB state unchanged.
   4. `GET /api/portfolio/history` returns a time-ordered `portfolio_snapshots` series, with snapshots recorded immediately after each trade and every 60 seconds piggybacked on the existing price-update loop.
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — Extend MarketDataSource ABC + both concrete sources with register_tick_observer + unit tests
+- [ ] 03-02-PLAN.md — Portfolio sub-package: Pydantic v2 models, domain exceptions, execute_trade/get_portfolio/get_history/compute_total_value/make_snapshot_observer with service unit tests
+- [ ] 03-03-PLAN.md — Routes (GET /api/portfolio, POST /trade, GET /history) + lifespan wiring (observer + router + last_snapshot_at) + route/observer integration tests
 
 ### Phase 4: Watchlist API
 **Goal**: The user can add, remove, and list tickers, and the market data subsystem starts/stops tracking them immediately without restarts.
@@ -158,7 +162,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. App Shell & Config | 3/3 | Complete | 2026-04-20 |
 | 2. Database Foundation | 3/3 | Complete | 2026-04-20 |
-| 3. Portfolio & Trading API | 0/TBD | Not started | - |
+| 3. Portfolio & Trading API | 0/3 | Not started | - |
 | 4. Watchlist API | 0/TBD | Not started | - |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
 | 6. Frontend Scaffold & SSE | 0/TBD | Not started | - |
