@@ -67,7 +67,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 03-01-PLAN.md — Extend MarketDataSource ABC + both concrete sources with register_tick_observer + unit tests (completed 2026-04-21)
-- [ ] 03-02-PLAN.md — Portfolio sub-package: Pydantic v2 models, domain exceptions, execute_trade/get_portfolio/get_history/compute_total_value/make_snapshot_observer with service unit tests
+- [x] 03-02-PLAN.md — Portfolio sub-package: Pydantic v2 models, domain exceptions, execute_trade/get_portfolio/get_history/compute_total_value/make_snapshot_observer with service unit tests (completed 2026-04-21)
 - [ ] 03-03-PLAN.md — Routes (GET /api/portfolio, POST /trade, GET /history) + lifespan wiring (observer + router + last_snapshot_at) + route/observer integration tests
 
 ### Phase 4: Watchlist API
@@ -162,7 +162,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. App Shell & Config | 3/3 | Complete | 2026-04-20 |
 | 2. Database Foundation | 3/3 | Complete | 2026-04-20 |
-| 3. Portfolio & Trading API | 1/3 | In progress | - |
+| 3. Portfolio & Trading API | 2/3 | In progress | - |
 | 4. Watchlist API | 0/TBD | Not started | - |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
 | 6. Frontend Scaffold & SSE | 0/TBD | Not started | - |

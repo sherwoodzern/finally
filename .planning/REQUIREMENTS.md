@@ -35,10 +35,10 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### Portfolio & Trading
 
-- [ ] **PORT-01**: `GET /api/portfolio` returns positions, cash, total value, and per-position unrealized P&L, reading live prices from the in-memory cache with graceful fallback to `avg_cost` when a ticker has no cached tick yet
-- [ ] **PORT-02**: `POST /api/portfolio/trade` executes market orders (buy/sell, fractional quantities), updates cash and `positions`, and appends an immutable `trades` row — instant fill at the cached price, no fees, no confirmation dialog
-- [ ] **PORT-03**: Trade validation — reject buys without sufficient cash and sells exceeding held quantity; return structured errors
-- [ ] **PORT-04**: `GET /api/portfolio/history` returns the `portfolio_snapshots` time-series used by the P&L chart
+- [x] **PORT-01**: `GET /api/portfolio` returns positions, cash, total value, and per-position unrealized P&L, reading live prices from the in-memory cache with graceful fallback to `avg_cost` when a ticker has no cached tick yet _(service layer landed in Plan 03-02 — get_portfolio + compute_total_value with avg_cost fallback; HTTP endpoint wiring comes in Plan 03-03)_
+- [x] **PORT-02**: `POST /api/portfolio/trade` executes market orders (buy/sell, fractional quantities), updates cash and `positions`, and appends an immutable `trades` row — instant fill at the cached price, no fees, no confirmation dialog _(service layer landed in Plan 03-02 — execute_trade with weighted-average avg_cost on buy, epsilon-delete on zero-qty; HTTP endpoint wiring comes in Plan 03-03)_
+- [x] **PORT-03**: Trade validation — reject buys without sufficient cash and sells exceeding held quantity; return structured errors _(domain exceptions UnknownTicker/PriceUnavailable/InsufficientCash/InsufficientShares with `code` class attributes landed in Plan 03-02; 6-test validation suite asserts zero DB writes on any raise; HTTP mapping comes in Plan 03-03)_
+- [x] **PORT-04**: `GET /api/portfolio/history` returns the `portfolio_snapshots` time-series used by the P&L chart _(service layer landed in Plan 03-02 — get_history with ORDER BY recorded_at ASC + optional LIMIT; HTTP endpoint wiring comes in Plan 03-03)_
 - [ ] **PORT-05**: Snapshot recording on every executed trade, plus a 60-second cadence snapshot piggybacked on the existing price-update loop — no separate background task
 
 ### Watchlist
@@ -134,11 +134,11 @@ Which phases cover which requirements. Populated during roadmap creation.
 | DB-01 | Phase 2 | Pending |
 | DB-02 | Phase 2 | Pending |
 | DB-03 | Phase 2 | Pending |
-| PORT-01 | Phase 3 | Pending |
-| PORT-02 | Phase 3 | Pending |
-| PORT-03 | Phase 3 | Pending |
-| PORT-04 | Phase 3 | Pending |
-| PORT-05 | Phase 3 | Pending |
+| PORT-01 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP route) |
+| PORT-02 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP route) |
+| PORT-03 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP mapping) |
+| PORT-04 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP route) |
+| PORT-05 | Phase 3 | Pending (03-03 — observer wiring) |
 | WATCH-01 | Phase 4 | Pending |
 | WATCH-02 | Phase 4 | Pending |
 | WATCH-03 | Phase 4 | Pending |
@@ -175,4 +175,4 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-20 after Plan 01-03 completion (APP-01, APP-03, APP-04 verified — Phase 1 complete)*
+*Last updated: 2026-04-21 after Plan 03-02 completion (PORT-01, PORT-02, PORT-03, PORT-04 service layer complete — HTTP wiring in Plan 03-03)*

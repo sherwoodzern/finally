@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-04-21T13:05:15.688Z"
+stopped_at: Completed 03-02-PLAN.md
+last_updated: "2026-04-21T13:15:18.000Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 10
   completed_phases: 2
   total_plans: 9
-  completed_plans: 7
-  percent: 78
+  completed_plans: 8
+  percent: 26
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 3 of 10 (Portfolio & Trading API) — IN PROGRESS
-Plan: 1 of 3 complete (03-01 — MarketDataSource tick-observer extension)
-Status: Plan 03-01 complete; next plan 03-02 (portfolio sub-package: models, service, exceptions)
-Last activity: 2026-04-21 -- Completed 03-01 (register_tick_observer + both implementations + 6 tests)
+Plan: 2 of 3 complete (03-02 — Portfolio sub-package: models, service, exceptions)
+Status: Plan 03-02 complete; next plan 03-03 (FastAPI routes + lifespan wiring)
+Last activity: 2026-04-21 -- Completed 03-02 (portfolio sub-package with 27 service tests; 134 total pass)
 
-Progress: [##░░░░░░░░] 23%
+Progress: [###░░░░░░░] 26%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [##░░░░░░░░] 23%
 *Updated after each plan completion*
 | Phase 01 P03 | 60min | 3 tasks | 6 files |
 | Phase 03 P01 | 4m 9s | 4 tasks | 4 files |
+| Phase 03 P02 | 7m 6s | 4 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,12 @@ Recent decisions affecting current work:
 - [Phase ?]: 01-03: httpx and asgi-lifespan declared in [project.optional-dependencies].dev (not PEP 735 [dependency-groups]) to match uv sync --extra dev.
 - [Phase ?]: 01-03: Fresh FastAPI(lifespan=lifespan) per test (via _build_app helper) — avoids shared state on module-level app.main.app across tests.
 - [Phase 03]: 03-01: register_tick_observer declared as zero-arg Callable on MarketDataSource ABC; per-callback nested try/except + logger.exception in Simulator._run_loop and Massive._poll_once isolates broken observers from the tick/poll loop (D-04, D-08)
+- [Phase 03]: 03-02: Portfolio service is pure functions (conn + cache + business args) with zero FastAPI imports — keeps service.py easy to unit-test and lets routes in 03-03 thin-wrap it (D-02)
+- [Phase 03]: 03-02: Domain exception hierarchy rooted at TradeValidationError with `code: str` class attributes (`insufficient_cash`, `insufficient_shares`, `unknown_ticker`, `price_unavailable`) — routes in 03-03 map these 1:1 to 400-level responses (D-09)
+- [Phase 03]: 03-02: execute_trade uses validate-then-write with a single conn.commit() at the end — any raise leaves zero DB writes, enforced by the 6-test validation suite asserting row-count invariants (D-12)
+- [Phase 03]: 03-02: Positions with `abs(new_qty) < 1e-9` are DELETEd rather than stored as zero-quantity rows, preserving the "no position" invariant for both get_portfolio and future trade math (D-15)
+- [Phase 03]: 03-02: Buy updates avg_cost as weighted-average `(old_qty*old_avg + new_qty*price)/(old_qty+new_qty)`; sell leaves avg_cost unchanged — realized P&L is a reporting concern, not a position-row concern (D-16)
+- [Phase 03]: 03-02: make_snapshot_observer(state) returns a zero-arg closure checking `time.monotonic() - state.last_snapshot_at >= 60.0`; observer is registered in 03-03's lifespan, keeping the observer pattern decoupled from FastAPI itself (D-05, D-06, D-07)
 
 ### Pending Todos
 
@@ -104,7 +111,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-21T13:05:15.682Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-04-21T13:15:18.000Z
+Stopped at: Completed 03-02-PLAN.md
 Resume file: None
-Resumed: 2026-04-20 — proceeding to plan-checker for Phase 3
+Resumed: 2026-04-21 — proceeding to plan 03-03 (FastAPI routes + lifespan wiring)
