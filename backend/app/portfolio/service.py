@@ -4,13 +4,21 @@ from __future__ import annotations
 
 import logging
 import sqlite3
+import time
 import uuid
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Literal
 
 from app.market import PriceCache
 
-from .models import TradeResponse
+from .models import (
+    HistoryResponse,
+    PortfolioResponse,
+    PositionOut,
+    SnapshotOut,
+    TradeResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -201,3 +209,122 @@ def execute_trade(
         position_avg_cost=pos_avg_out,
         executed_at=now,
     )
+
+
+def compute_total_value(
+    conn: sqlite3.Connection,
+    cache: PriceCache,
+    user_id: str = DEFAULT_USER_ID,
+) -> float:
+    """Return cash + sum(qty * current_or_avg). Shared by get_portfolio + snapshot observer."""
+    cash_row = conn.execute(
+        "SELECT cash_balance FROM users_profile WHERE id = ?",
+        (user_id,),
+    ).fetchone()
+    cash = float(cash_row["cash_balance"]) if cash_row else 0.0
+    return _compute_total_value_with(conn, cache, cash, user_id)
+
+
+def get_portfolio(
+    conn: sqlite3.Connection,
+    cache: PriceCache,
+    user_id: str = DEFAULT_USER_ID,
+) -> PortfolioResponse:
+    """Return cash, total_value, and positions with live prices falling back to avg_cost."""
+    cash_row = conn.execute(
+        "SELECT cash_balance FROM users_profile WHERE id = ?",
+        (user_id,),
+    ).fetchone()
+    cash = float(cash_row["cash_balance"]) if cash_row else 0.0
+
+    rows = conn.execute(
+        "SELECT ticker, quantity, avg_cost FROM positions WHERE user_id = ? "
+        "ORDER BY ticker ASC",
+        (user_id,),
+    ).fetchall()
+
+    positions: list[PositionOut] = []
+    total = cash
+    for row in rows:
+        ticker = row["ticker"]
+        qty = float(row["quantity"])
+        avg = float(row["avg_cost"])
+        cached = cache.get_price(ticker)
+        current = cached if cached is not None else avg
+        pnl = (current - avg) * qty
+        pct = ((current - avg) / avg * 100.0) if avg != 0.0 else 0.0
+        total += qty * current
+        positions.append(
+            PositionOut(
+                ticker=ticker,
+                quantity=qty,
+                avg_cost=avg,
+                current_price=current,
+                unrealized_pnl=round(pnl, 2),
+                change_percent=round(pct, 2),
+            )
+        )
+
+    return PortfolioResponse(
+        cash_balance=cash,
+        total_value=round(total, 2),
+        positions=positions,
+    )
+
+
+def get_history(
+    conn: sqlite3.Connection,
+    limit: int | None = None,
+    user_id: str = DEFAULT_USER_ID,
+) -> HistoryResponse:
+    """Return portfolio_snapshots for user_id, ORDER BY recorded_at ASC."""
+    if limit is None:
+        rows = conn.execute(
+            "SELECT total_value, recorded_at FROM portfolio_snapshots "
+            "WHERE user_id = ? ORDER BY recorded_at ASC",
+            (user_id,),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT total_value, recorded_at FROM portfolio_snapshots "
+            "WHERE user_id = ? ORDER BY recorded_at ASC LIMIT ?",
+            (user_id, limit),
+        ).fetchall()
+    snaps = [
+        SnapshotOut(total_value=float(r["total_value"]), recorded_at=r["recorded_at"])
+        for r in rows
+    ]
+    return HistoryResponse(snapshots=snaps)
+
+
+def make_snapshot_observer(state) -> Callable[[], None]:
+    """Return a zero-arg tick observer that writes a snapshot every 60s (D-05, D-06, D-07).
+
+    Closes over `state` (FastAPI app.state) with:
+        - state.db:                sqlite3.Connection
+        - state.price_cache:       PriceCache
+        - state.last_snapshot_at:  float (monotonic clock)
+
+    Uses time.monotonic() for the 60s threshold; datetime.now(UTC).isoformat() for
+    the recorded_at column (Pitfall 6).
+    """
+
+    def observer() -> None:
+        now = time.monotonic()
+        if now - state.last_snapshot_at < 60.0:
+            return
+        total_value = compute_total_value(state.db, state.price_cache)
+        state.db.execute(
+            "INSERT INTO portfolio_snapshots (id, user_id, total_value, recorded_at) "
+            "VALUES (?, ?, ?, ?)",
+            (
+                str(uuid.uuid4()),
+                DEFAULT_USER_ID,
+                total_value,
+                datetime.now(UTC).isoformat(),
+            ),
+        )
+        state.db.commit()
+        state.last_snapshot_at = now
+
+    return observer

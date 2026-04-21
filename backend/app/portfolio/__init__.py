@@ -27,7 +27,11 @@ from .service import (
     PriceUnavailable,
     TradeValidationError,
     UnknownTicker,
+    compute_total_value,
     execute_trade,
+    get_history,
+    get_portfolio,
+    make_snapshot_observer,
 )
 
 __all__ = [
@@ -43,5 +47,9 @@ __all__ = [
     "TradeResponse",
     "TradeValidationError",
     "UnknownTicker",
+    "compute_total_value",
     "execute_trade",
+    "get_history",
+    "get_portfolio",
+    "make_snapshot_observer",
 ]
