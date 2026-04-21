@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: App Shell & Config** - Mount FastAPI, wire the PriceCache singleton, expose browser-reachable SSE, load `.env` (completed 2026-04-20)
 - [x] **Phase 2: Database Foundation** - SQLite schema, lazy init with default seed, Docker-volume persistence (completed 2026-04-20)
-- [ ] **Phase 3: Portfolio & Trading API** - `/api/portfolio`, `/api/portfolio/trade`, `/api/portfolio/history`, validation, snapshot recording
+- [x] **Phase 3: Portfolio & Trading API** - `/api/portfolio`, `/api/portfolio/trade`, `/api/portfolio/history`, validation, snapshot recording (completed 2026-04-21)
 - [ ] **Phase 4: Watchlist API** - `/api/watchlist` GET/POST/DELETE wired to the price cache's dynamic ticker lifecycle
 - [ ] **Phase 5: AI Chat Integration** - `/api/chat` with LiteLLM → OpenRouter (Cerebras), structured outputs, auto-exec of trades + watchlist changes, mock mode, full backend test suite
 - [ ] **Phase 6: Frontend Scaffold & SSE** - Next.js TypeScript static-export project with Tailwind theme and the live-price SSE client
@@ -68,7 +68,7 @@ Plans:
 Plans:
 - [x] 03-01-PLAN.md — Extend MarketDataSource ABC + both concrete sources with register_tick_observer + unit tests (completed 2026-04-21)
 - [x] 03-02-PLAN.md — Portfolio sub-package: Pydantic v2 models, domain exceptions, execute_trade/get_portfolio/get_history/compute_total_value/make_snapshot_observer with service unit tests (completed 2026-04-21)
-- [ ] 03-03-PLAN.md — Routes (GET /api/portfolio, POST /trade, GET /history) + lifespan wiring (observer + router + last_snapshot_at) + route/observer integration tests
+- [x] 03-03-PLAN.md — Routes (GET /api/portfolio, POST /trade, GET /history) + lifespan wiring (observer + router + last_snapshot_at) + route/observer integration tests (completed 2026-04-21)
 
 ### Phase 4: Watchlist API
 **Goal**: The user can add, remove, and list tickers, and the market data subsystem starts/stops tracking them immediately without restarts.
@@ -162,7 +162,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 |-------|----------------|--------|-----------|
 | 1. App Shell & Config | 3/3 | Complete | 2026-04-20 |
 | 2. Database Foundation | 3/3 | Complete | 2026-04-20 |
-| 3. Portfolio & Trading API | 2/3 | In progress | - |
+| 3. Portfolio & Trading API | 3/3 | Complete | 2026-04-21 |
 | 4. Watchlist API | 0/TBD | Not started | - |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
 | 6. Frontend Scaffold & SSE | 0/TBD | Not started | - |

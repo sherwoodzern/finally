@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 03-02-PLAN.md
-last_updated: "2026-04-21T13:15:18.000Z"
+stopped_at: Completed 03-03-PLAN.md
+last_updated: "2026-04-21T13:30:13.000Z"
 last_activity: 2026-04-21
 progress:
   total_phases: 10
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 8
-  percent: 26
+  completed_plans: 9
+  percent: 33
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-19)
 
 **Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf.
-**Current focus:** Phase 3 — Portfolio & Trading API (next)
+**Current focus:** Phase 4 — Watchlist API (next)
 
 ## Current Position
 
-Phase: 3 of 10 (Portfolio & Trading API) — IN PROGRESS
-Plan: 2 of 3 complete (03-02 — Portfolio sub-package: models, service, exceptions)
-Status: Plan 03-02 complete; next plan 03-03 (FastAPI routes + lifespan wiring)
-Last activity: 2026-04-21 -- Completed 03-02 (portfolio sub-package with 27 service tests; 134 total pass)
+Phase: 3 of 10 (Portfolio & Trading API) — COMPLETE
+Plan: 3 of 3 complete (03-03 — FastAPI routes + lifespan wiring + integration tests)
+Status: Phase 3 complete; next phase 04 (Watchlist API)
+Last activity: 2026-04-21 -- Completed 03-03 (portfolio routes + lifespan observer wiring; 158 total pass, +24 tests)
 
-Progress: [###░░░░░░░] 26%
+Progress: [###░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -55,6 +55,7 @@ Progress: [###░░░░░░░] 26%
 | Phase 01 P03 | 60min | 3 tasks | 6 files |
 | Phase 03 P01 | 4m 9s | 4 tasks | 4 files |
 | Phase 03 P02 | 7m 6s | 4 tasks | 8 files |
+| Phase 03 P03 | 7m 9s | 4 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,10 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-02: Positions with `abs(new_qty) < 1e-9` are DELETEd rather than stored as zero-quantity rows, preserving the "no position" invariant for both get_portfolio and future trade math (D-15)
 - [Phase 03]: 03-02: Buy updates avg_cost as weighted-average `(old_qty*old_avg + new_qty*price)/(old_qty+new_qty)`; sell leaves avg_cost unchanged — realized P&L is a reporting concern, not a position-row concern (D-16)
 - [Phase 03]: 03-02: make_snapshot_observer(state) returns a zero-arg closure checking `time.monotonic() - state.last_snapshot_at >= 60.0`; observer is registered in 03-03's lifespan, keeping the observer pattern decoupled from FastAPI itself (D-05, D-06, D-07)
+- [Phase 03]: 03-03: create_portfolio_router(db, cache) is a factory-closure APIRouter mirroring create_stream_router — fresh router per call, no module-level state, prefix="/api/portfolio"; TradeValidationError subclasses translate 1:1 to HTTPException(400, detail={error: code, message: str(exc)}) at a single catch site (D-03, D-09, D-10)
+- [Phase 03]: 03-03: Route-level post-trade clock reset (`request.app.state.last_snapshot_at = time.monotonic()`) keeps service.execute_trade FastAPI-agnostic; the observer only double-fires if a trade and a 60s-natural-tick collide within the same moment, which is now impossible (D-07)
+- [Phase 03]: 03-03: Boot-time initial snapshot — make_snapshot_observer special-cases `last_snapshot_at == 0.0` so the first observer tick writes a snapshot unconditionally; Plan 02's pure 60s gate was tightened to `!= 0.0 and delta < 60` (Rule 2 fix, assumption A2 in 03-RESEARCH.md)
+- [Phase 03]: 03-03: Integration test harness = `asgi_lifespan.LifespanManager` + `httpx.ASGITransport(app=app)` + `async with httpx.AsyncClient(...)` with a fresh `FastAPI(lifespan=lifespan)` per test and `patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True)` — established as the canonical pattern for all remaining API phases
 
 ### Pending Todos
 
@@ -111,7 +116,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-21T13:15:18.000Z
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-04-21T13:30:13.000Z
+Stopped at: Completed 03-03-PLAN.md
 Resume file: None
-Resumed: 2026-04-21 — proceeding to plan 03-03 (FastAPI routes + lifespan wiring)
+Resumed: 2026-04-21 — Phase 3 complete; next phase 04 (Watchlist API)
