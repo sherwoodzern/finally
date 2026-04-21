@@ -45,10 +45,10 @@ created: 2026-04-20
 | 03-02-01 | 02 | 2 | PORT-02 | — | Weighted avg_cost on BUY | unit | `cd backend && uv run --extra dev pytest tests/portfolio/test_service_buy.py -q` | ❌ W0 | ⬜ pending |
 | 03-02-02 | 02 | 2 | PORT-02 | — | Partial/full sell + zero-row delete | unit | `cd backend && uv run --extra dev pytest tests/portfolio/test_service_sell.py -q` | ❌ W0 | ⬜ pending |
 | 03-02-03 | 02 | 2 | PORT-03 | — | Domain exceptions raised | unit | `cd backend && uv run --extra dev pytest tests/portfolio/test_service_validation.py -q` | ❌ W0 | ⬜ pending |
-| 03-03-01 | 03 | 3 | PORT-01 | — | GET /api/portfolio shape + fallback | integration | `cd backend && uv run --extra dev pytest tests/portfolio/test_routes_portfolio.py -q` | ❌ W0 | ⬜ pending |
-| 03-03-02 | 03 | 3 | PORT-02, PORT-03 | — | POST /trade 200/400 contract | integration | `cd backend && uv run --extra dev pytest tests/portfolio/test_routes_trade.py -q` | ❌ W0 | ⬜ pending |
-| 03-03-03 | 03 | 3 | PORT-04 | — | GET /history ordering + limit | integration | `cd backend && uv run --extra dev pytest tests/portfolio/test_routes_history.py -q` | ❌ W0 | ⬜ pending |
-| 03-03-04 | 03 | 3 | PORT-05 | — | 60s cadence + trade-reset clock | integration | `cd backend && uv run --extra dev pytest tests/portfolio/test_snapshot_observer.py -q` | ❌ W0 | ⬜ pending |
+| 03-03-01 | 03 | 3 | PORT-01 | — | GET /api/portfolio shape + fallback | integration | `cd backend && uv run --extra dev pytest tests/portfolio/test_routes_portfolio.py -q` | ✅ | ⬜ pending |
+| 03-03-02 | 03 | 3 | PORT-02, PORT-03 | — | POST /trade 200/400 contract | integration | `cd backend && uv run --extra dev pytest tests/portfolio/test_routes_trade.py -q` | ✅ | ⬜ pending |
+| 03-03-03 | 03 | 3 | PORT-04 | — | GET /history ordering + limit | integration | `cd backend && uv run --extra dev pytest tests/portfolio/test_routes_history.py -q` | ✅ | ⬜ pending |
+| 03-03-04 | 03 | 3 | PORT-05 | — | 60s cadence + trade-reset clock | integration | `cd backend && uv run --extra dev pytest tests/portfolio/test_snapshot_observer.py -q` | ✅ | ⬜ pending |
 
 *Status: pending · green · red · flaky*
 
