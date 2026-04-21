@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: App Shell & Config** - Mount FastAPI, wire the PriceCache singleton, expose browser-reachable SSE, load `.env` (completed 2026-04-20)
 - [x] **Phase 2: Database Foundation** - SQLite schema, lazy init with default seed, Docker-volume persistence (completed 2026-04-20)
 - [x] **Phase 3: Portfolio & Trading API** - `/api/portfolio`, `/api/portfolio/trade`, `/api/portfolio/history`, validation, snapshot recording (completed 2026-04-21)
-- [ ] **Phase 4: Watchlist API** - `/api/watchlist` GET/POST/DELETE wired to the price cache's dynamic ticker lifecycle
+- [x] **Phase 4: Watchlist API** - `/api/watchlist` GET/POST/DELETE wired to the price cache's dynamic ticker lifecycle (completed 2026-04-21)
 - [ ] **Phase 5: AI Chat Integration** - `/api/chat` with LiteLLM → OpenRouter (Cerebras), structured outputs, auto-exec of trades + watchlist changes, mock mode, full backend test suite
 - [ ] **Phase 6: Frontend Scaffold & SSE** - Next.js TypeScript static-export project with Tailwind theme and the live-price SSE client
 - [ ] **Phase 7: Market Data & Trading UI** - Watchlist panel with sparklines, main chart, positions table, trade bar, header with live totals and connection dot
