@@ -1,48 +1,37 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-20T21:29:23.368Z",
+  "timestamp": "2026-04-20T21:40:00.000Z",
   "phase": "03",
   "phase_name": "portfolio-trading-api",
   "phase_dir": ".planning/phases/03-portfolio-trading-api",
-  "workflow": "discuss-phase",
+  "workflow": "plan-phase",
   "plan": null,
   "task": null,
   "total_tasks": 0,
-  "status": "paused",
+  "status": "paused_mid_plan_phase",
   "completed_tasks": [
-    {"id": "03-discuss-01", "name": "Load prior context (ROADMAP, REQUIREMENTS, STATE, Phase 1/2 CONTEXT)", "status": "done"},
-    {"id": "03-discuss-02", "name": "Scout codebase (lifespan, db package, market package, tests)", "status": "done"},
-    {"id": "03-discuss-03", "name": "Identify and present 4 gray areas to user", "status": "done"},
-    {"id": "03-discuss-04", "name": "Deep-dive all 4 gray areas (14 sub-questions, all Recommended selected)", "status": "done"},
-    {"id": "03-discuss-05", "name": "Write 03-CONTEXT.md with 16 decisions (D-01..D-16)", "status": "done", "commit": "0feee40"},
-    {"id": "03-discuss-06", "name": "Write 03-DISCUSSION-LOG.md audit trail", "status": "done", "commit": "0feee40"}
+    {"id": "03-plan-01", "name": "Research Phase 3 (gsd-phase-researcher)", "status": "done", "commit": "8e75530", "artifact": "03-RESEARCH.md"},
+    {"id": "03-plan-02", "name": "Nyquist validation strategy from template", "status": "done", "commit": "8e75530", "artifact": "03-VALIDATION.md"},
+    {"id": "03-plan-03", "name": "Pattern map (gsd-pattern-mapper)", "status": "done", "commit": "43ad910", "artifact": "03-PATTERNS.md"},
+    {"id": "03-plan-04", "name": "Create 3 plans (gsd-planner) — 03-01 observer ext, 03-02 service+models, 03-03 routes+lifespan+integration", "status": "done", "commit": "f78de4c", "artifact": "03-0{1,2,3}-PLAN.md + ROADMAP.md"}
   ],
   "remaining_tasks": [
-    {"id": "03-state-sync", "name": "Update .planning/STATE.md to reflect Phase 3 context gathered", "status": "not_started"},
-    {"id": "03-plan", "name": "Run /gsd-plan-phase 3 to produce RESEARCH.md + PLAN.md", "status": "not_started"}
+    {"id": "03-plan-05", "name": "Run gsd-plan-checker to verify the 3 plans", "status": "not_started"},
+    {"id": "03-plan-06", "name": "Revision loop if checker finds issues (max 3 iterations)", "status": "not_started"},
+    {"id": "03-plan-07", "name": "Requirements coverage gate (PORT-01..05 all mapped)", "status": "not_started"},
+    {"id": "03-plan-08", "name": "Auto-advance to /gsd-execute-phase 3 (--auto flag was set)", "status": "not_started"}
   ],
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "D-01: app/portfolio/ sub-package (routes.py + service.py + models.py)", "rationale": "Mirrors Phase 1/2 pattern; public surface via __init__.py", "phase": "03"},
-    {"decision": "D-02: Pure functions taking (conn, cache, ...) for the trade service", "rationale": "Framework-agnostic so Phase 5 chat auto-exec can import and call directly", "phase": "03"},
-    {"decision": "D-03: Pydantic v2 BaseModel for request and response models", "rationale": "Auto-OpenAPI, auto-validation at the edge", "phase": "03"},
-    {"decision": "D-04: Tick-observer callback (register_tick_observer) added to MarketDataSource ABC + both impls", "rationale": "PLAN.md forbids a separate background task; observer piggybacks on existing tick loop without breaking module boundary", "phase": "03"},
-    {"decision": "D-05: Observer registered in lifespan after source.start(tickers)", "rationale": "Keeps module boundary — portfolio code owns the snapshot, market code owns the tick", "phase": "03"},
-    {"decision": "D-06: app.state.last_snapshot_at float tracks 60s snapshot clock", "rationale": "Consistent with Phase 1 D-02 (no module-level singletons)", "phase": "03"},
-    {"decision": "D-07: Trade snapshot resets the 60s clock", "rationale": "Avoids back-to-back near-duplicate snapshots around trade times", "phase": "03"},
-    {"decision": "D-09: Domain exceptions (InsufficientCash / InsufficientShares / UnknownTicker / PriceUnavailable) subclass TradeValidationError", "rationale": "Service stays FastAPI-agnostic; Phase 5 chat catches and formats into chat reply", "phase": "03"},
-    {"decision": "D-10/D-11: 400 Bad Request with {detail: {error: <code>, message: <human>}}; 422 reserved for pydantic", "rationale": "Machine-readable code + human message; clean separation of business-rule vs schema failure", "phase": "03"},
-    {"decision": "D-13: Reject trade with 400 price_unavailable when cache.get_price returns None", "rationale": "No silent fallback to seed prices; client retries if race window hits", "phase": "03"},
-    {"decision": "D-14: Reject trade with 400 unknown_ticker when ticker not in watchlist table", "rationale": "Watchlist set = cache set (PLAN.md §6); clean Phase 3 / Phase 4 boundary", "phase": "03"},
-    {"decision": "D-15: DELETE positions row when sell zeros out quantity (epsilon abs(new_qty) < 1e-9)", "rationale": "Idiomatic 'current holdings'; re-buy gets fresh avg_cost; epsilon handles float residuals", "phase": "03"},
-    {"decision": "D-16: Weighted avg_cost on BUY adding to existing position", "rationale": "(old_qty*old_avg + buy_qty*buy_price) / (old_qty + buy_qty) — standard brokerage math", "phase": "03"}
+    {"decision": "Paused at 83% context before spawning plan-checker to preserve budget for the revision loop", "rationale": "Plan-checker + up to 3 revision iterations could exhaust remaining context; checker is the highest-value gate before execution and deserves a fresh window", "phase": "03"},
+    {"decision": "Plan slice: 3 plans in 3 sequential waves", "rationale": "Planner's recommended slice from 03-RESEARCH.md — observer ABC extension must ship before portfolio package can wire into lifespan", "phase": "03"}
   ],
   "uncommitted_files": [
-    {"path": ".planning/STATE.md", "status": "modified", "notes": "Partial edits present — status flipped to 'planning', percent changed from 20 to 100. Needs review; pause-work does not own STATE.md updates."},
-    {"path": "CLAUDE.md", "status": "modified", "notes": "Appended GSD stack/convention blocks; unrelated to phase-3 discuss-phase work."},
-    {"path": ".claude/scheduled_tasks.lock", "status": "untracked", "notes": "Runtime lock file; gitignore candidate."}
+    {"path": ".planning/STATE.md", "status": "modified", "notes": "Partial edits present from prior session — status 'planning', percent 100. Percent is wrong (2 of 10 phases = 20%). Still deferred from previous handoff."},
+    {"path": "CLAUDE.md", "status": "modified", "notes": "Appended GSD stack blocks from an earlier session. Unrelated to Phase 3 work."},
+    {"path": ".claude/scheduled_tasks.lock", "status": "untracked", "notes": "Runtime lock — gitignore candidate."}
   ],
-  "next_action": "Run /gsd-plan-phase 3 — 03-CONTEXT.md is ready for the planner to consume.",
-  "context_notes": "Phase 3 (Portfolio & Trading API) discuss-phase completed cleanly. 14 gray-area questions answered, all Recommended options selected. Key architectural note: introduces tick-observer callback (register_tick_observer) onto the already-Validated MarketDataSource ABC — the planner and executor must extend the ABC and both implementations (SimulatorDataSource, MassiveDataSource) as a scoped change, with observer failures isolated via try/except + logger.exception so a bad callback can't kill the tick loop. Phase 5 (chat) will reuse the pure-function trade service directly by catching domain exceptions (InsufficientCash, InsufficientShares, UnknownTicker, PriceUnavailable) — that is why the service must not raise HTTPException."
+  "next_action": "Run /gsd-plan-phase 3 --auto in a fresh session. Since 03-RESEARCH.md already exists, has_research will be true and the workflow will skip research and go straight to the plan-checker. Alternatively, run /gsd-verify-plans 3 or manually spawn gsd-plan-checker.",
+  "context_notes": "Phase 3 plan-phase workflow paused mid-run at 83% context. All upstream artifacts (RESEARCH.md, VALIDATION.md, PATTERNS.md, PLAN.md x3) are written and committed. The remaining steps are: (1) plan-checker verification, (2) any revision iterations, (3) requirements-coverage gate, (4) auto-advance to execute-phase (the --auto flag triggered the chain). On resume, --auto should continue the chain. Key architectural invariants to preserve: D-04 observer pattern extends the already-Validated MarketDataSource ABC, D-02 service stays FastAPI-agnostic so Phase 5 chat can reuse, D-12 validate-then-write with single commit per trade. Planner's self-reported Source Audit passed (all 5 PORT IDs covered, all 16 CONTEXT decisions mapped to tasks, all 10 RESEARCH pitfalls referenced)."
 }
