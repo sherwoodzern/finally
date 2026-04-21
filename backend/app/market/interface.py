@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Callable
 
 
 class MarketDataSource(ABC):
@@ -55,3 +56,14 @@ class MarketDataSource(ABC):
     @abstractmethod
     def get_tickers(self) -> list[str]:
         """Return the current list of actively tracked tickers."""
+
+    @abstractmethod
+    def register_tick_observer(self, callback: Callable[[], None]) -> None:
+        """Register a zero-arg callable invoked after each tick/poll.
+
+        Callbacks must be fast and non-raising. The source wraps each
+        invocation in try/except + logger.exception so a broken observer
+        does not kill the tick loop. Callbacks always fire on the asyncio
+        event loop thread (NOT the Massive worker thread) - see D-04, D-08
+        and 03-RESEARCH.md Pitfall 2.
+        """

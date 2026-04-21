@@ -16,7 +16,24 @@ class TestABC:
     """ABC-level contract: register_tick_observer is abstract."""
 
     def test_register_tick_observer_is_abstract(self):
-        pytest.skip("Wave 0 stub - implemented in Task 2")
+        class Incomplete(MarketDataSource):
+            async def start(self, tickers):
+                pass
+
+            async def stop(self):
+                pass
+
+            async def add_ticker(self, ticker):
+                pass
+
+            async def remove_ticker(self, ticker):
+                pass
+
+            def get_tickers(self):
+                return []
+
+        with pytest.raises(TypeError):
+            Incomplete()
 
 
 @pytest.mark.asyncio
