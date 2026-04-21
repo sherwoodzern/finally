@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-stopped_at: Phase 4 context gathered
-last_updated: "2026-04-21T14:01:25.615Z"
-last_activity: 2026-04-21 -- Completed 03-03 (portfolio routes + lifespan observer wiring; 158 total pass, +24 tests)
+status: executing
+stopped_at: Plan 04-01 complete (models + service); next up 04-02 (routes + lifespan)
+last_updated: "2026-04-21T19:56:29Z"
+last_activity: 2026-04-21 -- Plan 04-01 executed (models + pure-function service)
 progress:
   total_phases: 10
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
-  percent: 100
+  total_plans: 12
+  completed_plans: 10
+  percent: 83
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-19)
 
 **Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf.
-**Current focus:** Phase 4 — Watchlist API (next)
+**Current focus:** Phase 04 — watchlist-api
 
 ## Current Position
 
-Phase: 3 of 10 (Portfolio & Trading API) — COMPLETE
-Plan: 3 of 3 complete (03-03 — FastAPI routes + lifespan wiring + integration tests)
-Status: Phase 3 complete; next phase 04 (Watchlist API)
-Last activity: 2026-04-21 -- Completed 03-03 (portfolio routes + lifespan observer wiring; 158 total pass, +24 tests)
+Phase: 04 (watchlist-api) — EXECUTING
+Plan: 2 of 2
+Status: Executing Phase 04
+Last activity: 2026-04-21 -- Plan 04-01 completed (models + pure-function service)
 
-Progress: [###░░░░░░░] 33%
+Progress: [########░░] 83%
 
 ## Performance Metrics
 
@@ -56,6 +56,7 @@ Progress: [###░░░░░░░] 33%
 | Phase 03 P01 | 4m 9s | 4 tasks | 4 files |
 | Phase 03 P02 | 7m 6s | 4 tasks | 8 files |
 | Phase 03 P03 | 7m 9s | 4 tasks | 10 files |
+| Phase 04 P01 | 4m 14s | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,11 @@ Recent decisions affecting current work:
 - [Phase 03]: 03-03: Route-level post-trade clock reset (`request.app.state.last_snapshot_at = time.monotonic()`) keeps service.execute_trade FastAPI-agnostic; the observer only double-fires if a trade and a 60s-natural-tick collide within the same moment, which is now impossible (D-07)
 - [Phase 03]: 03-03: Boot-time initial snapshot — make_snapshot_observer special-cases `last_snapshot_at == 0.0` so the first observer tick writes a snapshot unconditionally; Plan 02's pure 60s gate was tightened to `!= 0.0 and delta < 60` (Rule 2 fix, assumption A2 in 03-RESEARCH.md)
 - [Phase 03]: 03-03: Integration test harness = `asgi_lifespan.LifespanManager` + `httpx.ASGITransport(app=app)` + `async with httpx.AsyncClient(...)` with a fresh `FastAPI(lifespan=lifespan)` per test and `patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True)` — established as the canonical pattern for all remaining API phases
+- [Phase 04]: 04-01: Watchlist service mirrors portfolio — pure functions on `(conn, cache, *args)` with zero FastAPI imports so Phase 5 chat auto-exec can import `add_ticker`/`remove_ticker` directly (D-02)
+- [Phase 04]: 04-01: `normalize_ticker(value)` is a module-level helper shared by Pydantic `WatchlistAddRequest`'s `field_validator(mode="before")` and the future Plan 04-02 `DELETE /{ticker}` path-param pre-check — regex `^[A-Z][A-Z0-9.]{0,9}$`, service trusts its input (D-04)
+- [Phase 04]: 04-01: Idempotent mutations return a status-literal discriminator (`AddResult(status="added"|"exists")`, `RemoveResult(status="removed"|"not_present")`) instead of raising — 04-02 translates all four to HTTP 200 with `WatchlistMutationResponse`, never 409/404 (D-06)
+- [Phase 04]: 04-01: `add_ticker` uses `INSERT ... ON CONFLICT(user_id, ticker) DO NOTHING` + `cursor.rowcount` branching (one query, atomic, race-free); `remove_ticker` uses `DELETE` + `cursor.rowcount` — commit only when rowcount==1 (D-09)
+- [Phase 04]: 04-01: `get_watchlist` orders `ORDER BY added_at ASC, ticker ASC` (same as `get_watchlist_tickers`) and falls back to `None` on every price field when the cache has no tick yet — never 0, never omitted (D-05, D-08)
 
 ### Pending Todos
 
@@ -116,7 +122,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-21T14:01:25.611Z
-Stopped at: Phase 4 context gathered
-Resume file: .planning/phases/04-watchlist-api/04-CONTEXT.md
-Resumed: 2026-04-21 — Phase 3 complete; next phase 04 (Watchlist API)
+Last session: 2026-04-21T19:56:29Z
+Stopped at: Plan 04-01 complete (models + pure-function service); next up 04-02 (routes + lifespan)
+Resume file: .planning/phases/04-watchlist-api/04-02-PLAN.md
+Resumed: 2026-04-21 — Plan 04-01 executed (3 tasks, 9 files, 27 new tests; 185/185 full suite green)

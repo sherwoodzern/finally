@@ -43,9 +43,9 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### Watchlist
 
-- [ ] **WATCH-01**: `GET /api/watchlist` returns the user's watchlist with latest prices from the cache
-- [ ] **WATCH-02**: `POST /api/watchlist` adds a ticker; unknown symbols are onboarded into the market data source on the next tick
-- [ ] **WATCH-03**: `DELETE /api/watchlist/{ticker}` removes a ticker and stops tracking it in the cache
+- [x] **WATCH-01**: `GET /api/watchlist` returns the user's watchlist with latest prices from the cache _(service layer `get_watchlist(conn, cache)` landed in Plan 04-01 with 4 unit tests; HTTP endpoint wired in Plan 04-02)_
+- [x] **WATCH-02**: `POST /api/watchlist` adds a ticker; unknown symbols are onboarded into the market data source on the next tick _(service layer `add_ticker(conn, ticker)` with `INSERT ... ON CONFLICT DO NOTHING` + rowcount + idempotent `AddResult(status="added"|"exists")` landed in Plan 04-01; HTTP route + `source.add_ticker` hand-off wired in Plan 04-02)_
+- [x] **WATCH-03**: `DELETE /api/watchlist/{ticker}` removes a ticker and stops tracking it in the cache _(service layer `remove_ticker(conn, ticker)` with idempotent `RemoveResult(status="removed"|"not_present")` landed in Plan 04-01; HTTP route + `source.remove_ticker` hand-off wired in Plan 04-02)_
 
 ### AI Chat
 
@@ -139,9 +139,9 @@ Which phases cover which requirements. Populated during roadmap creation.
 | PORT-03 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP mapping) |
 | PORT-04 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP route) |
 | PORT-05 | Phase 3 | Pending (03-03 — observer wiring) |
-| WATCH-01 | Phase 4 | Pending |
-| WATCH-02 | Phase 4 | Pending |
-| WATCH-03 | Phase 4 | Pending |
+| WATCH-01 | Phase 4 | In progress (04-01 service layer; 04-02 adds HTTP route) |
+| WATCH-02 | Phase 4 | In progress (04-01 service layer; 04-02 adds HTTP route) |
+| WATCH-03 | Phase 4 | In progress (04-01 service layer; 04-02 adds HTTP route) |
 | CHAT-01 | Phase 5 | Pending |
 | CHAT-02 | Phase 5 | Pending |
 | CHAT-03 | Phase 5 | Pending |
@@ -175,4 +175,4 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-21 after Plan 03-02 completion (PORT-01, PORT-02, PORT-03, PORT-04 service layer complete — HTTP wiring in Plan 03-03)*
+*Last updated: 2026-04-21 after Plan 04-01 completion (WATCH-01, WATCH-02, WATCH-03 service layer complete — HTTP wiring in Plan 04-02)*
