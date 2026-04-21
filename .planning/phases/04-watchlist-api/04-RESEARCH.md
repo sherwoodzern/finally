@@ -607,32 +607,32 @@ All claims in the Standard Stack table are `[VERIFIED]` via direct `uv run` insp
 
 **If this table is empty:** All claims in this research were verified or cited — no user confirmation needed.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Field naming: `timestamp` vs `updated_at` on `WatchlistItem`.**
    - What we know: `PriceUpdate.timestamp` (Unix float seconds, `app/market/models.py:16`) is the cache's live-price timestamp. `watchlist.added_at` (ISO string) is the DB row's creation time. These are two different fields that already coexist in the response.
    - What's unclear: Whether to call the cache timestamp `timestamp` (matching `PriceUpdate.timestamp`) or `updated_at` (matching `positions.updated_at` column naming).
-   - Recommendation: Use `timestamp: float | None` — matches `PriceUpdate.to_dict()` verbatim (`app/market/models.py:44`), reduces frontend translation. `added_at` stays as the ISO-string column name per schema.
+   - Recommendation: RESOLVED: Use `timestamp: float | None` — matches `PriceUpdate.to_dict()` verbatim (`app/market/models.py:44`), reduces frontend translation. `added_at` stays as the ISO-string column name per schema.
 
 2. **Handler ordering inside `routes.py`.**
    - What we know: `prefix="/api/watchlist"` + `tags=["watchlist"]` on the router (Phase 3 D-03 parity).
    - What's unclear: GET → POST → DELETE or POST → DELETE → GET order.
-   - Recommendation: GET → POST → DELETE (reader-friendly: read before write, add before remove). FastAPI doesn't care. Claude's Discretion per CONTEXT.
+   - Recommendation: RESOLVED: GET → POST → DELETE (reader-friendly: read before write, add before remove). FastAPI doesn't care. Claude's Discretion per CONTEXT.
 
 3. **`DELETE` SQL shape: `RETURNING id` vs `cursor.rowcount`.**
    - What we know: Both work (SQLite 3.35+ has `RETURNING`; project runs 3.50.4). Both are acceptable per CONTEXT Claude's Discretion.
    - What's unclear: Which is more idiomatic for this codebase.
-   - Recommendation: Use `cursor.rowcount` — matches the add path's `cursor.rowcount` check, which is one consistent read pattern. `RETURNING` is fine if planner prefers the stronger "I got the row I deleted" signal, but it's an extra column for no behavior gain.
+   - Recommendation: RESOLVED: Use `cursor.rowcount` — matches the add path's `cursor.rowcount` check, which is one consistent read pattern. `RETURNING` is fine if planner prefers the stronger "I got the row I deleted" signal, but it's an extra column for no behavior gain.
 
 4. **Where should `normalize_ticker` live?**
    - What we know: D-04 mandates one shared helper called from both `WatchlistAddRequest.field_validator` and the DELETE path-param pre-check.
    - What's unclear: `models.py` vs a dedicated `validators.py` module.
-   - Recommendation: `models.py` (top of the file, before the `BaseModel` classes). Keeps the Pydantic-facing code in one place. No need for a new module for one helper.
+   - Recommendation: RESOLVED: `models.py` (top of the file, before the `BaseModel` classes). Keeps the Pydantic-facing code in one place. No need for a new module for one helper.
 
 5. **Is `service.get_watchlist` allowed to depend on `PriceCache`?**
    - What we know: D-02 says "Service functions do NOT take `MarketDataSource`." It does NOT say "do not take `PriceCache`." Phase 3's `get_portfolio` takes both `conn` and `cache`.
    - What's unclear: Whether `get_watchlist(conn, cache)` violates the "pure DB-only" framing.
-   - Recommendation: Take both. The "DB-only" framing in D-02 is about avoiding the async `MarketDataSource` surface, not about avoiding the synchronous in-process `PriceCache`. Phase 3 sets the precedent. Phase 5 chat auto-exec will not call `get_watchlist` from its handler (it will generate the snapshot for prompt context via a different path), so no reuse concern.
+   - Recommendation: RESOLVED: Take both. The "DB-only" framing in D-02 is about avoiding the async `MarketDataSource` surface, not about avoiding the synchronous in-process `PriceCache`. Phase 3 sets the precedent. Phase 5 chat auto-exec will not call `get_watchlist` from its handler (it will generate the snapshot for prompt context via a different path), so no reuse concern.
 
 ## Environment Availability
 
