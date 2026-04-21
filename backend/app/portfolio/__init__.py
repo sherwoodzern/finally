@@ -20,6 +20,7 @@ from .models import (
     TradeRequest,
     TradeResponse,
 )
+from .routes import create_portfolio_router
 from .service import (
     DEFAULT_USER_ID,
     InsufficientCash,
@@ -48,6 +49,7 @@ __all__ = [
     "TradeValidationError",
     "UnknownTicker",
     "compute_total_value",
+    "create_portfolio_router",
     "execute_trade",
     "get_history",
     "get_portfolio",

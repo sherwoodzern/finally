@@ -10,6 +10,7 @@ from fastapi import FastAPI
 
 from .db import get_watchlist_tickers, init_database, open_database, seed_defaults
 from .market import PriceCache, create_market_data_source, create_stream_router
+from .portfolio import create_portfolio_router, make_snapshot_observer
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,16 @@ async def lifespan(app: FastAPI):
                  list(SEED_PRICES.keys())) - PLAN.md section 6 contract.
       D-07:      DB_PATH resolved via os.environ.get at lifespan entry, after
                  .env has been loaded in backend/app/main.py.
+
+    Phase 3 additions (03-RESEARCH.md Lifespan diff, D-05/D-06/D-07):
+      - Initialise app.state.last_snapshot_at = 0.0 BEFORE registering the
+        observer (the observer closure reads state.last_snapshot_at on its
+        first tick).
+      - Register make_snapshot_observer(app.state) on the market source so a
+        portfolio snapshot is written at most once per 60 monotonic seconds.
+      - Mount create_portfolio_router(conn, cache) alongside the SSE router so
+        /api/portfolio, /api/portfolio/trade, and /api/portfolio/history are
+        reachable for the lifetime of the app.
     """
     if not os.environ.get("OPENROUTER_API_KEY"):
         logger.warning(
@@ -49,7 +60,10 @@ async def lifespan(app: FastAPI):
     app.state.db = conn
     app.state.price_cache = cache
     app.state.market_source = source
+    app.state.last_snapshot_at = 0.0                                   # D-06
+    source.register_tick_observer(make_snapshot_observer(app.state))   # D-05
     app.include_router(create_stream_router(cache))
+    app.include_router(create_portfolio_router(conn, cache))
 
     logger.info(
         "App started: db=%s tickers=%d source=%s",
