@@ -20,12 +20,28 @@ from .models import (
     TradeRequest,
     TradeResponse,
 )
+from .service import (
+    DEFAULT_USER_ID,
+    InsufficientCash,
+    InsufficientShares,
+    PriceUnavailable,
+    TradeValidationError,
+    UnknownTicker,
+    execute_trade,
+)
 
 __all__ = [
+    "DEFAULT_USER_ID",
     "HistoryResponse",
+    "InsufficientCash",
+    "InsufficientShares",
     "PortfolioResponse",
     "PositionOut",
+    "PriceUnavailable",
     "SnapshotOut",
     "TradeRequest",
     "TradeResponse",
+    "TradeValidationError",
+    "UnknownTicker",
+    "execute_trade",
 ]
