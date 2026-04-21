@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: context exhaustion at 95% (2026-04-20)
-last_updated: "2026-04-20T21:24:16.599Z"
-last_activity: 2026-04-20 -- Phase 02 verified and complete
+status: verifying
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-04-21T13:05:15.688Z"
+last_activity: 2026-04-21
 progress:
   total_phases: 10
   completed_phases: 2
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_plans: 9
+  completed_plans: 7
+  percent: 78
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 
 ## Current Position
 
-Phase: 2 of 10 (Database Foundation) — COMPLETE & VERIFIED
-Plan: 3 of 3 complete
-Status: Ready to plan next phase
-Last activity: 2026-04-20 -- Phase 02 verified and complete
+Phase: 3 of 10 (Portfolio & Trading API) — IN PROGRESS
+Plan: 1 of 3 complete (03-01 — MarketDataSource tick-observer extension)
+Status: Plan 03-01 complete; next plan 03-02 (portfolio sub-package: models, service, exceptions)
+Last activity: 2026-04-21 -- Completed 03-01 (register_tick_observer + both implementations + 6 tests)
 
-Progress: [##░░░░░░░░] 20%
+Progress: [##░░░░░░░░] 23%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [##░░░░░░░░] 20%
 
 *Updated after each plan completion*
 | Phase 01 P03 | 60min | 3 tasks | 6 files |
+| Phase 03 P01 | 4m 9s | 4 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -78,6 +79,7 @@ Recent decisions affecting current work:
 - [Phase ?]: D-06 (01-03): create_stream_router builds a fresh APIRouter per call — pre-existing module-level router accumulated duplicate /prices routes across factory calls (Rule 1 auto-fix).
 - [Phase ?]: 01-03: httpx and asgi-lifespan declared in [project.optional-dependencies].dev (not PEP 735 [dependency-groups]) to match uv sync --extra dev.
 - [Phase ?]: 01-03: Fresh FastAPI(lifespan=lifespan) per test (via _build_app helper) — avoids shared state on module-level app.main.app across tests.
+- [Phase 03]: 03-01: register_tick_observer declared as zero-arg Callable on MarketDataSource ABC; per-callback nested try/except + logger.exception in Simulator._run_loop and Massive._poll_once isolates broken observers from the tick/poll loop (D-04, D-08)
 
 ### Pending Todos
 
@@ -102,6 +104,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-20T21:24:16.596Z
-Stopped at: context exhaustion at 95% (2026-04-20)
+Last session: 2026-04-21T13:05:15.682Z
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
+Resumed: 2026-04-20 — proceeding to plan-checker for Phase 3
