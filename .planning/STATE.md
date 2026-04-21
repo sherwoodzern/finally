@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Plan 04-01 complete (models + service); next up 04-02 (routes + lifespan)
-last_updated: "2026-04-21T19:56:29Z"
-last_activity: 2026-04-21 -- Plan 04-01 executed (models + pure-function service)
+stopped_at: Plan 04-02 complete (routes + lifespan mount + integration tests); Phase 4 ready for /gsd-verify-work
+last_updated: "2026-04-21T20:10:26Z"
+last_activity: 2026-04-21 -- Plan 04-02 executed (router factory + lifespan mount + 22 integration tests)
 progress:
   total_phases: 10
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 12
-  completed_plans: 10
-  percent: 83
+  completed_plans: 11
+  percent: 92
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 
 ## Current Position
 
-Phase: 04 (watchlist-api) — EXECUTING
+Phase: 04 (watchlist-api) — COMPLETE
 Plan: 2 of 2
-Status: Executing Phase 04
-Last activity: 2026-04-21 -- Plan 04-01 completed (models + pure-function service)
+Status: Phase 04 complete; ready for /gsd-verify-work 4; next up Phase 05 (chat-llm)
+Last activity: 2026-04-21 -- Plan 04-02 completed (routes + lifespan mount + integration tests)
 
-Progress: [########░░] 83%
+Progress: [#########░] 92%
 
 ## Performance Metrics
 
@@ -57,6 +57,7 @@ Progress: [########░░] 83%
 | Phase 03 P02 | 7m 6s | 4 tasks | 8 files |
 | Phase 03 P03 | 7m 9s | 4 tasks | 10 files |
 | Phase 04 P01 | 4m 14s | 3 tasks | 9 files |
+| Phase 04 P02 | 6m 22s | 4 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,10 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-01: Idempotent mutations return a status-literal discriminator (`AddResult(status="added"|"exists")`, `RemoveResult(status="removed"|"not_present")`) instead of raising — 04-02 translates all four to HTTP 200 with `WatchlistMutationResponse`, never 409/404 (D-06)
 - [Phase 04]: 04-01: `add_ticker` uses `INSERT ... ON CONFLICT(user_id, ticker) DO NOTHING` + `cursor.rowcount` branching (one query, atomic, race-free); `remove_ticker` uses `DELETE` + `cursor.rowcount` — commit only when rowcount==1 (D-09)
 - [Phase 04]: 04-01: `get_watchlist` orders `ORDER BY added_at ASC, ticker ASC` (same as `get_watchlist_tickers`) and falls back to `None` on every price field when the cache has no tick yet — never 0, never omitted (D-05, D-08)
+- [Phase 04]: 04-02: create_watchlist_router(db, cache, source) factory mirrors create_portfolio_router; mounted natively in lifespan BEFORE `yield` (line 68, `# D-13`) so `/api/watchlist` + `/api/watchlist/{ticker}` are in app.router.routes the moment LifespanManager.__aenter__ returns — no shim, no post-startup registration
+- [Phase 04]: 04-02: DB-first-then-source choreography with try/except around `await source.{add,remove}_ticker` only; post-commit source failure logs WARNING with `exc_info=True` and still returns 200 (D-11). DB row-count arithmetic asserted strictly as `== before + 1` / `== before - 1`, not `>=`
+- [Phase 04]: 04-02: Idempotent mutation responses always 200 with `status="added"/"exists"/"removed"/"not_present"` (SC#4); never 409/404. Uniform discriminator lets Phase 5 LLM handler branch without HTTP-code sniffing (D-06)
+- [Phase 04]: 04-02: Module-scoped `app_with_lifespan` + `client` fixtures with `@pytest_asyncio.fixture(loop_scope="module", scope="module")` + `pytestmark = pytest.mark.asyncio(loop_scope="module")` + module-scoped `event_loop_policy` override in each test file — required by pytest-asyncio 1.x for module-scoped async fixtures. 21 integration tests across 3 files, exactly 1 SimulatorDataSource start per file (runtime <1s per file, well under 30s VALIDATION.md budget)
 
 ### Pending Todos
 
@@ -122,7 +127,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-21T19:56:29Z
-Stopped at: Plan 04-01 complete (models + pure-function service); next up 04-02 (routes + lifespan)
-Resume file: .planning/phases/04-watchlist-api/04-02-PLAN.md
-Resumed: 2026-04-21 — Plan 04-01 executed (3 tasks, 9 files, 27 new tests; 185/185 full suite green)
+Last session: 2026-04-21T20:10:26Z
+Stopped at: Plan 04-02 complete (routes + lifespan mount + integration tests); Phase 4 ready for /gsd-verify-work 4; next up Phase 05 (chat-llm-auto-exec)
+Resume file: .planning/phases/05-chat-llm/  (Phase 5 planning not yet started)
+Resumed: 2026-04-21 — Plan 04-02 executed (4 tasks, 4 new files + 4 modified, 22 new tests; 207/207 full suite green)

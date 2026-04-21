@@ -82,7 +82,7 @@ Plans:
 **Plans**: 2 plans
 Plans:
 - [x] 04-01-PLAN.md — Watchlist sub-package: Pydantic v2 models + pure-function service (get/add/remove) with unit tests (completed 2026-04-21)
-- [ ] 04-02-PLAN.md — Routes (GET /api/watchlist, POST, DELETE /{ticker}) + lifespan wiring (router + MarketDataSource ticker bridge) + integration tests
+- [x] 04-02-PLAN.md — Routes (GET /api/watchlist, POST, DELETE /{ticker}) + lifespan wiring (router + MarketDataSource ticker bridge) + integration tests (completed 2026-04-21)
 
 ### Phase 5: AI Chat Integration
 **Goal**: A chat message posts to `/api/chat`, the LLM responds with a structured JSON answer, any trades or watchlist changes it proposes auto-execute through the same validation path as manual trades, and the full backend test suite passes for the feature set delivered so far.
@@ -166,7 +166,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 1. App Shell & Config | 3/3 | Complete | 2026-04-20 |
 | 2. Database Foundation | 3/3 | Complete | 2026-04-20 |
 | 3. Portfolio & Trading API | 3/3 | Complete | 2026-04-21 |
-| 4. Watchlist API | 1/2 | In progress | - |
+| 4. Watchlist API | 2/2 | Complete | 2026-04-21 |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
 | 6. Frontend Scaffold & SSE | 0/TBD | Not started | - |
 | 7. Market Data & Trading UI | 0/TBD | Not started | - |
