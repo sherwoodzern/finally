@@ -41,13 +41,58 @@ class TestSimulator:
     """SimulatorDataSource observer behavior (D-04, D-08)."""
 
     async def test_observer_fires_on_tick(self):
-        pytest.skip("Wave 0 stub - implemented in Task 3")
+        cache = PriceCache()
+        source = SimulatorDataSource(price_cache=cache, update_interval=0.05)
+        counter = {"n": 0}
+
+        def bump():
+            counter["n"] += 1
+
+        source.register_tick_observer(bump)
+        await source.start(["AAPL"])
+        await asyncio.sleep(0.3)
+        await source.stop()
+        assert counter["n"] >= 1
 
     async def test_multiple_observers_all_fire(self):
-        pytest.skip("Wave 0 stub - implemented in Task 3")
+        cache = PriceCache()
+        source = SimulatorDataSource(price_cache=cache, update_interval=0.05)
+        counter_a = {"n": 0}
+        counter_b = {"n": 0}
+
+        def bump_a():
+            counter_a["n"] += 1
+
+        def bump_b():
+            counter_b["n"] += 1
+
+        source.register_tick_observer(bump_a)
+        source.register_tick_observer(bump_b)
+        await source.start(["AAPL"])
+        await asyncio.sleep(0.3)
+        await source.stop()
+        assert counter_a["n"] >= 1
+        assert counter_b["n"] >= 1
 
     async def test_observer_exception_does_not_kill_loop(self):
-        pytest.skip("Wave 0 stub - implemented in Task 3")
+        cache = PriceCache()
+        source = SimulatorDataSource(price_cache=cache, update_interval=0.05)
+        counter = {"n": 0}
+
+        def boom():
+            raise RuntimeError("boom")
+
+        def bump():
+            counter["n"] += 1
+
+        source.register_tick_observer(boom)
+        source.register_tick_observer(bump)
+        initial_version = cache.version
+        await source.start(["AAPL"])
+        await asyncio.sleep(0.3)
+        await source.stop()
+        assert cache.version > initial_version
+        assert counter["n"] >= 1
 
 
 @pytest.mark.asyncio

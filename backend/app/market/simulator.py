@@ -6,6 +6,7 @@ import asyncio
 import logging
 import math
 import random
+from collections.abc import Callable
 
 import numpy as np
 
@@ -215,6 +216,7 @@ class SimulatorDataSource(MarketDataSource):
         self._event_prob = event_probability
         self._sim: GBMSimulator | None = None
         self._task: asyncio.Task | None = None
+        self._observers: list[Callable[[], None]] = []
 
     async def start(self, tickers: list[str]) -> None:
         self._sim = GBMSimulator(
@@ -265,6 +267,15 @@ class SimulatorDataSource(MarketDataSource):
                     prices = self._sim.step()
                     for ticker, price in prices.items():
                         self._cache.update(ticker=ticker, price=price)
+                    # Fires on event loop thread, NOT Polygon worker - see D-04
+                    for cb in self._observers:
+                        try:
+                            cb()
+                        except Exception:
+                            logger.exception("Tick observer raised")
             except Exception:
                 logger.exception("Simulator step failed")
             await asyncio.sleep(self._interval)
+
+    def register_tick_observer(self, callback: Callable[[], None]) -> None:
+        self._observers.append(callback)
