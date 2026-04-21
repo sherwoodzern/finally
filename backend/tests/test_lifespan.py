@@ -143,3 +143,44 @@ class TestLifespan:
                 ).fetchone()[0]
                 assert user_count == 1
                 assert wl_count == 10
+
+    async def test_attaches_last_snapshot_at_to_app_state(self, db_path):
+        """Phase 3 D-06: startup initialises app.state.last_snapshot_at to 0.0.
+
+        The boot-time observer may advance it on the first tick, so assert the
+        value is set to 0.0 BEFORE the first tick fires (i.e. the attribute
+        exists with the correct initial value at registration time). We check
+        the attribute exists and that it was 0.0 or has since advanced to a
+        non-negative float.
+        """
+        app = _build_app()
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
+            async with LifespanManager(app):
+                assert hasattr(app.state, "last_snapshot_at")
+                assert isinstance(app.state.last_snapshot_at, float)
+                assert app.state.last_snapshot_at >= 0.0
+
+    async def test_includes_portfolio_router_during_startup(self, db_path):
+        """app.include_router(create_portfolio_router(conn, cache)) runs in lifespan."""
+        app = _build_app()
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
+            async with LifespanManager(app):
+                paths = {getattr(r, "path", None) for r in app.router.routes}
+                assert "/api/portfolio" in paths, paths
+                assert "/api/portfolio/trade" in paths, paths
+                assert "/api/portfolio/history" in paths, paths
+
+    async def test_registers_snapshot_observer_on_market_source(self, db_path):
+        """Phase 3 D-05: source.register_tick_observer(make_snapshot_observer(app.state))
+        runs in startup, and the boot-time first tick advances last_snapshot_at > 0.0."""
+        import asyncio
+
+        app = _build_app()
+        with patch.dict(os.environ, {"DB_PATH": str(db_path)}, clear=True):
+            async with LifespanManager(app):
+                observers = getattr(app.state.market_source, "_observers", None)
+                assert observers is not None, "SimulatorDataSource must expose _observers"
+                assert len(observers) >= 1
+                # After the next tick, last_snapshot_at advances from 0.0 (boot snapshot).
+                await asyncio.sleep(0.7)
+                assert app.state.last_snapshot_at > 0.0

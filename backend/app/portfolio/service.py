@@ -311,7 +311,10 @@ def make_snapshot_observer(state) -> Callable[[], None]:
 
     def observer() -> None:
         now = time.monotonic()
-        if now - state.last_snapshot_at < 60.0:
+        # Boot-time first tick always fires (assumption A2): when
+        # last_snapshot_at == 0.0 the observer has never run, so emit an
+        # initial snapshot regardless of the monotonic value.
+        if state.last_snapshot_at != 0.0 and now - state.last_snapshot_at < 60.0:
             return
         total_value = compute_total_value(state.db, state.price_cache)
         state.db.execute(
