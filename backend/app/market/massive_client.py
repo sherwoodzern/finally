@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Callable
 
 from massive import RESTClient
 from massive.rest.models import SnapshotMarketType
@@ -37,6 +38,7 @@ class MassiveDataSource(MarketDataSource):
         self._tickers: list[str] = []
         self._task: asyncio.Task | None = None
         self._client: RESTClient | None = None
+        self._observers: list[Callable[[], None]] = []
 
     async def start(self, tickers: list[str]) -> None:
         self._client = RESTClient(api_key=self._api_key)
@@ -114,6 +116,12 @@ class MassiveDataSource(MarketDataSource):
                         e,
                     )
             logger.debug("Massive poll: updated %d/%d tickers", processed, len(self._tickers))
+            # Fires on event loop thread, NOT Polygon worker - see D-04
+            for cb in self._observers:
+                try:
+                    cb()
+                except Exception:
+                    logger.exception("Tick observer raised")
 
         except Exception as e:
             logger.error("Massive poll failed: %s", e)
@@ -126,3 +134,6 @@ class MassiveDataSource(MarketDataSource):
             market_type=SnapshotMarketType.STOCKS,
             tickers=self._tickers,
         )
+
+    def register_tick_observer(self, callback: Callable[[], None]) -> None:
+        self._observers.append(callback)

@@ -100,7 +100,47 @@ class TestMassive:
     """MassiveDataSource observer behavior (D-04, D-08)."""
 
     async def test_observer_fires_after_successful_poll(self):
-        pytest.skip("Wave 0 stub - implemented in Task 4")
+        cache = PriceCache()
+        source = MassiveDataSource(
+            api_key="test-key", price_cache=cache, poll_interval=60.0
+        )
+        source._tickers = ["AAPL"]
+        source._client = MagicMock()
+        counter = {"n": 0}
+
+        def bump():
+            counter["n"] += 1
+
+        source.register_tick_observer(bump)
+        mock_snap = MagicMock(
+            ticker="AAPL",
+            last_trade=MagicMock(price=190.50, timestamp=1_700_000_000_000.0),
+        )
+        with patch.object(source, "_fetch_snapshots", return_value=[mock_snap]):
+            await source._poll_once()
+        assert counter["n"] == 1
 
     async def test_observer_exception_isolation(self):
-        pytest.skip("Wave 0 stub - implemented in Task 4")
+        cache = PriceCache()
+        source = MassiveDataSource(
+            api_key="test-key", price_cache=cache, poll_interval=60.0
+        )
+        source._tickers = ["AAPL"]
+        source._client = MagicMock()
+        counter = {"n": 0}
+
+        def boom():
+            raise RuntimeError("boom")
+
+        def bump():
+            counter["n"] += 1
+
+        source.register_tick_observer(boom)
+        source.register_tick_observer(bump)
+        mock_snap = MagicMock(
+            ticker="AAPL",
+            last_trade=MagicMock(price=190.50, timestamp=1_700_000_000_000.0),
+        )
+        with patch.object(source, "_fetch_snapshots", return_value=[mock_snap]):
+            await source._poll_once()
+        assert counter["n"] == 1
