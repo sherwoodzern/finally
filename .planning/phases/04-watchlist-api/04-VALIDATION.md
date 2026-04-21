@@ -44,18 +44,18 @@ now lives entirely under Plan 04-02.
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 4-01-01 | 04-01 | 1 | WATCH-01/02/03 | T-04-06, T-04-07 | normalize_ticker regex + extra="forbid" | unit | `pytest tests/watchlist/test_models.py -q` | ✅ | ⬜ pending |
-| 4-01-02 | 04-01 | 1 | WATCH-01 | T-04-12 | parameterized SELECT | unit | `pytest tests/watchlist/test_service_get.py -q` | ✅ | ⬜ pending |
-| 4-01-03a | 04-01 | 1 | WATCH-02 | T-04-12 | parameterized INSERT ... ON CONFLICT | unit | `pytest tests/watchlist/test_service_add.py -q` | ✅ | ⬜ pending |
-| 4-01-03b | 04-01 | 1 | WATCH-03 | T-04-12 | parameterized DELETE + rowcount | unit | `pytest tests/watchlist/test_service_remove.py -q` | ✅ | ⬜ pending |
-| 4-02-01 | 04-02 | 2 | WATCH-01/02/03 | T-04-06, T-04-07, T-04-09 | 422 on malformed ticker; log-and-continue on post-commit source failure | unit | `pytest tests/watchlist/ -q` (indirectly via integration) | ✅ | ⬜ pending |
-| 4-02-02 | 04-02 | 2 | WATCH-01/02/03 | T-04-13, T-04-14 | lifespan registers `/api/watchlist` + `/api/watchlist/{ticker}` before `yield` | integration | `pytest tests/test_lifespan.py::*::test_includes_watchlist_router_during_startup -q` | ✅ | ⬜ pending |
-| 4-02-03a | 04-02 | 2 | WATCH-01 | T-04-09 | GET returns 200 with 10-ticker seed + cold-cache None-price contract | integration | `pytest tests/watchlist/test_routes_get.py -q` | ✅ | ⬜ pending |
-| 4-02-03b | 04-02 | 2 | WATCH-02, SC#4 | T-04-06, T-04-10, T-04-12 | POST dup → `status="exists"` (NOT 409); source-fail → 200 + WARNING | integration | `pytest tests/watchlist/test_routes_post.py -q` | ✅ | ⬜ pending |
-| 4-02-03c | 04-02 | 2 | WATCH-03, SC#4 | T-04-07, T-04-10 | DELETE missing → `status="not_present"` (NOT 404); 422 on malformed path | integration | `pytest tests/watchlist/test_routes_delete.py -q` | ✅ | ⬜ pending |
-| 4-02-04 | 04-02 | 2 | all | — | full backend suite regression | integration | `pytest -q && ruff check app/ tests/` | ✅ | ⬜ pending |
+| 4-01-01 | 04-01 | 1 | WATCH-01/02/03 | T-04-06, T-04-07 | normalize_ticker regex + extra="forbid" | unit | `pytest tests/watchlist/test_models.py -q` | ✅ | ✅ green |
+| 4-01-02 | 04-01 | 1 | WATCH-01 | T-04-12 | parameterized SELECT | unit | `pytest tests/watchlist/test_service_get.py -q` | ✅ | ✅ green |
+| 4-01-03a | 04-01 | 1 | WATCH-02 | T-04-12 | parameterized INSERT ... ON CONFLICT | unit | `pytest tests/watchlist/test_service_add.py -q` | ✅ | ✅ green |
+| 4-01-03b | 04-01 | 1 | WATCH-03 | T-04-12 | parameterized DELETE + rowcount | unit | `pytest tests/watchlist/test_service_remove.py -q` | ✅ | ✅ green |
+| 4-02-01 | 04-02 | 2 | WATCH-01/02/03 | T-04-06, T-04-07, T-04-09 | 422 on malformed ticker; log-and-continue on post-commit source failure | unit | `pytest tests/watchlist/ -q` (indirectly via integration) | ✅ | ✅ green |
+| 4-02-02 | 04-02 | 2 | WATCH-01/02/03 | T-04-13, T-04-14 | lifespan registers `/api/watchlist` + `/api/watchlist/{ticker}` before `yield` | integration | `pytest tests/test_lifespan.py::*::test_includes_watchlist_router_during_startup -q` | ✅ | ✅ green |
+| 4-02-03a | 04-02 | 2 | WATCH-01 | T-04-09 | GET returns 200 with 10-ticker seed + cold-cache None-price contract | integration | `pytest tests/watchlist/test_routes_get.py -q` | ✅ | ✅ green |
+| 4-02-03b | 04-02 | 2 | WATCH-02, SC#4 | T-04-06, T-04-10, T-04-12 | POST dup → `status="exists"` (NOT 409); source-fail → 200 + WARNING | integration | `pytest tests/watchlist/test_routes_post.py -q` | ✅ | ✅ green |
+| 4-02-03c | 04-02 | 2 | WATCH-03, SC#4 | T-04-07, T-04-10 | DELETE missing → `status="not_present"` (NOT 404); 422 on malformed path | integration | `pytest tests/watchlist/test_routes_delete.py -q` | ✅ | ✅ green |
+| 4-02-04 | 04-02 | 2 | all | — | full backend suite regression | integration | `pytest -q && ruff check app/ tests/` | ✅ | ✅ green |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: ✅ green · ✅ green · ❌ red · ⚠️ flaky*
 
 Every task row has a concrete `<automated>` command backed by an existing or
 planned test file. No `❌ W0` entries remain — Wave 0 test scaffolding is
@@ -110,3 +110,6 @@ service + routes/lifespan work back into a single atomic plan (04-02), mirroring
 the Phase 3 `03-03-PLAN.md` precedent that shipped portfolio routes + lifespan
 mount + integration tests in one plan. Final layout: 2 plans, 0 shims,
 route mounted natively in the lifespan before `yield`.
+
+> Phase split: original 3-plan layout merged to 2 plans on revision iteration 1
+> per checker (Plan 02+03 atomic per 03-03-PLAN.md precedent).
