@@ -1,37 +1,48 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-20T21:40:00.000Z",
-  "phase": "03",
-  "phase_name": "portfolio-trading-api",
-  "phase_dir": ".planning/phases/03-portfolio-trading-api",
-  "workflow": "plan-phase",
+  "timestamp": "2026-04-22T23:44:30.582Z",
+  "phase": "06",
+  "phase_name": "Frontend Scaffold & SSE",
+  "phase_dir": ".planning/phases/06-frontend-scaffold-sse",
+  "workflow": "discuss-phase",
   "plan": null,
   "task": null,
   "total_tasks": 0,
-  "status": "paused_mid_plan_phase",
+  "status": "paused_after_discuss_phase",
+  "stage": "discuss-complete",
   "completed_tasks": [
-    {"id": "03-plan-01", "name": "Research Phase 3 (gsd-phase-researcher)", "status": "done", "commit": "8e75530", "artifact": "03-RESEARCH.md"},
-    {"id": "03-plan-02", "name": "Nyquist validation strategy from template", "status": "done", "commit": "8e75530", "artifact": "03-VALIDATION.md"},
-    {"id": "03-plan-03", "name": "Pattern map (gsd-pattern-mapper)", "status": "done", "commit": "43ad910", "artifact": "03-PATTERNS.md"},
-    {"id": "03-plan-04", "name": "Create 3 plans (gsd-planner) — 03-01 observer ext, 03-02 service+models, 03-03 routes+lifespan+integration", "status": "done", "commit": "f78de4c", "artifact": "03-0{1,2,3}-PLAN.md + ROADMAP.md"}
+    {"id": "06-discuss-01", "name": "Load prior context (PROJECT.md, REQUIREMENTS.md, STATE.md, phase 01 + 05 CONTEXTs, codebase maps)", "status": "done"},
+    {"id": "06-discuss-02", "name": "Scout codebase — SSE endpoint at stream.py, PriceUpdate.to_dict() shape, no frontend/ dir", "status": "done"},
+    {"id": "06-discuss-03", "name": "Analyze phase, identify gray areas, auto-select all + recommended options", "status": "done"},
+    {"id": "06-discuss-04", "name": "Write 06-CONTEXT.md (24 decisions across 8 categories)", "status": "done", "commit": "9aa59c4", "artifact": "06-CONTEXT.md"},
+    {"id": "06-discuss-05", "name": "Write 06-DISCUSSION-LOG.md (audit trail)", "status": "done", "commit": "9aa59c4", "artifact": "06-DISCUSSION-LOG.md"},
+    {"id": "06-discuss-06", "name": "Record STATE.md session", "status": "done", "commit": "ee984a5"}
   ],
   "remaining_tasks": [
-    {"id": "03-plan-05", "name": "Run gsd-plan-checker to verify the 3 plans", "status": "not_started"},
-    {"id": "03-plan-06", "name": "Revision loop if checker finds issues (max 3 iterations)", "status": "not_started"},
-    {"id": "03-plan-07", "name": "Requirements coverage gate (PORT-01..05 all mapped)", "status": "not_started"},
-    {"id": "03-plan-08", "name": "Auto-advance to /gsd-execute-phase 3 (--auto flag was set)", "status": "not_started"}
+    {"id": "06-plan-01", "name": "Run /gsd-plan-phase 06 --auto (chain flag persisted)", "status": "not_started"}
   ],
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "Paused at 83% context before spawning plan-checker to preserve budget for the revision loop", "rationale": "Plan-checker + up to 3 revision iterations could exhaust remaining context; checker is the highest-value gate before execution and deserves a fresh window", "phase": "03"},
-    {"decision": "Plan slice: 3 plans in 3 sequential waves", "rationale": "Planner's recommended slice from 03-RESEARCH.md — observer ABC extension must ship before portfolio package can wire into lifespan", "phase": "03"}
+    {"decision": "Next.js 15 App Router + TypeScript + Tailwind via create-next-app (D-01)", "rationale": "One-command scaffold; matches PLAN.md §11 Node 20 Docker stage; current defaults", "phase": "06"},
+    {"decision": "npm + Node >=20 <21 engines pin (D-02)", "rationale": "Aligns with Phase 9 Dockerfile expectations; fails fast on old Node", "phase": "06"},
+    {"decision": "output: 'export' + images.unoptimized + trailingSlash (D-05, D-06)", "rationale": "Required for static export; smooth FastAPI StaticFiles interop in Phase 8", "phase": "06"},
+    {"decision": "Dev-only next.config.mjs rewrites() /api/* + /api/stream/* -> localhost:8000 (D-07, D-08)", "rationale": "Same-origin in all envs; PLAN.md §3 forbids CORS; EventSource stays relative URL", "phase": "06"},
+    {"decision": "Tailwind theme tokens + CSS variables together; permanent dark class (D-09, D-10)", "rationale": "One palette for utilities + runtime-styled components (flash anim, heatmap); no light mode scope", "phase": "06"},
+    {"decision": "Root-level PriceStreamProvider owns single EventSource lifecycle (D-11, D-15)", "rationale": "One connection per app lifetime; testable; no SSR/StrictMode double-connect", "phase": "06"},
+    {"decision": "Zustand for ticker-keyed price store (D-12)", "rationale": "Selector-based re-renders critical at 500ms * N tickers; Context+useReducer would flood", "phase": "06"},
+    {"decision": "session_start_price computed frontend-side, first-seen per ticker (D-14)", "rationale": "Avoids backend change; Phase 6 stays frontend-only; accepted tradeoff: page reload resets baseline", "phase": "06"},
+    {"decision": "Connection status in same store: connected|reconnecting|disconnected (D-18)", "rationale": "Phase 7 FE-10 header dot reads this verbatim; no second state surface", "phase": "06"},
+    {"decision": "Narrow try/catch around JSON.parse + ingest; console.warn + continue (D-19)", "rationale": "Matches backend log-and-continue pattern; EventSource stays alive on bad frame", "phase": "06"},
+    {"decision": "/debug page + Vitest + MockEventSource test (D-20, D-21)", "rationale": "Satisfies SC #3 (real wire) AND SC #4 (pure logic); cheap to keep or delete later", "phase": "06"},
+    {"decision": "Only new prod dep: zustand. Dev deps: vitest toolchain. No chart libs (D-24)", "rationale": "Chart libs arrive in Phase 7/8 with their requirements; no premature deps", "phase": "06"}
   ],
   "uncommitted_files": [
-    {"path": ".planning/STATE.md", "status": "modified", "notes": "Partial edits present from prior session — status 'planning', percent 100. Percent is wrong (2 of 10 phases = 20%). Still deferred from previous handoff."},
-    {"path": "CLAUDE.md", "status": "modified", "notes": "Appended GSD stack blocks from an earlier session. Unrelated to Phase 3 work."},
-    {"path": ".claude/scheduled_tasks.lock", "status": "untracked", "notes": "Runtime lock — gitignore candidate."}
+    {"path": ".idea/finally.iml", "status": "modified", "notes": "IDE config drift from prior session; not Phase 6 related"},
+    {"path": "CLAUDE.md", "status": "modified", "notes": "Carried over from earlier sessions; not Phase 6 related"},
+    {"path": "backend/db/", "status": "untracked", "notes": "SQLite runtime dir; not Phase 6 related"},
+    {"path": ".claude/worktrees/, .claude/scheduled_tasks.lock", "status": "untracked", "notes": "Runtime artifacts; gitignore candidates"}
   ],
-  "next_action": "Run /gsd-plan-phase 3 --auto in a fresh session. Since 03-RESEARCH.md already exists, has_research will be true and the workflow will skip research and go straight to the plan-checker. Alternatively, run /gsd-verify-plans 3 or manually spawn gsd-plan-checker.",
-  "context_notes": "Phase 3 plan-phase workflow paused mid-run at 83% context. All upstream artifacts (RESEARCH.md, VALIDATION.md, PATTERNS.md, PLAN.md x3) are written and committed. The remaining steps are: (1) plan-checker verification, (2) any revision iterations, (3) requirements-coverage gate, (4) auto-advance to execute-phase (the --auto flag triggered the chain). On resume, --auto should continue the chain. Key architectural invariants to preserve: D-04 observer pattern extends the already-Validated MarketDataSource ABC, D-02 service stays FastAPI-agnostic so Phase 5 chat can reuse, D-12 validate-then-write with single commit per trade. Planner's self-reported Source Audit passed (all 5 PORT IDs covered, all 16 CONTEXT decisions mapped to tasks, all 10 RESEARCH pitfalls referenced)."
+  "next_action": "Run: /clear, then /gsd-plan-phase 06 --auto. Chain flag workflow._auto_chain_active should already be true from this discuss run — plan-phase will auto-advance to execute-phase on completion.",
+  "context_notes": "Phase 6 discuss-phase complete in --auto mode. 24 decisions captured across 8 categories (scaffolding, dev proxy, theme, SSE client & store, verification, directory layout, dependency budget, Claude's discretion). Canonical refs list is comprehensive: PLAN.md §2/§3/§4/§6/§10/§11, REQUIREMENTS.md FE-01/FE-02, ROADMAP.md phase 6 success criteria, phase 01 + 05 CONTEXTs, 5 codebase maps, plus 6 external docs (Next.js static exports, rewrites, Tailwind v4, Zustand, MDN EventSource, Vitest+Next). Backend is read-only for this phase — backend/app/market/stream.py emits {TICKER: PriceUpdate.to_dict()} per SSE data frame, which frontend parses verbatim. Planner should produce ~3 plans: (1) scaffold + theme + dev proxy, (2) Zustand store + PriceStreamProvider + session_start_price logic, (3) Vitest + MockEventSource test + /debug page. No blockers, no anti-patterns discovered this session."
 }
