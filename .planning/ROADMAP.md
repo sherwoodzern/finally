@@ -94,7 +94,11 @@ Plans:
   3. The prompt sent to the LLM includes the current cash, positions with P&L, watchlist with live prices, total portfolio value, and recent `chat_messages` history as context.
   4. Trades and watchlist changes specified by the LLM auto-execute through the manual-trade validation path; failures are reflected back in the response payload rather than silently swallowed, and both the user turn and the assistant turn (including executed `actions` JSON) are persisted in `chat_messages`.
   5. When `LLM_MOCK=true`, the endpoint returns deterministic canned responses without calling OpenRouter, and the extended pytest suite (portfolio math, trade execution, trade validation, watchlist CRUD, LLM structured-output parsing, API routes, LLM mock mode) passes green.
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 05-01-PLAN.md — Chat sub-package foundation: models, LiveChatClient, MockChatClient, prompt assembly + unit tests
+- [ ] 05-02-PLAN.md — Service orchestration: run_turn, get_history, ChatTurnError + service-level unit tests
+- [ ] 05-03-PLAN.md — Routes (POST /api/chat, GET /api/chat/history) + lifespan wiring (D-20, D-05 warning) + route integration tests
 **AI integration hint**: yes
 
 ### Phase 6: Frontend Scaffold & SSE
