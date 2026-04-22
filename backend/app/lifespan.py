@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from .chat import create_chat_client, create_chat_router
 from .db import get_watchlist_tickers, init_database, open_database, seed_defaults
 from .market import PriceCache, create_market_data_source, create_stream_router
 from .portfolio import create_portfolio_router, make_snapshot_observer
@@ -42,9 +43,15 @@ async def lifespan(app: FastAPI):
         /api/portfolio, /api/portfolio/trade, and /api/portfolio/history are
         reachable for the lifetime of the app.
     """
-    if not os.environ.get("OPENROUTER_API_KEY"):
+    # D-05: warn on startup if the live LLM path is selected but no key is set.
+    # Redact: never log the key value. Only the presence/absence is logged.
+    if (
+        os.environ.get("LLM_MOCK") != "true"
+        and not os.environ.get("OPENROUTER_API_KEY")
+    ):
         logger.warning(
-            "OPENROUTER_API_KEY not set; chat endpoint will fail in Phase 5"
+            "OPENROUTER_API_KEY is unset and LLM_MOCK != 'true'; "
+            "POST /api/chat will return 502 until a key is provided"
         )
 
     db_path = os.environ.get("DB_PATH", "db/finally.db")
@@ -66,6 +73,9 @@ async def lifespan(app: FastAPI):
     app.include_router(create_stream_router(cache))
     app.include_router(create_portfolio_router(conn, cache))
     app.include_router(create_watchlist_router(conn, cache, source))   # D-13
+    chat_client = create_chat_client()
+    app.state.chat_client = chat_client
+    app.include_router(create_chat_router(conn, cache, source, chat_client))   # D-20
 
     logger.info(
         "App started: db=%s tickers=%d source=%s",
