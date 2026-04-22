@@ -6,7 +6,8 @@ Public API:
             ChatMessageOut, HistoryResponse
     Client: ChatClient (Protocol), LiveChatClient, MockChatClient,
             create_chat_client
-    Prompts: (added in Task 4)
+    Prompts: SYSTEM_PROMPT, CHAT_HISTORY_WINDOW, build_portfolio_context,
+             build_messages
 """
 
 from __future__ import annotations
@@ -24,8 +25,15 @@ from .models import (
     WatchlistAction,
     WatchlistActionResult,
 )
+from .prompts import (
+    CHAT_HISTORY_WINDOW,
+    SYSTEM_PROMPT,
+    build_messages,
+    build_portfolio_context,
+)
 
 __all__ = [
+    "CHAT_HISTORY_WINDOW",
     "ChatClient",
     "ChatMessageOut",
     "ChatRequest",
@@ -33,10 +41,13 @@ __all__ = [
     "HistoryResponse",
     "LiveChatClient",
     "MockChatClient",
+    "SYSTEM_PROMPT",
     "StructuredResponse",
     "TradeAction",
     "TradeActionResult",
     "WatchlistAction",
     "WatchlistActionResult",
+    "build_messages",
+    "build_portfolio_context",
     "create_chat_client",
 ]
