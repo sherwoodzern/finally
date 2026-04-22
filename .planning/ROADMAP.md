@@ -96,7 +96,7 @@ Plans:
   5. When `LLM_MOCK=true`, the endpoint returns deterministic canned responses without calling OpenRouter, and the extended pytest suite (portfolio math, trade execution, trade validation, watchlist CRUD, LLM structured-output parsing, API routes, LLM mock mode) passes green.
 **Plans**: 3 plans
 Plans:
-- [ ] 05-01-PLAN.md — Chat sub-package foundation: models, LiveChatClient, MockChatClient, prompt assembly + unit tests
+- [x] 05-01-PLAN.md — Chat sub-package foundation: models, LiveChatClient, MockChatClient, prompt assembly + unit tests
 - [ ] 05-02-PLAN.md — Service orchestration: run_turn, get_history, ChatTurnError + service-level unit tests
 - [ ] 05-03-PLAN.md — Routes (POST /api/chat, GET /api/chat/history) + lifespan wiring (D-20, D-05 warning) + route integration tests
 **AI integration hint**: yes
