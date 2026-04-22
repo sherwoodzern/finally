@@ -32,6 +32,7 @@ from .prompts import (
     build_messages,
     build_portfolio_context,
 )
+from .routes import create_chat_router
 from .service import ChatTurnError, get_history, run_turn
 
 __all__ = [
@@ -53,6 +54,7 @@ __all__ = [
     "build_messages",
     "build_portfolio_context",
     "create_chat_client",
+    "create_chat_router",
     "get_history",
     "run_turn",
 ]
