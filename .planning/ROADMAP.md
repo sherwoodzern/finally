@@ -97,8 +97,8 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 05-01-PLAN.md — Chat sub-package foundation: models, LiveChatClient, MockChatClient, prompt assembly + unit tests
-- [ ] 05-02-PLAN.md — Service orchestration: run_turn, get_history, ChatTurnError + service-level unit tests
-- [ ] 05-03-PLAN.md — Routes (POST /api/chat, GET /api/chat/history) + lifespan wiring (D-20, D-05 warning) + route integration tests
+- [x] 05-02-PLAN.md — Service orchestration: run_turn, get_history, ChatTurnError + service-level unit tests (completed 2026-04-22)
+- [x] 05-03-PLAN.md — Routes (POST /api/chat, GET /api/chat/history) + lifespan wiring (D-20, D-05 warning) + route integration tests (completed 2026-04-22)
 **AI integration hint**: yes
 
 ### Phase 6: Frontend Scaffold & SSE
