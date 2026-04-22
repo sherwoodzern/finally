@@ -9,3 +9,27 @@ Public API:
 """
 
 from __future__ import annotations
+
+from .models import (
+    ChatMessageOut,
+    ChatRequest,
+    ChatResponse,
+    HistoryResponse,
+    StructuredResponse,
+    TradeAction,
+    TradeActionResult,
+    WatchlistAction,
+    WatchlistActionResult,
+)
+
+__all__ = [
+    "ChatMessageOut",
+    "ChatRequest",
+    "ChatResponse",
+    "HistoryResponse",
+    "StructuredResponse",
+    "TradeAction",
+    "TradeActionResult",
+    "WatchlistAction",
+    "WatchlistActionResult",
+]
