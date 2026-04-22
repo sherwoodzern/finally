@@ -7,9 +7,9 @@ import uuid
 
 import pytest
 
-from app.chat import MockChatClient, StructuredResponse, TradeAction
+from app.chat import MockChatClient
 from app.chat.service import ChatTurnError, get_history, run_turn
-from tests.chat.conftest import FakeChatClient, RaisingChatClient
+from tests.chat.conftest import RaisingChatClient
 
 
 def _chat_rows(conn, user_id: str = "default") -> list:
@@ -82,13 +82,18 @@ class TestChatMessagesUserIdFilter:
 
 class TestGetHistory:
     async def test_returns_rows_asc(self, fresh_db, warmed_cache, fake_source):
+        """Two run_turns produce [user hello, assistant reply, user world, assistant reply] ASC."""
         client = MockChatClient()
         await run_turn(fresh_db, warmed_cache, fake_source, client, "hello")
         await run_turn(fresh_db, warmed_cache, fake_source, client, "world")
         history = get_history(fresh_db, limit=50)
         assert len(history.messages) == 4
+        assert history.messages[0].role == "user"
         assert history.messages[0].content == "hello"
-        assert history.messages[-1].content == "world"
+        # Second user turn (third row) carries the "world" content.
+        assert history.messages[2].role == "user"
+        assert history.messages[2].content == "world"
+        assert history.messages[-1].role == "assistant"
 
     async def test_parses_actions_json_or_none(
         self, fresh_db, warmed_cache, fake_source

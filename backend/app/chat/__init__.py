@@ -8,6 +8,7 @@ Public API:
             create_chat_client
     Prompts: SYSTEM_PROMPT, CHAT_HISTORY_WINDOW, build_portfolio_context,
              build_messages
+    Service: run_turn, get_history, ChatTurnError
 """
 
 from __future__ import annotations
@@ -31,6 +32,7 @@ from .prompts import (
     build_messages,
     build_portfolio_context,
 )
+from .service import ChatTurnError, get_history, run_turn
 
 __all__ = [
     "CHAT_HISTORY_WINDOW",
@@ -38,6 +40,7 @@ __all__ = [
     "ChatMessageOut",
     "ChatRequest",
     "ChatResponse",
+    "ChatTurnError",
     "HistoryResponse",
     "LiveChatClient",
     "MockChatClient",
@@ -50,4 +53,6 @@ __all__ = [
     "build_messages",
     "build_portfolio_context",
     "create_chat_client",
+    "get_history",
+    "run_turn",
 ]

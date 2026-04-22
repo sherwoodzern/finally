@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from app.chat import MockChatClient
 from app.chat.service import run_turn
-from tests.chat.conftest import FakeSource
 
 
 def _count_chat_messages(conn, user_id: str = "default") -> int:
@@ -109,3 +108,74 @@ class TestRunTurnSourceFailureAfterAdd:
         )
         assert response.watchlist_changes[0].status == "added"  # DB wins
         assert _watchlist_has(fresh_db, "PYPL")
+
+
+class TestRunTurnRemove:
+    async def test_remove_existing_ticker_returns_removed(
+        self, fresh_db, warmed_cache, fake_source
+    ):
+        """'remove AAPL' -> DB deletes, source sees remove, status='removed'."""
+        client = MockChatClient()
+        assert _watchlist_has(fresh_db, "AAPL")  # seeded
+
+        response = await run_turn(
+            fresh_db, warmed_cache, fake_source, client, "remove AAPL"
+        )
+
+        assert len(response.watchlist_changes) == 1
+        assert response.watchlist_changes[0].ticker == "AAPL"
+        assert response.watchlist_changes[0].action == "remove"
+        assert response.watchlist_changes[0].status == "removed"
+        assert "AAPL" in fake_source.removed
+        assert not _watchlist_has(fresh_db, "AAPL")
+
+    async def test_drop_absent_ticker_returns_not_present(
+        self, fresh_db, warmed_cache, fake_source
+    ):
+        """'drop PYPL' when not in watchlist -> status='not_present', source untouched."""
+        client = MockChatClient()
+
+        response = await run_turn(
+            fresh_db, warmed_cache, fake_source, client, "drop PYPL"
+        )
+
+        assert response.watchlist_changes[0].status == "not_present"
+        # Idempotent remove did not call source (DB rowcount==0)
+        assert "PYPL" not in fake_source.removed
+
+    async def test_source_remove_raises_does_not_downgrade_result(
+        self, fresh_db, warmed_cache
+    ):
+        """Symmetric to add path: source.remove raises -> logs WARNING, status='removed'."""
+        from tests.chat.conftest import FakeSource
+
+        class BoomSource(FakeSource):
+            async def remove_ticker(self, ticker: str) -> None:
+                raise RuntimeError("source exploded on remove")
+
+        client = MockChatClient()
+        response = await run_turn(
+            fresh_db, warmed_cache, BoomSource(), client, "remove AAPL"
+        )
+        assert response.watchlist_changes[0].status == "removed"  # DB wins
+        assert not _watchlist_has(fresh_db, "AAPL")
+
+
+class TestRunTurnWatchlistInternalError:
+    async def test_add_ticker_unexpected_exception_becomes_internal_error(
+        self, fresh_db, warmed_cache, fake_source, monkeypatch
+    ):
+        """Any other Exception from add_ticker -> watchlist result status='failed', error='internal_error'."""
+        import app.chat.service as svc
+
+        def _boom(*args, **kwargs):
+            raise KeyError("db gremlin")
+
+        monkeypatch.setattr(svc, "add_ticker", _boom)
+
+        client = MockChatClient()
+        response = await run_turn(
+            fresh_db, warmed_cache, fake_source, client, "add PYPL"
+        )
+        assert response.watchlist_changes[0].status == "failed"
+        assert response.watchlist_changes[0].error == "internal_error"
