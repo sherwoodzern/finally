@@ -8,7 +8,7 @@ class MockEventSource {
   static CLOSED = 2 as const;
 
   url: string;
-  readyState = MockEventSource.CONNECTING;
+  readyState: number = MockEventSource.CONNECTING;
   onopen: ((this: MockEventSource, ev: Event) => void) | null = null;
   onmessage: ((this: MockEventSource, ev: MessageEvent) => void) | null = null;
   onerror: ((this: MockEventSource, ev: Event) => void) | null = null;
