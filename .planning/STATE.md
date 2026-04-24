@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: phase 06 planning complete (2026-04-23)
-last_updated: "2026-04-23T00:00:00.000Z"
-last_activity: 2026-04-23 -- Phase 06 planning complete (3 plans, 3 waves)
+stopped_at: phase 06 plan 1 of 3 complete (2026-04-24)
+last_updated: "2026-04-24T04:23:27Z"
+last_activity: 2026-04-24 -- Plan 06-01 executed (3 tasks, frontend scaffold + theme + static export gate)
 progress:
   total_phases: 10
   completed_phases: 5
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 
 ## Current Position
 
-Phase: 06 (frontend-scaffold-sse) — PLANNED
-Plan: 0 of 3
-Status: Ready to execute
-Last activity: 2026-04-23 -- Phase 06 planning complete (3 plans, 3 waves)
+Phase: 06 (frontend-scaffold-sse) — EXECUTING
+Plan: 1 of 3
+Status: Plan 06-01 complete; Plan 06-02 (SSE client + Zustand store) is next
+Last activity: 2026-04-24 -- Plan 06-01 executed (3 tasks, frontend scaffold + theme + static export gate)
 
 Progress: [#########░] 92%
 
@@ -58,6 +58,7 @@ Progress: [#########░] 92%
 | Phase 03 P03 | 7m 9s | 4 tasks | 10 files |
 | Phase 04 P01 | 4m 14s | 3 tasks | 9 files |
 | Phase 04 P02 | 6m 22s | 4 tasks | 8 files |
+| Phase 06 P01 | 1h 5m 15s | 3 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,11 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-02: DB-first-then-source choreography with try/except around `await source.{add,remove}_ticker` only; post-commit source failure logs WARNING with `exc_info=True` and still returns 200 (D-11). DB row-count arithmetic asserted strictly as `== before + 1` / `== before - 1`, not `>=`
 - [Phase 04]: 04-02: Idempotent mutation responses always 200 with `status="added"/"exists"/"removed"/"not_present"` (SC#4); never 409/404. Uniform discriminator lets Phase 5 LLM handler branch without HTTP-code sniffing (D-06)
 - [Phase 04]: 04-02: Module-scoped `app_with_lifespan` + `client` fixtures with `@pytest_asyncio.fixture(loop_scope="module", scope="module")` + `pytestmark = pytest.mark.asyncio(loop_scope="module")` + module-scoped `event_loop_policy` override in each test file — required by pytest-asyncio 1.x for module-scoped async fixtures. 21 integration tests across 3 files, exactly 1 SimulatorDataSource start per file (runtime <1s per file, well under 30s VALIDATION.md budget)
+- [Phase 06]: 06-01: create-next-app scaffold with `--import-alias "@/*"` (D-01's `--no-import-alias=false` is invalid CLI syntax per RESEARCH G6). Next.js 16.2.4, Tailwind 4.2.4, React 19.2.4, TypeScript 5.9.3, Zustand 5.0.12, Vitest 4.1.5 landed. Scaffolded `frontend/CLAUDE.md` + `frontend/AGENTS.md` deleted (G11); repo-root CLAUDE.md is authoritative.
+- [Phase 06]: 06-01: Tailwind v4 CSS-first @theme block in `src/app/globals.css` replaces the v3 `tailwind.config.ts` pattern from CONTEXT.md D-09 (RESEARCH G1 override). No `tailwind.config.ts` file needed in Phase 06. `@tailwindcss/postcss` in postcss.config.mjs (not v3 `tailwindcss` plugin).
+- [Phase 06]: 06-01: Tailwind v4 tree-shakes `@theme` tokens without utility references — Phase 7-reserved tokens (accent-purple, surface-alt, border-muted, up, down, foreground-muted) redeclared in a plain `:root` block so the compiled CSS bundle always contains all four brand hex values required by the Wave 1 build gate (#0d1117, #ecad0a, #209dd7, #753991). `@theme` block still drives utility generation when Phase 7 adds `text-accent-purple` etc.
+- [Phase 06]: 06-01: `next.config.mjs` (not `.ts`) with dev-only `async rewrites()` guarded by `NODE_ENV === 'development'`; stream rewrite `/api/stream/:path*` precedes generic `/api/:path*` for correct path-matching precedence. Production export has an empty rewrites array — the benign `rewrites + output: 'export'` warning is expected per RESEARCH G2.
+- [Phase 06]: 06-01: Turbopack 16 emits CSS under `out/_next/static/chunks/*.css`, not `out/_next/static/css/*.css`. Plans 06-02/06-03 verify blocks should use the `chunks/*.css` path.
 
 ### Pending Todos
 
@@ -127,7 +133,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-22T23:44:30.641Z
-Stopped at: context exhaustion at 90% (2026-04-22)
+Last session: 2026-04-24T04:23:27Z
+Stopped at: Plan 06-01 complete, ready for Plan 06-02 (SSE client + Zustand store)
 Resume file: None
-Resumed: 2026-04-21 — Plan 04-02 executed (4 tasks, 4 new files + 4 modified, 22 new tests; 207/207 full suite green)
+Resumed: 2026-04-24 — Plan 06-01 executed (3 tasks: scaffold, theme+config templates, build gate; 3 atomic commits; frontend/out/ static export green with all four brand hex values)

@@ -112,7 +112,7 @@ Plans:
   4. Price updates observed in the store match the backend's emitted events for the current watchlist (verified by a simple debug view or a component test with a mock stream).
 **Plans**: 3 plans
 Plans:
-- [ ] 06-01-PLAN.md — Scaffold frontend/ with Next.js 16 + Tailwind v4 CSS-first theme + dev proxy rewrites + zero-error static export (Wave 1)
+- [x] 06-01-PLAN.md — Scaffold frontend/ with Next.js 16 + Tailwind v4 CSS-first theme + dev proxy rewrites + zero-error static export (Wave 1) (completed 2026-04-24)
 - [ ] 06-02-PLAN.md — Zustand price store + sse-types + PriceStreamProvider wired into root layout (D-11..D-19; Wave 2)
 - [ ] 06-03-PLAN.md — Vitest + MockEventSource (8 tests) + /debug page (UI-SPEC §5.2) + manual wire-check (Wave 3)
 **UI hint**: yes
@@ -176,7 +176,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Portfolio & Trading API | 3/3 | Complete | 2026-04-21 |
 | 4. Watchlist API | 2/2 | Complete | 2026-04-21 |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
-| 6. Frontend Scaffold & SSE | 0/TBD | Not started | - |
+| 6. Frontend Scaffold & SSE | 1/3 | In progress | - |
 | 7. Market Data & Trading UI | 0/TBD | Not started | - |
 | 8. Portfolio Visualization & Chat UI | 0/TBD | Not started | - |
 | 9. Dockerization & Packaging | 0/TBD | Not started | - |
