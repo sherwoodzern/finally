@@ -1,0 +1,63 @@
+Plan 06-03 Task 4 - Wave 3 merge gate verification
+===================================================
+
+Executed: 2026-04-23 on finally-gsd branch (sequential executor)
+
+1) cd frontend && npm run test:ci -- EXIT 0
+---------------------------------------------
+
+  Test Files  1 passed (1)
+       Tests  8 passed (8)
+    Duration  380ms (transform 16ms, setup 37ms, import 15ms, tests 3ms, env 266ms)
+
+All 8 behaviors per RESEARCH.md section 13 pass green:
+- onopen sets status connected
+- first event sets session_start_price per ticker
+- subsequent events update price but NOT session_start_price
+- onerror CONNECTING sets status reconnecting
+- onerror CLOSED sets status disconnected
+- connect is idempotent
+- malformed payload is logged and dropped; store unchanged
+- selector subscribe fires on store changes
+
+2) cd frontend && npm run build -- EXIT 0
+-------------------------------------------
+
+Next.js 16.2.4 + Turbopack.
+Route (app):
+  / (Static)
+  /_not-found (Static)
+  /debug (Static)
+
+Static export artifacts:
+  out/index.html                 OK
+  out/debug/index.html           OK
+  out/debug/index.html contains "Price Stream Debug"            OK
+  out/debug/index.html contains "Awaiting first price tick"     OK
+  out/debug/index.html contains "Connection lost"               OK
+
+Benign warning observed (documented in RESEARCH.md G2, harmless given
+NODE_ENV-guarded empty rewrites in production):
+  "Specified \"rewrites\" will not automatically work with \"output: export\"."
+
+3) Tailwind brand tokens in compiled CSS (Turbopack 16 -> chunks/*.css)
+-----------------------------------------------------------------------
+
+CSS chunk: out/_next/static/chunks/0pamctjyf33zf.css
+
+  #ecad0a (accent-yellow) OK
+  #209dd7 (accent-blue)   OK
+  #753991 (accent-purple) OK
+  #0d1117 (surface)       OK
+  #30363d (border-muted)  OK   (new utility landing from /debug page)
+  #8b949e (foreground-muted) OK (new utility landing from /debug page)
+
+All four Plan 06-01 build-gate brand hexes preserved. Two previously
+force-emitted tokens (border-muted, foreground-muted) now have direct
+utility references on the /debug page, proving the dual-declaration
+pattern from Plan 06-01 is working as intended.
+
+4) cd frontend && npm run lint -- EXIT 0
+------------------------------------------
+
+ESLint clean.
