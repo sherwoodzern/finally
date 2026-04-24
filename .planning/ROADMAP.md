@@ -127,7 +127,16 @@ Plans:
   3. The positions table renders ticker, quantity, avg cost, current price, unrealized P&L, and % for every position returned by `/api/portfolio`, updating as prices tick.
   4. The trade bar fills market orders instantly with no confirmation dialog — entering ticker + quantity and clicking Buy or Sell calls `POST /api/portfolio/trade` and reflects the result in cash, positions, and the header on the next render.
   5. The header continuously displays total portfolio value and cash balance, plus a connection-status dot that is green when SSE is connected, yellow while reconnecting, and red when disconnected.
-**Plans**: TBD
+**Plans**: 8 plans
+Plans:
+- [ ] 07-00-PLAN.md — Foundation: install lightweight-charts + @tanstack/react-query, align up/down palette to D-02 (#26a69a/#ef5350), create Providers client wrapper, wire into layout (Wave 1)
+- [ ] 07-01-PLAN.md — Store extension: flashDirection + sparklineBuffers + selectedTicker slices with selectors and unit tests (Wave 1)
+- [ ] 07-02-PLAN.md — API wrappers: lib/api/portfolio.ts + lib/api/watchlist.ts + TradeError + renderWithQuery test helper (Wave 2)
+- [ ] 07-03-PLAN.md — FE-03 Watchlist panel + WatchlistRow + Sparkline (Lightweight Charts v5 addSeries API) (Wave 3)
+- [ ] 07-04-PLAN.md — FE-04 MainChart for selected ticker with empty state (Wave 3)
+- [ ] 07-05-PLAN.md — FE-07 PositionsTable + PositionRow with client-side P&L and cold-start fallback (Wave 3)
+- [ ] 07-06-PLAN.md — FE-08 TradeBar with regex-gated ticker, D-07 error map, and invalidate-on-success (Wave 3)
+- [ ] 07-07-PLAN.md — FE-10 Header + ConnectionDot + Terminal three-column layout + replace app/page.tsx; final build gate (Wave 4)
 **UI hint**: yes
 
 ### Phase 8: Portfolio Visualization & Chat UI
@@ -177,7 +186,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. Watchlist API | 2/2 | Complete | 2026-04-21 |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
 | 6. Frontend Scaffold & SSE | 3/3 | Complete | 2026-04-24 |
-| 7. Market Data & Trading UI | 0/TBD | Not started | - |
+| 7. Market Data & Trading UI | 0/8 | Not started | - |
 | 8. Portfolio Visualization & Chat UI | 0/TBD | Not started | - |
 | 9. Dockerization & Packaging | 0/TBD | Not started | - |
 | 10. E2E Validation | 0/TBD | Not started | - |
