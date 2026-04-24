@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: phase 06 plan 1 of 3 complete (2026-04-24)
-last_updated: "2026-04-24T04:23:27Z"
-last_activity: 2026-04-24 -- Plan 06-01 executed (3 tasks, frontend scaffold + theme + static export gate)
+stopped_at: phase 06 plan 2 of 3 complete (2026-04-24)
+last_updated: "2026-04-24T05:02:15Z"
+last_activity: 2026-04-24 -- Plan 06-02 executed (3 source commits + 1 verification gate, SSE client + Zustand store + PriceStreamProvider wired into layout)
 progress:
   total_phases: 10
   completed_phases: 5
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 06 (frontend-scaffold-sse) — EXECUTING
-Plan: 1 of 3
-Status: Plan 06-01 complete; Plan 06-02 (SSE client + Zustand store) is next
-Last activity: 2026-04-24 -- Plan 06-01 executed (3 tasks, frontend scaffold + theme + static export gate)
+Plan: 2 of 3
+Status: Plan 06-02 complete; Plan 06-03 (Vitest + /debug page) is next
+Last activity: 2026-04-24 -- Plan 06-02 executed (3 source commits + Wave-2 gate green; sse-types + Zustand store + PriceStreamProvider + layout wired)
 
 Progress: [#########░] 92%
 
@@ -59,6 +59,7 @@ Progress: [#########░] 92%
 | Phase 04 P01 | 4m 14s | 3 tasks | 9 files |
 | Phase 04 P02 | 6m 22s | 4 tasks | 8 files |
 | Phase 06 P01 | 1h 5m 15s | 3 tasks | 17 files |
+| Phase 06 P02 | 15m 28s | 4 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,10 @@ Recent decisions affecting current work:
 - [Phase 06]: 06-01: Tailwind v4 tree-shakes `@theme` tokens without utility references — Phase 7-reserved tokens (accent-purple, surface-alt, border-muted, up, down, foreground-muted) redeclared in a plain `:root` block so the compiled CSS bundle always contains all four brand hex values required by the Wave 1 build gate (#0d1117, #ecad0a, #209dd7, #753991). `@theme` block still drives utility generation when Phase 7 adds `text-accent-purple` etc.
 - [Phase 06]: 06-01: `next.config.mjs` (not `.ts`) with dev-only `async rewrites()` guarded by `NODE_ENV === 'development'`; stream rewrite `/api/stream/:path*` precedes generic `/api/:path*` for correct path-matching precedence. Production export has an empty rewrites array — the benign `rewrites + output: 'export'` warning is expected per RESEARCH G2.
 - [Phase 06]: 06-01: Turbopack 16 emits CSS under `out/_next/static/chunks/*.css`, not `out/_next/static/css/*.css`. Plans 06-02/06-03 verify blocks should use the `chunks/*.css` path.
+- [Phase 06]: 06-02: Zustand store is the single source of truth for live ticker state — `prices: Record<string, Tick>`, `status: ConnectionStatus`, `lastEventAt: number | null`, methods `connect/disconnect/ingest/reset`. `session_start_price` is frozen client-side on first-seen (D-14) via `prior?.session_start_price ?? raw.price`. Single `es: EventSource | null` module-level singleton with D-15 idempotent guard `if (es && es.readyState !== 2) return` for StrictMode safety. Named exports only: `usePriceStore`, `__setEventSource`, `selectTick`, `selectConnectionStatus`.
+- [Phase 06]: 06-02: `PriceStreamProvider` is the React-mounted lifecycle owner — `'use client'`, `useEffect(() => { connect(); return () => disconnect(); }, [])` with empty deps. Placed outermost in `layout.tsx` so Plan 06-03 `/debug` page inherits the live EventSource without remounting. Conceptual analog of backend `SimulatorDataSource.start/stop`.
+- [Phase 06]: 06-02: Repo-root `.gitignore` Python template's `lib/` line (at line 17, next to `build/` / `dist/` / `eggs/`) was silently ignoring `frontend/src/lib/` — Rule 3 auto-fix added `!frontend/src/lib/` and `!frontend/src/lib/**` negations so the Phase 06 contract directory tracks. Does not alter Python build-dir exclusion semantics.
+- [Phase 06]: 06-02: Narrow try/catch at JSON.parse+ingest boundary only (D-19), `console.warn('sse parse failed', err, event.data)` with structured args (no template-literal interpolation, matching backend `%`-style logging pattern). No rethrow — EventSource stays alive after malformed frames and the browser's built-in `retry: 1000` auto-reconnect handles network drops.
 
 ### Pending Todos
 
@@ -133,7 +138,7 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-24T04:23:27Z
-Stopped at: Plan 06-01 complete, ready for Plan 06-02 (SSE client + Zustand store)
+Last session: 2026-04-24T05:02:15Z
+Stopped at: Plan 06-02 complete, ready for Plan 06-03 (Vitest + MockEventSource + /debug page)
 Resume file: None
-Resumed: 2026-04-24 — Plan 06-01 executed (3 tasks: scaffold, theme+config templates, build gate; 3 atomic commits; frontend/out/ static export green with all four brand hex values)
+Resumed: 2026-04-24 — Plan 06-02 executed (3 source commits: sse-types+store 669195f, PriceStreamProvider 288bbf6, layout wire 6f942a7; Wave-2 gate green: tsc+build+lint all exit 0, all four brand hex values preserved in out/_next/static/chunks/*.css; 1 Rule 3 auto-fix for .gitignore blocking frontend/src/lib/)
