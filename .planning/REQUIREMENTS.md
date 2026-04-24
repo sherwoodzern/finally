@@ -58,8 +58,8 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### Frontend
 
-- [ ] **FE-01**: Next.js TypeScript project configured for `output: 'export'` with Tailwind and the project dark theme + accent colors (yellow `#ecad0a`, blue `#209dd7`, purple `#753991`)
-- [ ] **FE-02**: `EventSource` SSE client connected to `/api/stream/prices` that updates a local ticker-keyed price store
+- [x] **FE-01**: Next.js TypeScript project configured for `output: 'export'` with Tailwind and the project dark theme + accent colors (yellow `#ecad0a`, blue `#209dd7`, purple `#753991`) _(Plan 06-01 scaffolded with Next.js 16 + Tailwind v4 CSS-first @theme + :root dual-declaration; all four brand hex values verified in compiled CSS chunks — FE-01 validated 2026-04-24)_
+- [x] **FE-02**: `EventSource` SSE client connected to `/api/stream/prices` that updates a local ticker-keyed price store _(Zustand price store + PriceStreamProvider landed in Plan 06-02; Vitest 8-test MockEventSource suite + /debug page delivered in Plan 06-03 — FE-02 validated 2026-04-24)_
 - [ ] **FE-03**: Watchlist panel — ticker, live price with green/red flash animation on tick, daily-change % computed from each event's session-start price, and a progressive sparkline accumulated from SSE since page load (Lightweight Charts)
 - [ ] **FE-04**: Main chart area showing the currently selected ticker (Lightweight Charts canvas); clicking a watchlist row selects the ticker
 - [ ] **FE-05**: Portfolio heatmap — treemap where rectangles are sized by position weight and colored by P&L
@@ -148,8 +148,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 | CHAT-04 | Phase 5 | Pending |
 | CHAT-05 | Phase 5 | Pending |
 | CHAT-06 | Phase 5 | Pending |
-| FE-01 | Phase 6 | Pending |
-| FE-02 | Phase 6 | Pending |
+| FE-01 | Phase 6 | Validated (06-01 scaffold + theme + static export) |
+| FE-02 | Phase 6 | Validated (06-02 store + provider; 06-03 tests + /debug page) |
 | FE-03 | Phase 7 | Pending |
 | FE-04 | Phase 7 | Pending |
 | FE-05 | Phase 8 | Pending |
@@ -175,4 +175,4 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-21 after Plan 04-01 completion (WATCH-01, WATCH-02, WATCH-03 service layer complete — HTTP wiring in Plan 04-02)*
+*Last updated: 2026-04-24 after Plan 06-03 completion (FE-01 validated via Plan 06-01 scaffold; FE-02 validated via Plan 06-02 store + Plan 06-03 MockEventSource tests + /debug page)*
