@@ -25,3 +25,23 @@ html, body {
   background-color: var(--color-surface);
   color: var(--color-foreground);
 }
+
+/*
+ * Force-emit tokens that Tailwind v4 would otherwise tree-shake because no
+ * utility references them yet. These are reserved for later phases but must
+ * survive the production bundle today (Phase 6 build gate asserts all four
+ * brand hex values appear in the compiled CSS).
+ *
+ * accent-purple is Phase 7 trade-bar submit (UI-SPEC 4.2).
+ * surface-alt is Phase 7 elevated panels (UI-SPEC 4.2).
+ * border-muted is Phase 6 debug page table (UI-SPEC 5.2, wired in Plan 06-03).
+ * up / down are Phase 7 price direction coloring (UI-SPEC 4.2).
+ */
+:root {
+  --color-accent-purple: #753991;
+  --color-surface-alt:   #1a1a2e;
+  --color-border-muted:  #30363d;
+  --color-up:            #3fb950;
+  --color-down:          #f85149;
+  --color-foreground-muted: #8b949e;
+}
