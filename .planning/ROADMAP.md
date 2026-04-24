@@ -110,7 +110,11 @@ Plans:
   2. `npm run build` produces a static export under `frontend/out/` with zero type errors and zero build errors.
   3. When the site is opened against the running backend, a single `EventSource` connects to `/api/stream/prices`, parses events, and updates a ticker-keyed price store that downstream components can subscribe to.
   4. Price updates observed in the store match the backend's emitted events for the current watchlist (verified by a simple debug view or a component test with a mock stream).
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 06-01-PLAN.md — Scaffold frontend/ with Next.js 16 + Tailwind v4 CSS-first theme + dev proxy rewrites + zero-error static export (Wave 1)
+- [ ] 06-02-PLAN.md — Zustand price store + sse-types + PriceStreamProvider wired into root layout (D-11..D-19; Wave 2)
+- [ ] 06-03-PLAN.md — Vitest + MockEventSource (8 tests) + /debug page (UI-SPEC §5.2) + manual wire-check (Wave 3)
 **UI hint**: yes
 
 ### Phase 7: Market Data & Trading UI
