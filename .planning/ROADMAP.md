@@ -136,7 +136,7 @@ Plans:
 - [x] 07-04-PLAN.md — FE-04 MainChart for selected ticker with empty state (Wave 3)
 - [x] 07-05-PLAN.md — FE-07 PositionsTable + PositionRow with client-side P&L and cold-start fallback (Wave 3)
 - [x] 07-06-PLAN.md — FE-08 TradeBar with regex-gated ticker, D-07 error map, and invalidate-on-success (Wave 3)
-- [ ] 07-07-PLAN.md — FE-10 Header + ConnectionDot + Terminal three-column layout + replace app/page.tsx; final build gate (Wave 4)
+- [x] 07-07-PLAN.md — FE-10 Header + ConnectionDot + Terminal three-column layout + replace app/page.tsx; final build gate (Wave 4)
 **UI hint**: yes
 
 ### Phase 8: Portfolio Visualization & Chat UI
