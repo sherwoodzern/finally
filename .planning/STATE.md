@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Plan 06-03 complete (all 3 Phase 06 plans done); next step is Phase 06 verifier via `/gsd-execute-phase` orchestrator
-last_updated: "2026-04-25T14:30:48.433Z"
+stopped_at: Phase 8 context gathered (08-CONTEXT.md + 08-DISCUSSION-LOG.md committed); next step is `/gsd-plan-phase 8`
+last_updated: "2026-04-25T15:05:00.000Z"
 last_activity: 2026-04-25
 progress:
   total_phases: 10
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 8
-Plan: Not started
-Status: Executing Phase 7
+Plan: Not started (context gathered)
+Status: Phase 8 context ready for planning
 Last activity: 2026-04-25
 
-Progress: [##########] 100% of Phase 06
+Progress: [          ] 0% of Phase 08 (context complete, plans pending)
 
 ## Performance Metrics
 
@@ -145,11 +145,11 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-04-25
-Stopped at: Phase 7 UAT exercised against the Next.js dev server (`http://localhost:3000`). 2 pass (UAT 4 trade flow, UAT 6 aesthetic), 1 fail (UAT 1 price-flash) + 3 blocked (UAT 2 sparklines, UAT 3 main chart, UAT 5 reconnect dot) — all four on the same root cause **G1**.
+Stopped at: Phase 8 context gathered. User selected two gray areas — **Visualization styling** and **Demo polish priorities** — and four single-question turns each. Heatmap = Recharts `<Treemap>` + binary up/down + ticker+P&L% labels + click-selects. P&L chart = Recharts `<LineChart>` over all snapshots + dotted $10k reference line + stroke flips at break-even. Chat dock = right-edge drawer, default open, push layout (~380px). LLM loading = 3-dot bubble. Cold-start = skeleton-per-panel. Agentic auto-trade = action-card pulse + position-row flash (~800ms, distinct from Phase 7's 500ms price flash). 17 decisions (D-01..D-17) recorded plus 10 Claude's Discretion items.
 
-**G1**: dev-only SSE redirect chain — `next.config.mjs` `trailingSlash: true` causes Next dev server to 308 `/api/stream/prices` → `/api/stream/prices/`; the rewrite then carries the slash to FastAPI which 307s back to `/api/stream/prices` as an absolute cross-origin URL; EventSource won't follow without CORS, so the stream never opens. Backend SSE itself is healthy (`curl http://localhost:8000/api/stream/prices` streams correctly). G1 is dev-only — Phase 8 SC#4 mounts the static export and removes the redirect chain entirely.
+**G1 carry-over (from Phase 7):** addressed in CONTEXT.md as D-14 (FastAPI `StaticFiles` mount of `frontend/out/` at `/` after API routers, `html=True`) + D-15 (`skipTrailingSlashRedirect: true` in `next.config.mjs`). Both land in the same plan so prod and dev SSE both work; Phase 7's deferred UAT 1/2/3/5 become testable.
 
-UAT 1, 2, 3, 5 deferred to Phase 8. Recorded in `.planning/phases/07-market-data-trading-ui/07-HUMAN-UAT.md` (status: complete_with_deferred). Recommended fix candidate: `skipTrailingSlashRedirect: true` in `next.config.mjs`.
+**New deps for Phase 8:** `recharts` (frontend prod). Second and final chart dep alongside the Phase 7 `lightweight-charts`.
 
-Resume file: None
-Next action: `/clear` then `/gsd-discuss-phase 8` (no CONTEXT.md exists for Phase 8 yet). Carry G1 in as a Phase 8 input — the SSE-dependent UAT items will be exercised against the prod-style FastAPI static mount.
+Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-CONTEXT.md`
+Next action: `/clear` then `/gsd-plan-phase 8`. Phase 8 is six requirements (FE-05, FE-06, FE-09, FE-11, APP-02, TEST-02) — significant surface area; expect the planner to break it into 4–6 plans.
