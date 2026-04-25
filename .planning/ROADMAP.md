@@ -134,7 +134,7 @@ Plans:
 - [x] 07-02-PLAN.md — API wrappers: lib/api/portfolio.ts + lib/api/watchlist.ts + TradeError + renderWithQuery test helper (Wave 2)
 - [x] 07-03-PLAN.md — FE-03 Watchlist panel + WatchlistRow + Sparkline (Lightweight Charts v5 addSeries API) (Wave 3)
 - [x] 07-04-PLAN.md — FE-04 MainChart for selected ticker with empty state (Wave 3)
-- [ ] 07-05-PLAN.md — FE-07 PositionsTable + PositionRow with client-side P&L and cold-start fallback (Wave 3)
+- [x] 07-05-PLAN.md — FE-07 PositionsTable + PositionRow with client-side P&L and cold-start fallback (Wave 3)
 - [ ] 07-06-PLAN.md — FE-08 TradeBar with regex-gated ticker, D-07 error map, and invalidate-on-success (Wave 3)
 - [ ] 07-07-PLAN.md — FE-10 Header + ConnectionDot + Terminal three-column layout + replace app/page.tsx; final build gate (Wave 4)
 **UI hint**: yes
