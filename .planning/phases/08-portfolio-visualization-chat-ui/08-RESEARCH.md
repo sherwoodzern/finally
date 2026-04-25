@@ -1395,7 +1395,7 @@ against the actual filesystem layout.)
 
 **Net assumption volume: 3, all LOW risk. No user confirmation needed.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the planner use the Path-from-`__file__` pattern or document
    the cwd contract for the StaticFiles mount?**
@@ -1405,7 +1405,7 @@ against the actual filesystem layout.)
      it works regardless of cwd. Phase 9's Dockerfile will copy
      `frontend/out/` into `backend/static/` and the path becomes static-
      relative.
-   - Recommendation: planner uses
+   - RESOLVED: planner uses
      `Path(__file__).resolve().parents[2] / "frontend" / "out"`. See §Code
      Examples.
 
@@ -1415,7 +1415,7 @@ against the actual filesystem layout.)
    - What's unclear: how strict the geometry-based assertions in UI-SPEC §13
      need to be. Most Phase 8 tests can assert against props (data shape,
      stroke color), not pixel positions.
-   - Recommendation: start with the `ResizeObserver` stub only. If a
+   - RESOLVED: start with the `ResizeObserver` stub only. If a
      specific test (e.g., row 1 "renders one rect per position") needs
      visible SVG, add `vi.mock('recharts', () => ({ ...original,
      ResponsiveContainer: <fixed-size-wrapper> }))` in JUST that test file.
@@ -1428,7 +1428,7 @@ against the actual filesystem layout.)
    - What's unclear: nothing — CLAUDE.md mandates latest APIs; the only
      breaking change touching Phase 8 is `TooltipProps` →
      `TooltipContentProps`, which is a 1-line import update.
-   - Recommendation: install `recharts@^3` (or `^3.8.0`). CONTEXT.md D-17
+   - RESOLVED: install `recharts@^3` (or `^3.8.0`). CONTEXT.md D-17
      and UI-SPEC §1 should be treated as a target version that needs minor
      correction during planning. The decision (use Recharts) is unchanged;
      only the version pin is corrected.
