@@ -149,7 +149,15 @@ Plans:
   3. A docked/collapsible AI chat panel shows conversation history, accepts input, displays a loading indicator during the LLM call, and renders inline confirmation entries for each executed trade and watchlist change returned by `/api/chat`.
   4. FastAPI, started from a single process, serves the built Next.js export at `/` on the same port (`:8000`) as the API — no CORS, no second server.
   5. Frontend component tests cover the price-flash animation trigger, watchlist CRUD UI, portfolio display calculations, and chat rendering + loading state, and all pass green; demo-grade polish (transitions, loading skeletons, chat micro-interactions, visible trade-execution moments) is present.
-**Plans**: TBD
+**Plans**: 7 plans
+Plans:
+- [ ] 08-01-PLAN.md — APP-02 FastAPI StaticFiles mount + G1 next.config.mjs skipTrailingSlashRedirect fix + integration test
+- [ ] 08-02-PLAN.md — recharts@^3.8.0 + portfolio.ts/chat.ts API clients + Zustand selectedTab/tradeFlash slices + ResizeObserver vitest stub + globals.css keyframes + fixtures
+- [ ] 08-03-PLAN.md — FE-05 Heatmap + HeatmapCell + 9 Vitest tests (Recharts Treemap, binary up/down, click-selects-ticker)
+- [ ] 08-04-PLAN.md — FE-06 PnLChart + PnLTooltip + 6 Vitest tests (Recharts LineChart, dotted $10k ReferenceLine, stroke flips at break-even)
+- [ ] 08-05-PLAN.md — SkeletonBlock primitive + TabBar + 4 tests + Terminal.tsx flex-row restructure with chat-drawer slot
+- [ ] 08-06-PLAN.md — FE-09 chat surface (8 components: ChatDrawer/ChatHeader/ChatThread/ChatMessage/ActionCardList/ActionCard/ChatInput/ThinkingBubble) + 15+ tests + Terminal.tsx ChatDrawer mount
+- [ ] 08-07-PLAN.md — FE-11 polish wiring (PositionRow trade-flash + TradeBar manual-flash) + final build gate (npm run build, full Vitest, full pytest)
 **UI hint**: yes
 
 ### Phase 9: Dockerization & Packaging
