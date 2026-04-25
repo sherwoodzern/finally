@@ -144,7 +144,12 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-24T14:42:35Z
-Stopped at: Plan 06-03 complete (all 3 Phase 06 plans done); next step is Phase 06 verifier via `/gsd-execute-phase` orchestrator
+Last session: 2026-04-25
+Stopped at: Phase 7 UAT exercised against the Next.js dev server (`http://localhost:3000`). 2 pass (UAT 4 trade flow, UAT 6 aesthetic), 1 fail (UAT 1 price-flash) + 3 blocked (UAT 2 sparklines, UAT 3 main chart, UAT 5 reconnect dot) — all four on the same root cause **G1**.
+
+**G1**: dev-only SSE redirect chain — `next.config.mjs` `trailingSlash: true` causes Next dev server to 308 `/api/stream/prices` → `/api/stream/prices/`; the rewrite then carries the slash to FastAPI which 307s back to `/api/stream/prices` as an absolute cross-origin URL; EventSource won't follow without CORS, so the stream never opens. Backend SSE itself is healthy (`curl http://localhost:8000/api/stream/prices` streams correctly). G1 is dev-only — Phase 8 SC#4 mounts the static export and removes the redirect chain entirely.
+
+UAT 1, 2, 3, 5 deferred to Phase 8. Recorded in `.planning/phases/07-market-data-trading-ui/07-HUMAN-UAT.md` (status: complete_with_deferred). Recommended fix candidate: `skipTrailingSlashRedirect: true` in `next.config.mjs`.
+
 Resume file: None
-Resumed: 2026-04-24 — Plan 06-03 finalized after user auto-approved the Task 5 human-verify checkpoint under --auto-chain. Prior executor committed 5 source changes (fa93834 Vitest config + jest-dom setup; 1898e99 8-test MockEventSource suite; 7d90f21 Rule 1 readyState widening; 5a36c51 /debug page; 78659bb Wave-3 VERIFY.txt). Gates: test:ci exit 0 (8/8 in 380ms), build exit 0 (out/debug/index.html + required copy strings), lint exit 0, all six brand hex values in out/_next/static/chunks/*.css. Continuation agent added 4 metadata commits (SUMMARY.md, STATE.md, ROADMAP.md, REQUIREMENTS.md).
+Next action: `/clear` then `/gsd-discuss-phase 8` (no CONTEXT.md exists for Phase 8 yet). Carry G1 in as a Phase 8 input — the SSE-dependent UAT items will be exercised against the prod-style FastAPI static mount.
