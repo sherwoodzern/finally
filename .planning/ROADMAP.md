@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 4: Watchlist API** - `/api/watchlist` GET/POST/DELETE wired to the price cache's dynamic ticker lifecycle (completed 2026-04-21)
 - [ ] **Phase 5: AI Chat Integration** - `/api/chat` with LiteLLM → OpenRouter (Cerebras), structured outputs, auto-exec of trades + watchlist changes, mock mode, full backend test suite
 - [x] **Phase 6: Frontend Scaffold & SSE** - Next.js TypeScript static-export project with Tailwind theme and the live-price SSE client (completed 2026-04-24)
-- [ ] **Phase 7: Market Data & Trading UI** - Watchlist panel with sparklines, main chart, positions table, trade bar, header with live totals and connection dot
+- [x] **Phase 7: Market Data & Trading UI** - Watchlist panel with sparklines, main chart, positions table, trade bar, header with live totals and connection dot (completed 2026-04-25)
 - [ ] **Phase 8: Portfolio Visualization & Chat UI** - Heatmap, P&L chart, collapsible AI chat panel, demo polish, static frontend mounted into FastAPI, frontend component tests
 - [ ] **Phase 9: Dockerization & Packaging** - Multi-stage Dockerfile, canonical `docker run` invocation, start/stop scripts, `.env.example`
 - [ ] **Phase 10: E2E Validation** - Playwright harness with `docker-compose.test.yml` and all §12 scenarios against the mocked-LLM image
@@ -186,7 +186,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. Watchlist API | 2/2 | Complete | 2026-04-21 |
 | 5. AI Chat Integration | 0/TBD | Not started | - |
 | 6. Frontend Scaffold & SSE | 3/3 | Complete | 2026-04-24 |
-| 7. Market Data & Trading UI | 0/8 | Not started | - |
+| 7. Market Data & Trading UI | 8/8 | Complete    | 2026-04-25 |
 | 8. Portfolio Visualization & Chat UI | 0/TBD | Not started | - |
 | 9. Dockerization & Packaging | 0/TBD | Not started | - |
 | 10. E2E Validation | 0/TBD | Not started | - |
