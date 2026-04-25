@@ -15,9 +15,9 @@
   --color-accent-blue:   #209dd7;
   --color-accent-purple: #753991;
 
-  /* Semantic up/down - declared for Phase 7; not rendered in Phase 6 */
-  --color-up:   #3fb950;
-  --color-down: #f85149;
+  /* Phase 07 D-02 — Lightweight Charts defaults */
+  --color-up:   #26a69a;
+  --color-down: #ef5350;
 }
 
 /* D-10: Permanent dark. No light palette because we never toggle. */
@@ -41,7 +41,7 @@ html, body {
   --color-accent-purple: #753991;
   --color-surface-alt:   #1a1a2e;
   --color-border-muted:  #30363d;
-  --color-up:            #3fb950;
-  --color-down:          #f85149;
+  --color-up:            #26a69a;   /* Phase 07 D-02 */
+  --color-down:          #ef5350;   /* Phase 07 D-02 */
   --color-foreground-muted: #8b949e;
 }
