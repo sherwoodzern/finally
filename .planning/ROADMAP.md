@@ -129,8 +129,8 @@ Plans:
   5. The header continuously displays total portfolio value and cash balance, plus a connection-status dot that is green when SSE is connected, yellow while reconnecting, and red when disconnected.
 **Plans**: 8 plans
 Plans:
-- [ ] 07-00-PLAN.md — Foundation: install lightweight-charts + @tanstack/react-query, align up/down palette to D-02 (#26a69a/#ef5350), create Providers client wrapper, wire into layout (Wave 1)
-- [ ] 07-01-PLAN.md — Store extension: flashDirection + sparklineBuffers + selectedTicker slices with selectors and unit tests (Wave 1)
+- [x] 07-00-PLAN.md — Foundation: install lightweight-charts + @tanstack/react-query, align up/down palette to D-02 (#26a69a/#ef5350), create Providers client wrapper, wire into layout (Wave 1)
+- [x] 07-01-PLAN.md — Store extension: flashDirection + sparklineBuffers + selectedTicker slices with selectors and unit tests (Wave 1)
 - [ ] 07-02-PLAN.md — API wrappers: lib/api/portfolio.ts + lib/api/watchlist.ts + TradeError + renderWithQuery test helper (Wave 2)
 - [ ] 07-03-PLAN.md — FE-03 Watchlist panel + WatchlistRow + Sparkline (Lightweight Charts v5 addSeries API) (Wave 3)
 - [ ] 07-04-PLAN.md — FE-04 MainChart for selected ticker with empty state (Wave 3)
