@@ -10,6 +10,7 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { postTrade, TradeError } from '@/lib/api/portfolio';
+import { usePriceStore } from '@/lib/price-store';
 
 const TICKER_RE = /^[A-Z][A-Z0-9.]{0,9}$/;
 
@@ -36,7 +37,8 @@ export function TradeBar() {
 
   const mutation = useMutation({
     mutationFn: postTrade,
-    onSuccess: async () => {
+    onSuccess: async (res) => {
+      usePriceStore.getState().flashTrade(res.ticker, 'up');
       await qc.invalidateQueries({ queryKey: ['portfolio'] });
       setTicker('');
       setQuantity('');
