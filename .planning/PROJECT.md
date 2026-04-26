@@ -34,13 +34,16 @@ A user runs one Docker command, opens `http://localhost:8000`, and within second
 - ✓ **WATCH-01**: `GET /api/watchlist` returns current watchlist with latest prices from the cache — Phase 4
 - ✓ **WATCH-02**: `POST /api/watchlist` adds a ticker; unknown symbols are onboarded into the market data source on the next tick — Phase 4
 - ✓ **WATCH-03**: `DELETE /api/watchlist/{ticker}` removes a ticker and stops tracking in the cache — Phase 4
+- ✓ **APP-02**: Static frontend mounting — FastAPI serves the Next.js `output: 'export'` build from `/` on the same port as the API — Phase 8 (08-01 mount + G1 dev SSE fix; 08-08 final build artifact)
+- ✓ **FE-05**: Portfolio heatmap / treemap — rectangles sized by position weight, colored by P&L — Phase 8 (08-03)
+- ✓ **FE-06**: P&L line chart driven by `/api/portfolio/history` (Recharts SVG) — Phase 8 (08-04)
+- ✓ **FE-09**: AI chat panel — docked/collapsible sidebar, scrolling history, send box, loading indicator, inline confirmations for executed trades + watchlist changes — Phase 8 (08-06 shell + 08-07 orchestration; XSS guarded)
+- ✓ **FE-11**: Demo-grade polish — smooth transitions, loading skeletons, chat-panel micro-interactions, visible trade-execution moments — Phase 8 (08-02/05/06/07/08 motion primitives + flash parity; perceptual feel items in 08-HUMAN-UAT.md)
+- ✓ **TEST-02**: Frontend component tests — price flash, watchlist CRUD, portfolio display, chat rendering + loading state — Phase 8 (111/111 Vitest across 19 files)
 
 ### Active
 
 <!-- v1 scope. Hypotheses until shipped and validated. Organized by subsystem. -->
-
-**Integration & app shell**
-- [ ] **APP-02**: Static frontend mounting — FastAPI serves the Next.js `output: 'export'` build from `/` on the same port as the API
 
 **AI chat**
 - [ ] **CHAT-01**: `POST /api/chat` — synchronous (non-streaming) request/response flow. Returns the complete LLM reply plus executed actions in one JSON payload
@@ -55,13 +58,9 @@ A user runs one Docker command, opens `http://localhost:8000`, and within second
 - [ ] **FE-02**: `EventSource`-based SSE client to `/api/stream/prices` that updates a local ticker-keyed price store
 - [ ] **FE-03**: Watchlist panel — ticker, live price with green/red flash animation on tick, daily-change % computed from each event's session-start price, and a progressive sparkline accumulated from SSE since page load (Lightweight Charts)
 - [ ] **FE-04**: Main chart area showing the currently selected ticker (Lightweight Charts canvas). Clicking a watchlist row selects the ticker
-- [ ] **FE-05**: Portfolio heatmap / treemap — rectangles sized by position weight, colored by P&L (green profit, red loss)
-- [ ] **FE-06**: P&L line chart driven by `/api/portfolio/history` (Recharts SVG)
 - [ ] **FE-07**: Positions table — ticker, qty, avg cost, current price, unrealized P&L, %
 - [ ] **FE-08**: Trade bar — ticker + qty + buy/sell buttons, market-only, instant fill, no confirmation dialog
-- [ ] **FE-09**: AI chat panel — docked/collapsible sidebar, scrolling history, send box, loading indicator during LLM calls, inline confirmations for executed trades and watchlist changes
 - [ ] **FE-10**: Header — live-updating total portfolio value, cash balance, and a connection-status dot (green connected / yellow reconnecting / red disconnected)
-- [ ] **FE-11**: Demo-grade polish — smooth transitions, loading skeletons, chat-panel micro-interactions, and visible "wow" moments when trades execute
 
 **Packaging & ops**
 - [ ] **OPS-01**: Multi-stage `Dockerfile` — Node 20 slim builds the Next.js static export, Python 3.12 slim installs the `uv`-managed backend and copies the frontend build into `static/`
@@ -71,7 +70,6 @@ A user runs one Docker command, opens `http://localhost:8000`, and within second
 
 **Testing**
 - [ ] **TEST-01**: Backend unit tests extending the existing pytest suite — portfolio math, trade execution, trade validation, LLM response parsing, API routes, LLM mock mode
-- [ ] **TEST-02**: Frontend component tests — price flash, watchlist CRUD, portfolio display, chat rendering and loading state
 - [ ] **TEST-03**: Playwright E2E harness in `test/` with its own `docker-compose.test.yml` running the app container with `LLM_MOCK=true` alongside a Playwright container
 - [ ] **TEST-04**: All §12 E2E scenarios — fresh start, watchlist add/remove, buy/sell paths, heatmap + P&L chart rendering, mocked chat with trade execution, SSE reconnection
 
@@ -142,4 +140,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-21 after Phase 4 (Watchlist API)*
+*Last updated: 2026-04-26 after Phase 8 (Portfolio Visualization & Chat UI) — APP-02, FE-05, FE-06, FE-09, FE-11, TEST-02 validated*

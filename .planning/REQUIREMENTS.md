@@ -23,7 +23,7 @@ Requirements for the initial release. Each maps to a roadmap phase.
 ### App Shell & Integration
 
 - [x] **APP-01**: FastAPI application with `lifespan` startup that constructs the shared `PriceCache`, selects and starts the market data source, initializes SQLite, and exposes `/api/health` _(lifespan + PriceCache + market source + SSE router wired in Plan 01-01; FastAPI `app` instance and `/api/health` landed in Plan 01-02; SQLite init comes in Phase 2)_
-- [ ] **APP-02**: FastAPI serves the Next.js static export from `/` on the same port as the API (no CORS, single origin)
+- [x] **APP-02**: FastAPI serves the Next.js static export from `/` on the same port as the API (no CORS, single origin) _(StaticFiles mount registered after all `/api/*` routers in Plan 08-01; G1 dev SSE 308→307 fix via `skipTrailingSlashRedirect: true` in next.config.mjs; final `npm run build` artifact `frontend/out/index.html` produced in Plan 08-08; `test_index_html_served_at_root` PASSES)_
 - [x] **APP-03**: `.env` loading at startup for `OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, and `LLM_MOCK` _(python-dotenv dependency added in Plan 01-01; `load_dotenv()` call site landed in Plan 01-02 `backend/app/main.py`)_
 - [x] **APP-04**: Browser-consumable SSE confirmed end-to-end — a real `EventSource` client receives ticks from the mounted `/api/stream/prices` endpoint _(Plan 01-03: httpx streaming client against an in-process uvicorn server receives `data:` frames and continues emitting as the cache version advances)_
 
@@ -62,13 +62,13 @@ Requirements for the initial release. Each maps to a roadmap phase.
 - [x] **FE-02**: `EventSource` SSE client connected to `/api/stream/prices` that updates a local ticker-keyed price store _(Zustand price store + PriceStreamProvider landed in Plan 06-02; Vitest 8-test MockEventSource suite + /debug page delivered in Plan 06-03 — FE-02 validated 2026-04-24)_
 - [ ] **FE-03**: Watchlist panel — ticker, live price with green/red flash animation on tick, daily-change % computed from each event's session-start price, and a progressive sparkline accumulated from SSE since page load (Lightweight Charts)
 - [ ] **FE-04**: Main chart area showing the currently selected ticker (Lightweight Charts canvas); clicking a watchlist row selects the ticker
-- [ ] **FE-05**: Portfolio heatmap — treemap where rectangles are sized by position weight and colored by P&L
-- [ ] **FE-06**: P&L line chart driven by `/api/portfolio/history` (Recharts SVG)
+- [x] **FE-05**: Portfolio heatmap — treemap where rectangles are sized by position weight and colored by P&L _(Recharts `<Treemap>` with `dataKey="weight" = quantity*current_price`, binary up/down fill via `var(--color-up/down)`, neutral `var(--color-surface-alt)` for cold-cache positions, exported `handleHeatmapCellClick` dispatches `setSelectedTicker` + `setSelectedTab('chart')` — Plan 08-03; 13 Vitest tests)_
+- [x] **FE-06**: P&L line chart driven by `/api/portfolio/history` (Recharts SVG) _(Recharts `<LineChart>` against real `getPortfolioHistory()` with 15s refetchInterval, dotted ReferenceLine at $10k, stroke flips at break-even, custom `<PnLTooltip />` typed via Recharts 3.x — Plan 08-04; 6 Vitest tests)_
 - [ ] **FE-07**: Positions table — ticker, quantity, avg cost, current price, unrealized P&L, %
 - [ ] **FE-08**: Trade bar — ticker and quantity inputs with buy/sell buttons, market-only, instant fill, no confirmation dialog
-- [ ] **FE-09**: AI chat panel — docked/collapsible sidebar with scrolling history, send box, loading indicator during LLM calls, and inline confirmations for executed trades and watchlist changes
+- [x] **FE-09**: AI chat panel — docked/collapsible sidebar with scrolling history, send box, loading indicator during LLM calls, and inline confirmations for executed trades and watchlist changes _(ChatDrawer collapsible shell + ChatHeader (›/‹) + ChatThread `useQuery(['chat','history'])` + ChatInput Enter/Shift+Enter contract + ThinkingBubble loading + ActionCardList rendering watchlist_changes BEFORE trades + ActionCard 6-status pulse + XSS guard via plain-text rendering — Plans 08-06 (shell) + 08-07 (orchestration); 16 Vitest tests including XSS regression)_
 - [ ] **FE-10**: Header — live-updating total portfolio value, cash balance, and connection-status dot (green connected / yellow reconnecting / red disconnected)
-- [ ] **FE-11**: Demo-grade polish — smooth transitions, loading skeletons, chat-panel micro-interactions, and visible "wow" moments when trades execute
+- [x] **FE-11**: Demo-grade polish — smooth transitions, loading skeletons, chat-panel micro-interactions, and visible "wow" moments when trades execute _(SkeletonBlock primitive, TabBar with accent-blue underline, ChatDrawer 300ms width transition, action-pulse-up/down 800ms keyframes, thinking-pulse loading dots, prefers-reduced-motion guard, PositionRow 800ms trade-flash co-existing with Phase-7 500ms price-flash, TradeBar manual-trade flash parity — Plans 08-02/05/06/07/08; perceptual feel items in 08-HUMAN-UAT.md)_
 
 ### Packaging & Ops
 
@@ -80,7 +80,7 @@ Requirements for the initial release. Each maps to a roadmap phase.
 ### Testing
 
 - [ ] **TEST-01**: Backend unit tests extending the existing pytest suite — portfolio math, trade execution, trade validation, LLM structured-output parsing, API routes, LLM mock mode
-- [ ] **TEST-02**: Frontend component tests — price flash animation, watchlist CRUD, portfolio display calculations, chat rendering and loading state
+- [x] **TEST-02**: Frontend component tests — price flash animation, watchlist CRUD, portfolio display calculations, chat rendering and loading state _(111/111 Vitest tests across 19 files; Heatmap+HeatmapCell calc tests, PnLChart tooltip+stroke-flip tests, ChatThread XSS-guard test, ChatInput keyboard contract tests, PositionRow price-flash + trade-flash regression tests — Plans 08-02..08-08)_
 - [ ] **TEST-03**: Playwright E2E harness under `test/` with its own `docker-compose.test.yml` running the app container (`LLM_MOCK=true`) alongside a Playwright container
 - [ ] **TEST-04**: All E2E scenarios from `planning/PLAN.md` §12 — fresh start, watchlist add/remove, buy/sell, heatmap + P&L chart rendering, mocked chat with trade execution, SSE reconnection
 
@@ -128,7 +128,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | APP-01 | Phase 1 | Complete (01-01, 01-02) |
-| APP-02 | Phase 8 | Pending |
+| APP-02 | Phase 8 | Complete (08-01 mount + G1 fix; 08-08 final build artifact) |
 | APP-03 | Phase 1 | Complete (01-01, 01-02) |
 | APP-04 | Phase 1 | Complete (01-03) |
 | DB-01 | Phase 2 | Pending |
@@ -152,19 +152,19 @@ Which phases cover which requirements. Populated during roadmap creation.
 | FE-02 | Phase 6 | Validated (06-02 store + provider; 06-03 tests + /debug page) |
 | FE-03 | Phase 7 | Pending |
 | FE-04 | Phase 7 | Pending |
-| FE-05 | Phase 8 | Pending |
-| FE-06 | Phase 8 | Pending |
+| FE-05 | Phase 8 | Complete (08-03 Heatmap + 08-05 TabBar wiring) |
+| FE-06 | Phase 8 | Complete (08-04 PnLChart + 08-05 TabBar wiring) |
 | FE-07 | Phase 7 | Pending |
 | FE-08 | Phase 7 | Pending |
-| FE-09 | Phase 8 | Pending |
+| FE-09 | Phase 8 | Complete (08-06 chat shell + 08-07 ChatThread/ChatInput orchestration) |
 | FE-10 | Phase 7 | Pending |
-| FE-11 | Phase 8 | Pending |
+| FE-11 | Phase 8 | Complete (08-02/05/06/07/08 motion primitives + skeletons + flash parity; HUMAN-UAT pending) |
 | OPS-01 | Phase 9 | Pending |
 | OPS-02 | Phase 9 | Pending |
 | OPS-03 | Phase 9 | Pending |
 | OPS-04 | Phase 9 | Pending |
 | TEST-01 | Phase 5 | Pending |
-| TEST-02 | Phase 8 | Pending |
+| TEST-02 | Phase 8 | Complete (111/111 Vitest across 19 files) |
 | TEST-03 | Phase 10 | Pending |
 | TEST-04 | Phase 10 | Pending |
 
@@ -175,4 +175,4 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-24 after Plan 06-03 completion (FE-01 validated via Plan 06-01 scaffold; FE-02 validated via Plan 06-02 store + Plan 06-03 MockEventSource tests + /debug page)*
+*Last updated: 2026-04-26 after Phase 8 completion (APP-02, FE-05, FE-06, FE-09, FE-11, TEST-02 validated; 5/5 automated must-haves PASSED, 6 perceptual items deferred to 08-HUMAN-UAT.md)*
