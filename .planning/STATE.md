@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 8 — Wave 2 in progress (08-03 Heatmap + 08-04 PnLChart complete; 08-05, 08-06 still outstanding)"
+stopped_at: "Phase 8 — Wave 2 complete (08-05 SkeletonBlock + TabBar + Terminal restructure landed); Wave 3 (08-06, 08-07) and Wave 4 (08-08) still outstanding"
 last_updated: "2026-04-26T00:00:00.000Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 10
   completed_phases: 7
   total_plans: 33
-  completed_plans: 29
-  percent: 88
+  completed_plans: 30
+  percent: 91
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 8
-Plan: Wave 2 in flight (08-05, 08-06 outstanding; 08-03 + 08-04 complete)
-Status: Phase 8 executing — wave 2 of 4 (Wave 1 complete; 08-03 + 08-04 merged: 89 vitest + 299 pytest green)
+Plan: Wave 2 complete (08-03 + 08-04 + 08-05); Wave 3 (08-06, 08-07) and Wave 4 (08-08) still outstanding
+Status: Phase 8 executing — wave 2 of 4 complete (08-05 merged: 93 vitest green = 89 prior + 4 new TabBar)
 Last activity: 2026-04-26
 
-Progress: [####      ] 50% of Phase 08 (4 of 8 plans complete; wave 2 in progress)
+Progress: [#####     ] 62% of Phase 08 (5 of 8 plans complete; wave 3 next)
 
 ## Performance Metrics
 
@@ -64,6 +64,7 @@ Progress: [####      ] 50% of Phase 08 (4 of 8 plans complete; wave 2 in progres
 | Phase 06 P03 | ~45m (incl. post-checkpoint finalize) | 5 tasks (5 pre-checkpoint commits + user auto-approve) | 5 files |
 | Phase 08 P03 | ~10m | 2 tasks | 4 files |
 | Phase 08 P04 | ~14m 36s | 2 tasks | 3 files |
+| Phase 08 P05 | ~12m | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -128,6 +129,8 @@ Recent decisions affecting current work:
 - [Phase 08]: 08-04: PnLChart uses Recharts `<LineChart>` over all `/api/portfolio/history` snapshots. Stroke = `var(--color-up)` when last `total_value >= 10000` else `var(--color-down)` (D-06, literal CSS-var strings flow into the `stroke=` SVG attribute — no Tailwind interpolation possible). `<ReferenceLine y={10000} strokeDasharray="4 4" strokeOpacity={0.4}>` is the dotted $10k anchor (D-05). Header summary template: `{formatMoney(total)} ({formatSignedMoney(delta)} vs $10k)`.
 - [Phase 08]: 08-04: PnLTooltip is typed with a small local `PnLTooltipProps` interface (`active?: boolean; payload?: Array<{ payload?: { recorded_at: string; total_value: number } }>`) NOT Recharts' `TooltipContentProps<TValue, TName>`. RESEARCH.md flags the rename from `TooltipProps` (2.x) to `TooltipContentProps` (3.x); we deliberately stay on a local interface to keep the tooltip portable across 3.x patch versions. The runtime shape (`active`, `payload[].payload`) is stable and a 4-prop interface keeps the import surface minimal.
 - [Phase 08]: 08-04: Rule 3 auto-fix — `PnLChart.test.tsx` includes a file-local `vi.mock('recharts', ...)` that overrides only `ResponsiveContainer` to a fixed-800x600 cloneElement shim. Without it, the global `ResizeObserver` stub from `vitest.setup.ts` lets the constructor succeed but never fires the callback, so `<ResponsiveContainer>` measures the parent at -1×-1 and Recharts skips rendering all `<path>` and `<line>` elements (Recharts logs *"The width(-1) and height(-1) of chart should be greater than 0"*). The mock keeps every other Recharts component real via `vi.importActual`. This is the standard escape hatch documented in 08-RESEARCH.md §Common Pitfall 5 and the recommended pattern for any future Phase 8 plan that needs to assert against rendered Recharts SVG.
+- [Phase 08]: 08-05: TabBar dispatches `setSelectedTab` via `usePriceStore.getState().setSelectedTab(t.id)` rather than pulling the action through the selector subscription — matches the existing `setSelectedTicker` pattern in `PositionRow.tsx` (Phase 7). Avoids unnecessary re-renders from action-identity churn under React 19 / Zustand 5. Use `aria-pressed` (toggle-button semantic), NOT `aria-current="page"` (route semantic): tabs are toggle buttons over store state, not page navigation.
+- [Phase 08]: 08-05: Terminal.tsx restructure leaves a `data-testid="chat-drawer-slot"` `<aside>` placeholder rather than mounting `<ChatDrawer />` preemptively. The placeholder uses `w-12 bg-surface-alt border-l border-border-muted flex flex-col` matching UI-SPEC §5.1's "drawer collapsed" width contract, so the visual layout already budgets for the drawer's eventual presence. Plan 06/07 will swap the entire `<aside>` for `<ChatDrawer />` (whose own root is also `<aside ...>`) and the outer `flex flex-row` wrapper plus workspace `flex-1` sibling stay untouched. This isolates 08-05's surface area (FE-05/06 tab switching) from 08-06/07's chat surface (FE-09).
 
 ### Pending Todos
 
@@ -153,7 +156,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-04-26
-Stopped at: Phase 8 — Wave 2 in progress. Plan 08-04 (PnLChart + PnLTooltip + 6 vitest tests) executed sequentially on `finally-gsd` (commits `bb43210` + `ccda211`). Full suite 89/89 vitest (12 files). Wave 2 still open: 08-05 (SkeletonBlock + TabBar + Terminal restructure), 08-06 (chat primitives + ChatDrawer shell). Wave 3: 08-07. Wave 4: 08-08.
+Stopped at: Phase 8 — Wave 2 complete. Plan 08-05 (SkeletonBlock primitive + TabBar component + 4 Vitest tests + Terminal.tsx flex-row restructure with chat-drawer placeholder slot) executed sequentially on `finally-gsd` (commits `ec2bfb6` + `98f6329` + `4efef2e` + `bb4f318`). Full suite 93/93 vitest (13 files). Wave 3 next: 08-06 (chat primitives + ChatDrawer shell), 08-07 (ChatThread + ChatInput + Terminal ChatDrawer mount). Wave 4: 08-08 (FE-11 polish + final build gate).
 
-Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-05-PLAN.md`
-Next action: continue Wave 2 of Phase 8 — execute 08-05 next (SkeletonBlock + TabBar + Terminal restructure). Apply the `useShallow` rule (Phase 8 08-03) to any selector that returns a fresh object literal, and the `vi.mock('recharts', { ResponsiveContainer })` shim (Phase 8 08-04) to any test that needs to assert on rendered Recharts SVG.
+Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-06-PLAN.md`
+Next action: continue Phase 8 with 08-06 (ChatHeader/ChatMessage/ActionCard/ActionCardList/ThinkingBubble + ChatDrawer SHELL + 8 tests). Plan 08-07 will replace the `<aside data-testid="chat-drawer-slot">` placeholder in Terminal.tsx with `<ChatDrawer />` — the placeholder is in place at lines 44-48 of `frontend/src/components/terminal/Terminal.tsx`. Apply the `useShallow` rule (08-03) to any selector that returns a fresh object literal, and the `vi.mock('recharts', { ResponsiveContainer })` shim (08-04) to any test that asserts on rendered Recharts SVG. SkeletonBlock primitive (`@/components/skeleton/SkeletonBlock`) is now available for ChatThread skeleton state.
