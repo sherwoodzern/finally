@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 8 — Wave 2 complete (08-05 SkeletonBlock + TabBar + Terminal restructure landed); Wave 3 (08-06, 08-07) and Wave 4 (08-08) still outstanding"
-last_updated: "2026-04-26T00:00:00.000Z"
+stopped_at: "Phase 8 — Wave 3 part 1 complete (08-06 chat primitives + ChatDrawer SHELL + 8 tests landed); 08-07 (ChatThread + ChatInput + Terminal mount) and Wave 4 (08-08 polish + build gate) still outstanding"
+last_updated: "2026-04-26T12:30:00.000Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 10
   completed_phases: 7
   total_plans: 33
-  completed_plans: 30
-  percent: 91
+  completed_plans: 31
+  percent: 94
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 8
-Plan: Wave 2 complete (08-03 + 08-04 + 08-05); Wave 3 (08-06, 08-07) and Wave 4 (08-08) still outstanding
-Status: Phase 8 executing — wave 2 of 4 complete (08-05 merged: 93 vitest green = 89 prior + 4 new TabBar)
+Plan: 08-06 complete; 08-07 (ChatThread + ChatInput + Terminal mount) and Wave 4 (08-08) still outstanding
+Status: Phase 8 executing — 6 of 8 plans complete (08-06 merged: 101 vitest green = 93 prior + 8 new chat primitives)
 Last activity: 2026-04-26
 
-Progress: [#####     ] 62% of Phase 08 (5 of 8 plans complete; wave 3 next)
+Progress: [######    ] 75% of Phase 08 (6 of 8 plans complete; 08-07 next)
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Progress: [#####     ] 62% of Phase 08 (5 of 8 plans complete; wave 3 next)
 | Phase 08 P03 | ~10m | 2 tasks | 4 files |
 | Phase 08 P04 | ~14m 36s | 2 tasks | 3 files |
 | Phase 08 P05 | ~12m | 3 tasks | 4 files |
+| Phase 08 P06 | ~13m | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,11 @@ Recent decisions affecting current work:
 - [Phase 08]: 08-04: Rule 3 auto-fix — `PnLChart.test.tsx` includes a file-local `vi.mock('recharts', ...)` that overrides only `ResponsiveContainer` to a fixed-800x600 cloneElement shim. Without it, the global `ResizeObserver` stub from `vitest.setup.ts` lets the constructor succeed but never fires the callback, so `<ResponsiveContainer>` measures the parent at -1×-1 and Recharts skips rendering all `<path>` and `<line>` elements (Recharts logs *"The width(-1) and height(-1) of chart should be greater than 0"*). The mock keeps every other Recharts component real via `vi.importActual`. This is the standard escape hatch documented in 08-RESEARCH.md §Common Pitfall 5 and the recommended pattern for any future Phase 8 plan that needs to assert against rendered Recharts SVG.
 - [Phase 08]: 08-05: TabBar dispatches `setSelectedTab` via `usePriceStore.getState().setSelectedTab(t.id)` rather than pulling the action through the selector subscription — matches the existing `setSelectedTicker` pattern in `PositionRow.tsx` (Phase 7). Avoids unnecessary re-renders from action-identity churn under React 19 / Zustand 5. Use `aria-pressed` (toggle-button semantic), NOT `aria-current="page"` (route semantic): tabs are toggle buttons over store state, not page navigation.
 - [Phase 08]: 08-05: Terminal.tsx restructure leaves a `data-testid="chat-drawer-slot"` `<aside>` placeholder rather than mounting `<ChatDrawer />` preemptively. The placeholder uses `w-12 bg-surface-alt border-l border-border-muted flex flex-col` matching UI-SPEC §5.1's "drawer collapsed" width contract, so the visual layout already budgets for the drawer's eventual presence. Plan 06/07 will swap the entire `<aside>` for `<ChatDrawer />` (whose own root is also `<aside ...>`) and the outer `flex flex-row` wrapper plus workspace `flex-1` sibling stay untouched. This isolates 08-05's surface area (FE-05/06 tab switching) from 08-06/07's chat surface (FE-09).
+- [Phase 08]: 08-06: ChatDrawer is intentionally a SHELL with `children?: ReactNode` rather than internally importing `<ChatThread />`. Plan 07 will mount `<ChatDrawer><ChatThread /></ChatDrawer>` inside Terminal.tsx, replacing the chat-drawer-slot placeholder. Decoupling lets the drawer ship and test independently of its eventual occupant — a children-slot pattern future drawer-style shells can reuse.
+- [Phase 08]: 08-06: ChatMessage renders `{message.content}` as a JSX text node only (whitespace-pre-wrap preserves newlines). No `dangerouslySetInnerHTML`, no markdown→HTML conversion. Mitigates threat T-08-12 at the `/api/chat` → DOM trust boundary. `grep -r "dangerouslySetInnerHTML" frontend/src/components/chat/` returns 0. Plan 07 must add the XSS-payload assertion test (window.__pwned remains undefined for `<script>` injection in assistant content) per VALIDATION.md row.
+- [Phase 08]: 08-06: ActionCard pulse is component-local: `useState(initial)` + `useEffect(() => setTimeout(() => setPulseClass(''), 800))` — clears after 800ms. Different lifetime semantics from the price-store `tradeFlash` slice (per-card mount vs. per-ticker debounced); not unified. STATUS_STYLE collapses `executed/added/removed` into one green visual treatment, `failed` into red, `exists/not_present` into muted gray (3 visual buckets across 6 statuses, per UI-SPEC §5.7).
+- [Phase 08]: 08-06: ERROR_COPY in ActionCard reuses TradeBar.tsx ERROR_TEXT verbatim for 4 overlapping codes (`insufficient_cash`, `insufficient_shares`, `unknown_ticker`, `price_unavailable`) and adds 2 Phase 5 codes (`invalid_ticker`, `internal_error`) with the same DEFAULT_ERROR fallback. Single source of truth for trade-error wording — keep these in sync if either map is edited.
+- [Phase 08]: 08-06: Test gotcha — `container.querySelectorAll('[data-testid^="action-card-"]')` matches BOTH the list wrapper (`data-testid="action-card-list"`) and the per-card testids (`data-testid="action-card-{status}"`). Filter results with `.filter((el) => el.dataset.testid !== 'action-card-list')` to exercise only the cards. Apply this pattern whenever a parent and children share a testid prefix.
 
 ### Pending Todos
 
@@ -156,7 +162,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-04-26
-Stopped at: Phase 8 — Wave 2 complete. Plan 08-05 (SkeletonBlock primitive + TabBar component + 4 Vitest tests + Terminal.tsx flex-row restructure with chat-drawer placeholder slot) executed sequentially on `finally-gsd` (commits `ec2bfb6` + `98f6329` + `4efef2e` + `bb4f318`). Full suite 93/93 vitest (13 files). Wave 3 next: 08-06 (chat primitives + ChatDrawer shell), 08-07 (ChatThread + ChatInput + Terminal ChatDrawer mount). Wave 4: 08-08 (FE-11 polish + final build gate).
+Stopped at: Phase 8 — Plan 08-06 complete. Six chat primitives (ThinkingBubble, ChatHeader, ChatMessage, ActionCard, ActionCardList, ChatDrawer SHELL) + 8 Vitest tests landed sequentially on `finally-gsd` (commits `d56b701` feat:5-primitives, `54e41e6` feat:drawer-shell, `f0576b4` test:8-tests). Full suite 101/101 vitest (16 files; +3 test files, +8 tests over 08-05's 93). T-08-12 XSS mitigation in place: 0 dangerouslySetInnerHTML in `frontend/src/components/chat/`. Plan 08-07 next: ChatThread + ChatInput orchestration, Terminal.tsx mount of `<ChatDrawer><ChatThread /></ChatDrawer>` replacing the slot placeholder, plus the XSS-payload assertion test (window.__pwned). Wave 4: 08-08 (FE-11 polish + final build gate).
 
-Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-06-PLAN.md`
-Next action: continue Phase 8 with 08-06 (ChatHeader/ChatMessage/ActionCard/ActionCardList/ThinkingBubble + ChatDrawer SHELL + 8 tests). Plan 08-07 will replace the `<aside data-testid="chat-drawer-slot">` placeholder in Terminal.tsx with `<ChatDrawer />` — the placeholder is in place at lines 44-48 of `frontend/src/components/terminal/Terminal.tsx`. Apply the `useShallow` rule (08-03) to any selector that returns a fresh object literal, and the `vi.mock('recharts', { ResponsiveContainer })` shim (08-04) to any test that asserts on rendered Recharts SVG. SkeletonBlock primitive (`@/components/skeleton/SkeletonBlock`) is now available for ChatThread skeleton state.
+Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-07-PLAN.md`
+Next action: execute 08-07. Compose `<ChatThread />` against the freshly-landed primitives (ChatMessage + ThinkingBubble + ActionCardList) and create `<ChatInput />` mirroring TradeBar's form/onSuccess pattern. Replace the `<aside data-testid="chat-drawer-slot">` at lines 44-48 of `frontend/src/components/terminal/Terminal.tsx` with `<ChatDrawer><ChatThread /><ChatInput /></ChatDrawer>` (the drawer's root is itself an `<aside>`). Apply the `useShallow` rule (08-03) to any new selector that synthesizes an object literal. ActionCard's pulse prop (08-06) is the seam for D-12 fresh-card animation: ChatThread must pass `pulseActions={true}` only on locally-appended fresh assistant messages, not on history-query results. Add the XSS unit test asserting `window.__pwned` stays undefined for `<script>` payloads in `message.content` (Plan 07 must close the T-08-12 verification loop).
