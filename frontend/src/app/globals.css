@@ -45,3 +45,45 @@ html, body {
   --color-down:          #ef5350;   /* Phase 07 D-02 */
   --color-foreground-muted: #8b949e;
 }
+
+/* Phase 8 — Action card pulse (D-12 agentic auto-trade flash; 800ms ease-out, runs once per fresh card). */
+@keyframes action-pulse-up {
+  0%   { background-color: rgb(38 166 154 / 0.30); }
+  100% { background-color: rgb(38 166 154 / 0.00); }
+}
+@keyframes action-pulse-down {
+  0%   { background-color: rgb(239 83 80 / 0.30); }
+  100% { background-color: rgb(239 83 80 / 0.00); }
+}
+.action-pulse-up   { animation: action-pulse-up   800ms ease-out 1; }
+.action-pulse-down { animation: action-pulse-down 800ms ease-out 1; }
+
+/* Phase 8 — ThinkingBubble dots (D-08 LLM loading indicator). */
+.thinking-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: var(--color-foreground-muted);
+  animation: thinking-pulse 1200ms infinite ease-in-out;
+}
+.thinking-dot:nth-child(2) { animation-delay: 200ms; }
+.thinking-dot:nth-child(3) { animation-delay: 400ms; }
+
+@keyframes thinking-pulse {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30%           { opacity: 1.0; transform: translateY(-2px); }
+}
+
+/* Phase 8 — prefers-reduced-motion: disable all four motion primitives (UI-SPEC §7).
+   Skeleton pulse, drawer slide, action pulse, thinking dots all collapse to static states. */
+@media (prefers-reduced-motion: reduce) {
+  .action-pulse-up,
+  .action-pulse-down,
+  .thinking-dot,
+  .animate-pulse,
+  .transition-colors,
+  .transition-\[width\] {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -68,3 +68,19 @@ export async function postTrade(body: TradeBody): Promise<TradeResponse> {
   }
   return (await res.json()) as TradeResponse;
 }
+
+export interface SnapshotOut {
+  recorded_at: string;
+  total_value: number;
+}
+
+export interface HistoryResponse {
+  snapshots: SnapshotOut[];
+}
+
+/** GET /api/portfolio/history — called by useQuery(['portfolio','history']). */
+export async function getPortfolioHistory(): Promise<HistoryResponse> {
+  const res = await fetch('/api/portfolio/history');
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return (await res.json()) as HistoryResponse;
+}
