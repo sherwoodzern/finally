@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 8 — Wave 2 in progress (08-03 Heatmap + HeatmapCell complete; 08-04, 08-05, 08-06 still outstanding)"
+stopped_at: "Phase 8 — Wave 2 in progress (08-03 Heatmap + 08-04 PnLChart complete; 08-05, 08-06 still outstanding)"
 last_updated: "2026-04-26T00:00:00.000Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 10
   completed_phases: 7
   total_plans: 33
-  completed_plans: 28
-  percent: 85
+  completed_plans: 29
+  percent: 88
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 8
-Plan: Wave 2 in flight (08-04, 08-05, 08-06 outstanding; 08-03 complete)
-Status: Phase 8 executing — wave 2 of 4 (Wave 1 complete; 08-03 merged: 83 vitest + 299 pytest green)
+Plan: Wave 2 in flight (08-05, 08-06 outstanding; 08-03 + 08-04 complete)
+Status: Phase 8 executing — wave 2 of 4 (Wave 1 complete; 08-03 + 08-04 merged: 89 vitest + 299 pytest green)
 Last activity: 2026-04-26
 
-Progress: [###       ] 38% of Phase 08 (3 of 8 plans complete; wave 2 in progress)
+Progress: [####      ] 50% of Phase 08 (4 of 8 plans complete; wave 2 in progress)
 
 ## Performance Metrics
 
@@ -63,6 +63,7 @@ Progress: [###       ] 38% of Phase 08 (3 of 8 plans complete; wave 2 in progres
 | Phase 06 P02 | 15m 28s | 4 tasks | 5 files |
 | Phase 06 P03 | ~45m (incl. post-checkpoint finalize) | 5 tasks (5 pre-checkpoint commits + user auto-approve) | 5 files |
 | Phase 08 P03 | ~10m | 2 tasks | 4 files |
+| Phase 08 P04 | ~14m 36s | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,9 @@ Recent decisions affecting current work:
 - [Phase 08]: 08-03: Heatmap.tsx exposes `buildTreeData(positions, ticks)` (pure data transform) and `handleHeatmapCellClick(node)` (store dispatcher) as named exports so unit tests assert directly against the data math + click semantics — Recharts SVG geometry is intentionally NOT exercised in jsdom. Treemap `onClick` wires straight to `handleHeatmapCellClick`, so the test code path is the production code path. Plans 08-04..08 should follow the same pure-function-extraction pattern; no `vi.mock('recharts')` was needed.
 - [Phase 08]: 08-03: Rule 1 auto-fix — Heatmap's per-render selector returning a fresh `Record<string, number | undefined>` failed Zustand v5 + React 19's identity check and threw "Maximum update depth exceeded". Wrapped with `useShallow` from `zustand/react/shallow`. ALL future Phase 8 selectors that synthesize an object/array literal must use `useShallow`. Watch for the same trap in `PnLChart`, `ChatThread`, and `ActionCardList`.
 - [Phase 08]: 08-03: Recharts 3.x `<Treemap>` props differ from the CONTEXT.md reference snippet (taken from a 2.x example): `strokeWidth` is not a valid Treemap prop, only `stroke`. `data` requires its element type to extend `TreemapDataType` (`{ [key: string]: any }`), so `TreeDatum` carries an explicit `[key: string]: string | number | boolean` index signature.
+- [Phase 08]: 08-04: PnLChart uses Recharts `<LineChart>` over all `/api/portfolio/history` snapshots. Stroke = `var(--color-up)` when last `total_value >= 10000` else `var(--color-down)` (D-06, literal CSS-var strings flow into the `stroke=` SVG attribute — no Tailwind interpolation possible). `<ReferenceLine y={10000} strokeDasharray="4 4" strokeOpacity={0.4}>` is the dotted $10k anchor (D-05). Header summary template: `{formatMoney(total)} ({formatSignedMoney(delta)} vs $10k)`.
+- [Phase 08]: 08-04: PnLTooltip is typed with a small local `PnLTooltipProps` interface (`active?: boolean; payload?: Array<{ payload?: { recorded_at: string; total_value: number } }>`) NOT Recharts' `TooltipContentProps<TValue, TName>`. RESEARCH.md flags the rename from `TooltipProps` (2.x) to `TooltipContentProps` (3.x); we deliberately stay on a local interface to keep the tooltip portable across 3.x patch versions. The runtime shape (`active`, `payload[].payload`) is stable and a 4-prop interface keeps the import surface minimal.
+- [Phase 08]: 08-04: Rule 3 auto-fix — `PnLChart.test.tsx` includes a file-local `vi.mock('recharts', ...)` that overrides only `ResponsiveContainer` to a fixed-800x600 cloneElement shim. Without it, the global `ResizeObserver` stub from `vitest.setup.ts` lets the constructor succeed but never fires the callback, so `<ResponsiveContainer>` measures the parent at -1×-1 and Recharts skips rendering all `<path>` and `<line>` elements (Recharts logs *"The width(-1) and height(-1) of chart should be greater than 0"*). The mock keeps every other Recharts component real via `vi.importActual`. This is the standard escape hatch documented in 08-RESEARCH.md §Common Pitfall 5 and the recommended pattern for any future Phase 8 plan that needs to assert against rendered Recharts SVG.
 
 ### Pending Todos
 
@@ -149,7 +153,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-04-26
-Stopped at: Phase 8 — Wave 2 in progress. Plan 08-03 (Heatmap + HeatmapCell + 13 vitest tests) executed sequentially on `finally-gsd` (commits `6df305a` + `5ae580a`). Full suite 83/83 vitest. Wave 2 still open: 08-04 (PnLChart + tests), 08-05 (SkeletonBlock + TabBar + Terminal restructure), 08-06 (chat primitives + ChatDrawer shell). Wave 3: 08-07. Wave 4: 08-08.
+Stopped at: Phase 8 — Wave 2 in progress. Plan 08-04 (PnLChart + PnLTooltip + 6 vitest tests) executed sequentially on `finally-gsd` (commits `bb43210` + `ccda211`). Full suite 89/89 vitest (12 files). Wave 2 still open: 08-05 (SkeletonBlock + TabBar + Terminal restructure), 08-06 (chat primitives + ChatDrawer shell). Wave 3: 08-07. Wave 4: 08-08.
 
-Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-04-PLAN.md`
-Next action: continue Wave 2 of Phase 8 — execute 08-04 next (PnLChart). Apply the `useShallow` rule (Phase 8 decision 08-03) to any per-render selector that synthesizes a new object literal.
+Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-05-PLAN.md`
+Next action: continue Wave 2 of Phase 8 — execute 08-05 next (SkeletonBlock + TabBar + Terminal restructure). Apply the `useShallow` rule (Phase 8 08-03) to any selector that returns a fresh object literal, and the `vi.mock('recharts', { ResponsiveContainer })` shim (Phase 8 08-04) to any test that needs to assert on rendered Recharts SVG.
