@@ -19,7 +19,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: AI Chat Integration** - `/api/chat` with LiteLLM → OpenRouter (Cerebras), structured outputs, auto-exec of trades + watchlist changes, mock mode, full backend test suite
 - [x] **Phase 6: Frontend Scaffold & SSE** - Next.js TypeScript static-export project with Tailwind theme and the live-price SSE client (completed 2026-04-24)
 - [x] **Phase 7: Market Data & Trading UI** - Watchlist panel with sparklines, main chart, positions table, trade bar, header with live totals and connection dot (completed 2026-04-25)
-- [ ] **Phase 8: Portfolio Visualization & Chat UI** - Heatmap, P&L chart, collapsible AI chat panel, demo polish, static frontend mounted into FastAPI, frontend component tests
+- [x] **Phase 8: Portfolio Visualization & Chat UI** - Heatmap, P&L chart, collapsible AI chat panel, demo polish, static frontend mounted into FastAPI, frontend component tests (completed 2026-04-26)
 - [ ] **Phase 9: Dockerization & Packaging** - Multi-stage Dockerfile, canonical `docker run` invocation, start/stop scripts, `.env.example`
 - [ ] **Phase 10: E2E Validation** - Playwright harness with `docker-compose.test.yml` and all §12 scenarios against the mocked-LLM image
 
@@ -158,7 +158,7 @@ Plans:
 - [x] 08-05-PLAN.md — SkeletonBlock primitive + TabBar + 4 tests + Terminal.tsx flex-row restructure with chat-drawer slot (completed 2026-04-26)
 - [x] 08-06-PLAN.md — FE-09 chat primitives (ChatHeader/ChatMessage/ActionCard/ActionCardList/ThinkingBubble + ChatDrawer SHELL) + 8 tests (ActionCard/ActionCardList/ChatDrawer) (completed 2026-04-26)
 - [x] 08-07-PLAN.md — FE-09 chat orchestration (ChatThread + ChatInput) + Terminal.tsx ChatDrawer mount + 8 tests (ChatThread incl. XSS guard + ChatInput) (completed 2026-04-26)
-- [ ] 08-08-PLAN.md — FE-11 polish wiring (PositionRow trade-flash + TradeBar manual-flash) + final build gate (npm run build, full Vitest, full pytest)
+- [x] 08-08-PLAN.md — FE-11 polish wiring (PositionRow trade-flash + TradeBar manual-flash) + final build gate (npm run build, full Vitest, full pytest) (completed 2026-04-26)
 **UI hint**: yes
 
 ### Phase 9: Dockerization & Packaging
@@ -196,6 +196,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. AI Chat Integration | 0/TBD | Not started | - |
 | 6. Frontend Scaffold & SSE | 3/3 | Complete | 2026-04-24 |
 | 7. Market Data & Trading UI | 8/8 | Complete    | 2026-04-25 |
-| 8. Portfolio Visualization & Chat UI | 7/8 | In progress | - |
+| 8. Portfolio Visualization & Chat UI | 8/8 | Complete | 2026-04-26 |
 | 9. Dockerization & Packaging | 0/TBD | Not started | - |
 | 10. E2E Validation | 0/TBD | Not started | - |
