@@ -153,7 +153,7 @@ Plans:
 Plans:
 - [x] 08-01-PLAN.md — APP-02 FastAPI StaticFiles mount + G1 next.config.mjs skipTrailingSlashRedirect fix + integration test (completed 2026-04-26)
 - [x] 08-02-PLAN.md — recharts@^3.8.0 + portfolio.ts/chat.ts API clients + Zustand selectedTab/tradeFlash slices + ResizeObserver vitest stub + globals.css keyframes + fixtures (completed 2026-04-26)
-- [ ] 08-03-PLAN.md — FE-05 Heatmap + HeatmapCell + 10+ Vitest tests (Recharts Treemap, binary up/down, exported handleHeatmapCellClick, cold-cache integration)
+- [x] 08-03-PLAN.md — FE-05 Heatmap + HeatmapCell + 13 Vitest tests (Recharts Treemap, binary up/down, exported handleHeatmapCellClick, cold-cache integration) (completed 2026-04-26)
 - [ ] 08-04-PLAN.md — FE-06 PnLChart + PnLTooltip + 6 Vitest tests (Recharts LineChart, dotted $10k ReferenceLine, stroke flips at break-even)
 - [ ] 08-05-PLAN.md — SkeletonBlock primitive + TabBar + 4 tests + Terminal.tsx flex-row restructure with chat-drawer slot
 - [ ] 08-06-PLAN.md — FE-09 chat primitives (ChatHeader/ChatMessage/ActionCard/ActionCardList/ThinkingBubble + ChatDrawer SHELL) + 8 tests (ActionCard/ActionCardList/ChatDrawer)

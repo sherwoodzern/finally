@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Executing Phase 8 — Wave 1 (08-01 static mount + G1 SSE fix; 08-02 frontend foundations)
+stopped_at: "Phase 8 — Wave 2 in progress (08-03 Heatmap + HeatmapCell complete; 08-04, 08-05, 08-06 still outstanding)"
 last_updated: "2026-04-26T00:00:00.000Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 10
   completed_phases: 7
   total_plans: 33
-  completed_plans: 27
-  percent: 82
+  completed_plans: 28
+  percent: 85
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 8
-Plan: Wave 2 in flight (08-03, 08-04, 08-05, 08-06)
-Status: Phase 8 executing — wave 2 of 4 (Wave 1 complete: 08-01, 08-02 merged, 70 vitest + 299 pytest green)
+Plan: Wave 2 in flight (08-04, 08-05, 08-06 outstanding; 08-03 complete)
+Status: Phase 8 executing — wave 2 of 4 (Wave 1 complete; 08-03 merged: 83 vitest + 299 pytest green)
 Last activity: 2026-04-26
 
-Progress: [##        ] 25% of Phase 08 (2 of 8 plans complete; wave 2 dispatched)
+Progress: [###       ] 38% of Phase 08 (3 of 8 plans complete; wave 2 in progress)
 
 ## Performance Metrics
 
@@ -62,6 +62,7 @@ Progress: [##        ] 25% of Phase 08 (2 of 8 plans complete; wave 2 dispatched
 | Phase 06 P01 | 1h 5m 15s | 3 tasks | 17 files |
 | Phase 06 P02 | 15m 28s | 4 tasks | 5 files |
 | Phase 06 P03 | ~45m (incl. post-checkpoint finalize) | 5 tasks (5 pre-checkpoint commits + user auto-approve) | 5 files |
+| Phase 08 P03 | ~10m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,9 @@ Recent decisions affecting current work:
 - [Phase 06]: 06-03: Rule 1 auto-fix — `MockEventSource.readyState` widened from the RESEARCH.md literal-union `0 | 1 | 2` to plain `number` to satisfy Next.js 16 strict tsc; the emit helpers mutate readyState via the static constants and the literal-union type rejected the assignment. One-line fix, zero behavioral change. RESEARCH.md section 13 template should be updated to `number` for future plans derived from it.
 - [Phase 06]: 06-03: `/debug` App Router page uses `'use client'` + three Zustand selector subscriptions (prices / status / lastEventAt). UTC `HH:MM:SS.sss` formatter for backend Unix-seconds timestamp; ISO formatter for epoch-ms `lastEventAt`. No `dangerouslySetInnerHTML`, no interactions (UI-SPEC section 6). `/debug/index.html` lands in `frontend/out/` via `trailingSlash: true`.
 - [Phase 06]: 06-03: Task 5 human-verify checkpoint resolved via user auto-approve under `/gsd-execute-phase --auto --no-transition`. All 4 ROADMAP Phase 6 success criteria have automated coverage (SC#1 CSS greps, SC#2 build gate, SC#3 MockEventSource idempotent + selector tests, SC#4 ingest against the RawPayload shape from backend/app/market/models.py:39-49). Live-wire browser check deferred — any discrepancy routed via `/gsd-plan-phase 06 --gaps`.
+- [Phase 08]: 08-03: Heatmap.tsx exposes `buildTreeData(positions, ticks)` (pure data transform) and `handleHeatmapCellClick(node)` (store dispatcher) as named exports so unit tests assert directly against the data math + click semantics — Recharts SVG geometry is intentionally NOT exercised in jsdom. Treemap `onClick` wires straight to `handleHeatmapCellClick`, so the test code path is the production code path. Plans 08-04..08 should follow the same pure-function-extraction pattern; no `vi.mock('recharts')` was needed.
+- [Phase 08]: 08-03: Rule 1 auto-fix — Heatmap's per-render selector returning a fresh `Record<string, number | undefined>` failed Zustand v5 + React 19's identity check and threw "Maximum update depth exceeded". Wrapped with `useShallow` from `zustand/react/shallow`. ALL future Phase 8 selectors that synthesize an object/array literal must use `useShallow`. Watch for the same trap in `PnLChart`, `ChatThread`, and `ActionCardList`.
+- [Phase 08]: 08-03: Recharts 3.x `<Treemap>` props differ from the CONTEXT.md reference snippet (taken from a 2.x example): `strokeWidth` is not a valid Treemap prop, only `stroke`. `data` requires its element type to extend `TreemapDataType` (`{ [key: string]: any }`), so `TreeDatum` carries an explicit `[key: string]: string | number | boolean` index signature.
 
 ### Pending Todos
 
@@ -145,7 +149,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-04-26
-Stopped at: Phase 8 plans written and revised based on checker feedback. 8 plans across 4 waves: 08-01 (StaticFiles mount + G1 fix), 08-02 (recharts + API clients + store slices + fixtures), 08-03 (Heatmap + tests), 08-04 (PnLChart + tests), 08-05 (SkeletonBlock + TabBar + Terminal restructure), 08-06 (chat primitives + ChatDrawer shell), 08-07 (chat orchestration + Terminal mount), 08-08 (FE-11 polish wiring + final build gate). Phase 7 still has 6 browser-only UAT items in 07-HUMAN-UAT.md outstanding (non-blocking — testable once 08-01 lands the StaticFiles mount).
+Stopped at: Phase 8 — Wave 2 in progress. Plan 08-03 (Heatmap + HeatmapCell + 13 vitest tests) executed sequentially on `finally-gsd` (commits `6df305a` + `5ae580a`). Full suite 83/83 vitest. Wave 2 still open: 08-04 (PnLChart + tests), 08-05 (SkeletonBlock + TabBar + Terminal restructure), 08-06 (chat primitives + ChatDrawer shell). Wave 3: 08-07. Wave 4: 08-08.
 
-Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-01-PLAN.md`
-Next action: `/clear` then `/gsd-execute-phase 8`. Stale `HANDOFF.json` from Phase 7 deleted — its `phase_complete` status was consumed when Phase 8 planning began.
+Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-04-PLAN.md`
+Next action: continue Wave 2 of Phase 8 — execute 08-04 next (PnLChart). Apply the `useShallow` rule (Phase 8 decision 08-03) to any per-render selector that synthesizes a new object literal.
