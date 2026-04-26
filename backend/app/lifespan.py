@@ -79,11 +79,14 @@ async def lifespan(app: FastAPI):
     app.state.chat_client = chat_client
     app.include_router(create_chat_router(conn, cache, source, chat_client))   # D-20
 
-    # APP-02 / D-14: serve frontend/out at / AFTER all /api/* routers (catch-all must be last)
+    # APP-02 / D-14: serve frontend/out at / AFTER all /api/* routers (catch-all must be last).
+    # check_dir=False defers existence check to first request - matches the plan's documented
+    # contract (frontend build is the Phase 8/9 prerequisite) and lets the backend start in
+    # dev / test before `npm run build` has produced frontend/out/.
     static_dir = Path(__file__).resolve().parents[2] / "frontend" / "out"
     app.mount(
         "/",
-        StaticFiles(directory=str(static_dir), html=True),
+        StaticFiles(directory=str(static_dir), html=True, check_dir=False),
         name="frontend",
     )
 
