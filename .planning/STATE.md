@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 8 — Wave 3 part 1 complete (08-06 chat primitives + ChatDrawer SHELL + 8 tests landed); 08-07 (ChatThread + ChatInput + Terminal mount) and Wave 4 (08-08 polish + build gate) still outstanding"
-last_updated: "2026-04-26T12:30:00.000Z"
+stopped_at: "Phase 8 — Wave 3 complete (08-07 ChatThread + ChatInput orchestration + Terminal.tsx live ChatDrawer mount + 8 tests + XSS guard landed); only Wave 4 (08-08 polish + final build gate) outstanding"
+last_updated: "2026-04-26T16:55:32.000Z"
 last_activity: 2026-04-26
 progress:
   total_phases: 10
   completed_phases: 7
   total_plans: 33
-  completed_plans: 31
-  percent: 94
+  completed_plans: 32
+  percent: 97
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 8
-Plan: 08-06 complete; 08-07 (ChatThread + ChatInput + Terminal mount) and Wave 4 (08-08) still outstanding
-Status: Phase 8 executing — 6 of 8 plans complete (08-06 merged: 101 vitest green = 93 prior + 8 new chat primitives)
+Plan: 08-07 complete; only 08-08 (FE-11 polish + final build gate) outstanding
+Status: Phase 8 executing — 7 of 8 plans complete (08-07 merged: 109 vitest green = 101 prior + 8 new chat orchestration tests incl. XSS guard)
 Last activity: 2026-04-26
 
-Progress: [######    ] 75% of Phase 08 (6 of 8 plans complete; 08-07 next)
+Progress: [#######   ] 87% of Phase 08 (7 of 8 plans complete; 08-08 next)
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Progress: [######    ] 75% of Phase 08 (6 of 8 plans complete; 08-07 next)
 | Phase 08 P04 | ~14m 36s | 2 tasks | 3 files |
 | Phase 08 P05 | ~12m | 3 tasks | 4 files |
 | Phase 08 P06 | ~13m | 3 tasks | 9 files |
+| Phase 08 P07 | ~9m | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -137,6 +138,10 @@ Recent decisions affecting current work:
 - [Phase 08]: 08-06: ActionCard pulse is component-local: `useState(initial)` + `useEffect(() => setTimeout(() => setPulseClass(''), 800))` — clears after 800ms. Different lifetime semantics from the price-store `tradeFlash` slice (per-card mount vs. per-ticker debounced); not unified. STATUS_STYLE collapses `executed/added/removed` into one green visual treatment, `failed` into red, `exists/not_present` into muted gray (3 visual buckets across 6 statuses, per UI-SPEC §5.7).
 - [Phase 08]: 08-06: ERROR_COPY in ActionCard reuses TradeBar.tsx ERROR_TEXT verbatim for 4 overlapping codes (`insufficient_cash`, `insufficient_shares`, `unknown_ticker`, `price_unavailable`) and adds 2 Phase 5 codes (`invalid_ticker`, `internal_error`) with the same DEFAULT_ERROR fallback. Single source of truth for trade-error wording — keep these in sync if either map is edited.
 - [Phase 08]: 08-06: Test gotcha — `container.querySelectorAll('[data-testid^="action-card-"]')` matches BOTH the list wrapper (`data-testid="action-card-list"`) and the per-card testids (`data-testid="action-card-{status}"`). Filter results with `.filter((el) => el.dataset.testid !== 'action-card-list')` to exercise only the cards. Apply this pattern whenever a parent and children share a testid prefix.
+- [Phase 08]: 08-07: ChatThread is the orchestrator (owns `useQuery(['chat','history'])` + `useMutation(postChat)`); ChatInput is dumb and takes `onSubmit` + `isPending` props. Optimistic local user-message append before `mutate()`; assistant turn produced from response only in `onSuccess`. No optimistic assistant placeholder — `ThinkingBubble` is the in-flight indicator. `['watchlist']` invalidation is conditional on `res.watchlist_changes.length > 0` so plain-chat turns don't refetch unrelated data. Auto-scroll uses `useLayoutEffect` keyed on `[messages.length, mutation.isPending]` so the paint sees the new bubble before the browser layout flush.
+- [Phase 08]: 08-07: XSS regression test asserts BOTH `window.__pwned === undefined` AND that the literal `<script>` string appears as text in the DOM — covers runtime-execution risk AND a future regression where someone might switch `ChatMessage` to `dangerouslySetInnerHTML`. ChatMessage's plain-JSX text path (Plan 06) is what makes the assertion pass; this plan adds the regression cover (T-08-12 mitigation closed).
+- [Phase 08]: 08-07: Vitest 4 + TS gotcha — `let onSubmit: ReturnType<typeof vi.fn>` does NOT structurally satisfy `(content: string) => void` when assigned to a typed prop (`Mock<Procedure | Constructable>` vs strict callback signature). Fix: declare as `((content: string) => void) & ReturnType<typeof vi.fn>` and cast `vi.fn() as` the same intersection. Preserves the `toHaveBeenCalledWith` assertion API. Apply to any Phase 8/9 test that passes a `vi.fn()` as a strictly-typed callback prop.
+- [Phase 08]: 08-07: Pre-existing TSC errors in `MainChart.test.tsx` and `Sparkline.test.tsx` (5 errors total, all "Tuple type '[]' of length '0' has no element at index N") confirmed via `git stash` to predate this plan and exist on the Plan 06 baseline. Out of scope per SCOPE BOUNDARY. Should be tracked as a separate Phase 7 cleanup item by the verifier.
 
 ### Pending Todos
 
@@ -162,7 +167,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-04-26
-Stopped at: Phase 8 — Plan 08-06 complete. Six chat primitives (ThinkingBubble, ChatHeader, ChatMessage, ActionCard, ActionCardList, ChatDrawer SHELL) + 8 Vitest tests landed sequentially on `finally-gsd` (commits `d56b701` feat:5-primitives, `54e41e6` feat:drawer-shell, `f0576b4` test:8-tests). Full suite 101/101 vitest (16 files; +3 test files, +8 tests over 08-05's 93). T-08-12 XSS mitigation in place: 0 dangerouslySetInnerHTML in `frontend/src/components/chat/`. Plan 08-07 next: ChatThread + ChatInput orchestration, Terminal.tsx mount of `<ChatDrawer><ChatThread /></ChatDrawer>` replacing the slot placeholder, plus the XSS-payload assertion test (window.__pwned). Wave 4: 08-08 (FE-11 polish + final build gate).
+Stopped at: Phase 8 — Plan 08-07 complete. ChatThread + ChatInput orchestration + 8 Vitest tests (incl. XSS regression guard) landed sequentially on `finally-gsd` (commits `9bdf007` feat:orchestration, `23c0ab6` feat:terminal-mount, `765de78` test:8-tests-incl-XSS). Full suite 109/109 vitest (18 files; +2 test files, +8 tests over 08-06's 101). Terminal.tsx now mounts the live `<ChatDrawer><ChatThread /></ChatDrawer>`; Plan 05's `chat-drawer-slot` placeholder removed. T-08-12 mitigation regression-tested: rendering `<script>window.__pwned = true</script>hello` as assistant content leaves `window.__pwned` undefined and shows the script as literal text. Plan 08-08 next (Wave 4): FE-11 polish + final phase build gate.
 
-Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-07-PLAN.md`
-Next action: execute 08-07. Compose `<ChatThread />` against the freshly-landed primitives (ChatMessage + ThinkingBubble + ActionCardList) and create `<ChatInput />` mirroring TradeBar's form/onSuccess pattern. Replace the `<aside data-testid="chat-drawer-slot">` at lines 44-48 of `frontend/src/components/terminal/Terminal.tsx` with `<ChatDrawer><ChatThread /><ChatInput /></ChatDrawer>` (the drawer's root is itself an `<aside>`). Apply the `useShallow` rule (08-03) to any new selector that synthesizes an object literal. ActionCard's pulse prop (08-06) is the seam for D-12 fresh-card animation: ChatThread must pass `pulseActions={true}` only on locally-appended fresh assistant messages, not on history-query results. Add the XSS unit test asserting `window.__pwned` stays undefined for `<script>` payloads in `message.content` (Plan 07 must close the T-08-12 verification loop).
+Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-08-PLAN.md`
+Next action: execute 08-08. With ChatThread / ChatInput / ChatDrawer / Terminal.tsx all live, only the FE-11 polish (price-change flashes synchronized with chat-driven trade execution; any final visual or accessibility tightening) and the final phase build gate (full Vitest suite + Next.js `output: 'export'` build + grep checks across all 7 prior plans) remain. Note for verifier: pre-existing TSC errors in `MainChart.test.tsx` and `Sparkline.test.tsx` (5 errors, "Tuple type '[]' of length '0' has no element at index N") are on the Plan 06 baseline and out of scope for Plan 07; should be tracked as a Phase 7 cleanup item.

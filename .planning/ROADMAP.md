@@ -157,7 +157,7 @@ Plans:
 - [x] 08-04-PLAN.md — FE-06 PnLChart + PnLTooltip + 6 Vitest tests (Recharts LineChart, dotted $10k ReferenceLine, stroke flips at break-even) (completed 2026-04-26)
 - [x] 08-05-PLAN.md — SkeletonBlock primitive + TabBar + 4 tests + Terminal.tsx flex-row restructure with chat-drawer slot (completed 2026-04-26)
 - [x] 08-06-PLAN.md — FE-09 chat primitives (ChatHeader/ChatMessage/ActionCard/ActionCardList/ThinkingBubble + ChatDrawer SHELL) + 8 tests (ActionCard/ActionCardList/ChatDrawer) (completed 2026-04-26)
-- [ ] 08-07-PLAN.md — FE-09 chat orchestration (ChatThread + ChatInput) + Terminal.tsx ChatDrawer mount + 8 tests (ChatThread incl. XSS guard + ChatInput)
+- [x] 08-07-PLAN.md — FE-09 chat orchestration (ChatThread + ChatInput) + Terminal.tsx ChatDrawer mount + 8 tests (ChatThread incl. XSS guard + ChatInput) (completed 2026-04-26)
 - [ ] 08-08-PLAN.md — FE-11 polish wiring (PositionRow trade-flash + TradeBar manual-flash) + final build gate (npm run build, full Vitest, full pytest)
 **UI hint**: yes
 
@@ -196,6 +196,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. AI Chat Integration | 0/TBD | Not started | - |
 | 6. Frontend Scaffold & SSE | 3/3 | Complete | 2026-04-24 |
 | 7. Market Data & Trading UI | 8/8 | Complete    | 2026-04-25 |
-| 8. Portfolio Visualization & Chat UI | 0/TBD | Not started | - |
+| 8. Portfolio Visualization & Chat UI | 7/8 | In progress | - |
 | 9. Dockerization & Packaging | 0/TBD | Not started | - |
 | 10. E2E Validation | 0/TBD | Not started | - |
