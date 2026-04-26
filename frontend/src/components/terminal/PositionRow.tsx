@@ -8,12 +8,13 @@
  * 07-UI-SPEC §5.4; 07-PATTERNS.md §PositionRow.
  */
 
-import { selectFlash, selectTick, usePriceStore } from '@/lib/price-store';
+import { selectFlash, selectTick, selectTradeFlash, usePriceStore } from '@/lib/price-store';
 import type { PositionOut } from '@/lib/api/portfolio';
 
 export function PositionRow({ position }: { position: PositionOut }) {
   const tick = usePriceStore(selectTick(position.ticker));
   const flash = usePriceStore(selectFlash(position.ticker));
+  const tradeFlash = usePriceStore(selectTradeFlash(position.ticker));
 
   const price = tick?.price ?? position.current_price;
   const pnl = tick
@@ -28,6 +29,12 @@ export function PositionRow({ position }: { position: PositionOut }) {
       ? 'bg-up/10'
       : flash === 'down'
         ? 'bg-down/10'
+        : '';
+  const tradeFlashClass =
+    tradeFlash === 'up'
+      ? 'bg-up/20'
+      : tradeFlash === 'down'
+        ? 'bg-down/20'
         : '';
   const pnlColor = pnl >= 0 ? 'text-up' : 'text-down';
 
@@ -45,7 +52,7 @@ export function PositionRow({ position }: { position: PositionOut }) {
       tabIndex={0}
       role="button"
       aria-label={`Select ${position.ticker}`}
-      className={`h-12 border-b border-border-muted cursor-pointer hover:bg-surface-alt transition-colors duration-500 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent-blue ${flashClass}`}
+      className={`h-12 border-b border-border-muted cursor-pointer hover:bg-surface-alt transition-colors duration-500 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent-blue ${flashClass} ${tradeFlashClass}`}
     >
       <td className="px-4 font-semibold">{position.ticker}</td>
       <td className="px-2 font-mono tabular-nums text-right text-sm">
