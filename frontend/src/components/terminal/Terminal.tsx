@@ -7,6 +7,8 @@
  * Decision refs: 07-UI-SPEC §5.1; 08-UI-SPEC §5.1; 08-CONTEXT.md D-07.
  */
 
+import { ChatDrawer } from '@/components/chat/ChatDrawer';
+import { ChatThread } from '@/components/chat/ChatThread';
 import { Heatmap } from '@/components/portfolio/Heatmap';
 import { PnLChart } from '@/components/portfolio/PnLChart';
 import { selectSelectedTab, usePriceStore } from '@/lib/price-store';
@@ -39,13 +41,9 @@ export function Terminal() {
           </div>
         </div>
       </div>
-      {/* Plan 06/07 will replace this slot with <ChatDrawer />. Kept as a placeholder
-          so the flex row exists and the visual layout already accounts for it. */}
-      <aside
-        data-testid="chat-drawer-slot"
-        className="w-12 bg-surface-alt border-l border-border-muted flex flex-col"
-        aria-label="Chat drawer placeholder"
-      />
+      <ChatDrawer>
+        <ChatThread />
+      </ChatDrawer>
     </main>
   );
 }
