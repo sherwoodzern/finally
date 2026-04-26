@@ -5,8 +5,10 @@ from __future__ import annotations
 import logging
 import os
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 
 from .chat import create_chat_client, create_chat_router
 from .db import get_watchlist_tickers, init_database, open_database, seed_defaults
@@ -76,6 +78,14 @@ async def lifespan(app: FastAPI):
     chat_client = create_chat_client()
     app.state.chat_client = chat_client
     app.include_router(create_chat_router(conn, cache, source, chat_client))   # D-20
+
+    # APP-02 / D-14: serve frontend/out at / AFTER all /api/* routers (catch-all must be last)
+    static_dir = Path(__file__).resolve().parents[2] / "frontend" / "out"
+    app.mount(
+        "/",
+        StaticFiles(directory=str(static_dir), html=True),
+        name="frontend",
+    )
 
     logger.info(
         "App started: db=%s tickers=%d source=%s",
