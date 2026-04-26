@@ -8,6 +8,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { ResponsiveContainer, Treemap } from 'recharts';
+import { useShallow } from 'zustand/react/shallow';
 import { fetchPortfolio, type PositionOut } from '@/lib/api/portfolio';
 import { usePriceStore } from '@/lib/price-store';
 import { HeatmapCell } from './HeatmapCell';
@@ -63,13 +64,15 @@ export function Heatmap() {
     queryFn: fetchPortfolio,
     refetchInterval: 15_000,
   });
-  const livePrices = usePriceStore((s) => {
-    const out: Record<string, number | undefined> = {};
-    for (const p of data?.positions ?? []) {
-      out[p.ticker] = s.prices[p.ticker]?.price;
-    }
-    return out;
-  });
+  const livePrices = usePriceStore(
+    useShallow((s) => {
+      const out: Record<string, number | undefined> = {};
+      for (const p of data?.positions ?? []) {
+        out[p.ticker] = s.prices[p.ticker]?.price;
+      }
+      return out;
+    }),
+  );
 
   const positions = data?.positions ?? [];
 
