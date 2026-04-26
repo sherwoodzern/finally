@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { __setEventSource, usePriceStore } from './price-store';
+import { __setEventSource, selectSelectedTab, selectTradeFlash, usePriceStore } from './price-store';
 import type { RawPayload } from './sse-types';
 
 // Reuse the Phase 06 harness shape.
@@ -130,5 +130,87 @@ describe('price-store Phase 7 extensions', () => {
     // Advancing past the timer must not re-introduce any flash state.
     vi.advanceTimersByTime(1000);
     expect(usePriceStore.getState().flashDirection).toEqual({});
+  });
+});
+
+describe('Phase 8 trade-flash + tabs', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+    __setEventSource(MockEventSource as unknown as typeof EventSource);
+    MockEventSource.reset();
+    usePriceStore.getState().reset();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    usePriceStore.getState().disconnect();
+  });
+
+  it('flashTrade("AAPL", "up") sets tradeFlash.AAPL to "up" immediately', () => {
+    usePriceStore.getState().flashTrade('AAPL', 'up');
+    expect(usePriceStore.getState().tradeFlash.AAPL).toBe('up');
+  });
+
+  it('tradeFlash.AAPL is cleared 800ms after flashTrade', () => {
+    usePriceStore.getState().flashTrade('AAPL', 'up');
+    expect(usePriceStore.getState().tradeFlash.AAPL).toBe('up');
+    vi.advanceTimersByTime(800);
+    expect(usePriceStore.getState().tradeFlash.AAPL).toBeUndefined();
+  });
+
+  it('setSelectedTab("heatmap") updates selectedTab', () => {
+    usePriceStore.getState().setSelectedTab('heatmap');
+    expect(usePriceStore.getState().selectedTab).toBe('heatmap');
+  });
+
+  it('default selectedTab is "chart"', () => {
+    expect(usePriceStore.getState().selectedTab).toBe('chart');
+  });
+
+  it('default tradeFlash is {}', () => {
+    expect(usePriceStore.getState().tradeFlash).toEqual({});
+  });
+
+  it('selectTradeFlash(ticker) returns the slice value', () => {
+    usePriceStore.getState().flashTrade('AAPL', 'down');
+    const value = selectTradeFlash('AAPL')(usePriceStore.getState());
+    expect(value).toBe('down');
+    const missing = selectTradeFlash('GOOGL')(usePriceStore.getState());
+    expect(missing).toBeUndefined();
+  });
+
+  it('selectSelectedTab returns the current tab', () => {
+    expect(selectSelectedTab(usePriceStore.getState())).toBe('chart');
+    usePriceStore.getState().setSelectedTab('pnl');
+    expect(selectSelectedTab(usePriceStore.getState())).toBe('pnl');
+  });
+
+  it('disconnect() zeroes tradeFlash and resets selectedTab to "chart"', () => {
+    usePriceStore.getState().setSelectedTab('heatmap');
+    usePriceStore.getState().flashTrade('AAPL', 'up');
+    usePriceStore.getState().disconnect();
+    expect(usePriceStore.getState().tradeFlash).toEqual({});
+    expect(usePriceStore.getState().selectedTab).toBe('chart');
+  });
+
+  it('reset() zeroes tradeFlash and resets selectedTab to "chart"', () => {
+    usePriceStore.getState().setSelectedTab('pnl');
+    usePriceStore.getState().flashTrade('AAPL', 'down');
+    usePriceStore.getState().reset();
+    expect(usePriceStore.getState().tradeFlash).toEqual({});
+    expect(usePriceStore.getState().selectedTab).toBe('chart');
+    // Advancing past the timer must not re-introduce any tradeFlash state.
+    vi.advanceTimersByTime(1000);
+    expect(usePriceStore.getState().tradeFlash).toEqual({});
+  });
+
+  it('regression guard: existing flashDirection slice still works (500ms)', () => {
+    usePriceStore.getState().connect();
+    MockEventSource.last().emitOpen();
+    MockEventSource.last().emitMessage({ AAPL: payload('AAPL', 190) });
+    MockEventSource.last().emitMessage({ AAPL: payload('AAPL', 195, 190) });
+    expect(usePriceStore.getState().flashDirection.AAPL).toBe('up');
+    vi.advanceTimersByTime(500);
+    expect(usePriceStore.getState().flashDirection.AAPL).toBeUndefined();
   });
 });
