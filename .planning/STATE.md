@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 8 context gathered (08-CONTEXT.md + 08-DISCUSSION-LOG.md committed); next step is `/gsd-plan-phase 8`
-last_updated: "2026-04-25T15:05:00.000Z"
-last_activity: 2026-04-25
+stopped_at: Executing Phase 8 — Wave 1 (08-01 static mount + G1 SSE fix; 08-02 frontend foundations)
+last_updated: "2026-04-26T00:00:00.000Z"
+last_activity: 2026-04-26
 progress:
   total_phases: 10
   completed_phases: 7
-  total_plans: 25
-  completed_plans: 25
-  percent: 100
+  total_plans: 33
+  completed_plans: 27
+  percent: 82
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-19)
 
 **Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf.
-**Current focus:** Phase 7 — Market Data & Trading UI
+**Current focus:** Phase 8 — Portfolio Visualization & Chat UI
 
 ## Current Position
 
 Phase: 8
-Plan: Not started (context gathered)
-Status: Phase 8 context ready for planning
-Last activity: 2026-04-25
+Plan: Wave 2 in flight (08-03, 08-04, 08-05, 08-06)
+Status: Phase 8 executing — wave 2 of 4 (Wave 1 complete: 08-01, 08-02 merged, 70 vitest + 299 pytest green)
+Last activity: 2026-04-26
 
-Progress: [          ] 0% of Phase 08 (context complete, plans pending)
+Progress: [##        ] 25% of Phase 08 (2 of 8 plans complete; wave 2 dispatched)
 
 ## Performance Metrics
 
@@ -144,12 +144,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-25
-Stopped at: Phase 8 context gathered. User selected two gray areas — **Visualization styling** and **Demo polish priorities** — and four single-question turns each. Heatmap = Recharts `<Treemap>` + binary up/down + ticker+P&L% labels + click-selects. P&L chart = Recharts `<LineChart>` over all snapshots + dotted $10k reference line + stroke flips at break-even. Chat dock = right-edge drawer, default open, push layout (~380px). LLM loading = 3-dot bubble. Cold-start = skeleton-per-panel. Agentic auto-trade = action-card pulse + position-row flash (~800ms, distinct from Phase 7's 500ms price flash). 17 decisions (D-01..D-17) recorded plus 10 Claude's Discretion items.
+Last session: 2026-04-26
+Stopped at: Phase 8 plans written and revised based on checker feedback. 8 plans across 4 waves: 08-01 (StaticFiles mount + G1 fix), 08-02 (recharts + API clients + store slices + fixtures), 08-03 (Heatmap + tests), 08-04 (PnLChart + tests), 08-05 (SkeletonBlock + TabBar + Terminal restructure), 08-06 (chat primitives + ChatDrawer shell), 08-07 (chat orchestration + Terminal mount), 08-08 (FE-11 polish wiring + final build gate). Phase 7 still has 6 browser-only UAT items in 07-HUMAN-UAT.md outstanding (non-blocking — testable once 08-01 lands the StaticFiles mount).
 
-**G1 carry-over (from Phase 7):** addressed in CONTEXT.md as D-14 (FastAPI `StaticFiles` mount of `frontend/out/` at `/` after API routers, `html=True`) + D-15 (`skipTrailingSlashRedirect: true` in `next.config.mjs`). Both land in the same plan so prod and dev SSE both work; Phase 7's deferred UAT 1/2/3/5 become testable.
-
-**New deps for Phase 8:** `recharts` (frontend prod). Second and final chart dep alongside the Phase 7 `lightweight-charts`.
-
-Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-CONTEXT.md`
-Next action: `/clear` then `/gsd-plan-phase 8`. Phase 8 is six requirements (FE-05, FE-06, FE-09, FE-11, APP-02, TEST-02) — significant surface area; expect the planner to break it into 4–6 plans.
+Resume file: `.planning/phases/08-portfolio-visualization-chat-ui/08-01-PLAN.md`
+Next action: `/clear` then `/gsd-execute-phase 8`. Stale `HANDOFF.json` from Phase 7 deleted — its `phase_complete` status was consumed when Phase 8 planning began.
