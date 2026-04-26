@@ -3,6 +3,7 @@ const nextConfig = {
   output: 'export',
   images: { unoptimized: true },
   trailingSlash: true,
+  skipTrailingSlashRedirect: true,
   async rewrites() {
     if (process.env.NODE_ENV !== 'development') return [];
     return [
