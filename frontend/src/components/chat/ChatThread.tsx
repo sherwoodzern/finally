@@ -74,7 +74,7 @@ export function ChatThread() {
     const text = content.trim();
     if (!text) return;
     setAppended((p) => [...p, localUserMessage(text)]);
-    mutation.mutate({ content: text });
+    mutation.mutate({ message: text });
   };
 
   const messages: ChatMessageOut[] = [

@@ -60,7 +60,7 @@ export async function getChatHistory(): Promise<HistoryResponse> {
 
 /** POST /api/chat — called by useMutation in ChatInput.
  * Phase 5 D-12 transport errors return 502; throw plain Error (not custom class). */
-export async function postChat(body: { content: string }): Promise<ChatResponse> {
+export async function postChat(body: { message: string }): Promise<ChatResponse> {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
