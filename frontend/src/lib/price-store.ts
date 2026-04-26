@@ -17,11 +17,15 @@ interface PriceStoreState {
   sparklineBuffers: Record<string, number[]>;
   flashDirection: Record<string, 'up' | 'down'>;
   selectedTicker: string | null;
+  selectedTab: 'chart' | 'heatmap' | 'pnl';
+  tradeFlash: Record<string, 'up' | 'down'>;
   connect: () => void;
   disconnect: () => void;
   ingest: (payload: Record<string, RawPayload>) => void;
   reset: () => void;
   setSelectedTicker: (t: string | null) => void;
+  setSelectedTab: (t: 'chart' | 'heatmap' | 'pnl') => void;
+  flashTrade: (ticker: string, dir: 'up' | 'down') => void;
 }
 
 const SSE_URL = '/api/stream/prices'; // D-16: relative URL, same-origin in dev (via rewrites) and prod (via StaticFiles mount)
@@ -41,6 +45,8 @@ let es: EventSource | null = null;
 
 const flashTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const FLASH_MS = 500;
+const tradeFlashTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const TRADE_FLASH_MS = 800;
 const SPARKLINE_WINDOW = 120; // ~60s at 500ms tick cadence (D-03)
 
 function isValidPayload(v: unknown): v is RawPayload {
@@ -56,6 +62,8 @@ export const usePriceStore = create<PriceStoreState>()((set, get) => ({
   sparklineBuffers: {},
   flashDirection: {},
   selectedTicker: null,
+  selectedTab: 'chart',
+  tradeFlash: {},
 
   ingest: (payload) => {
     const state = get();
@@ -139,12 +147,16 @@ export const usePriceStore = create<PriceStoreState>()((set, get) => ({
     }
     flashTimers.forEach(clearTimeout);
     flashTimers.clear();
-    set({ status: 'disconnected', flashDirection: {} });
+    tradeFlashTimers.forEach(clearTimeout);
+    tradeFlashTimers.clear();
+    set({ status: 'disconnected', flashDirection: {}, tradeFlash: {}, selectedTab: 'chart' });
   },
 
   reset: () => {
     flashTimers.forEach(clearTimeout);
     flashTimers.clear();
+    tradeFlashTimers.forEach(clearTimeout);
+    tradeFlashTimers.clear();
     set({
       prices: {},
       status: 'disconnected',
@@ -152,10 +164,29 @@ export const usePriceStore = create<PriceStoreState>()((set, get) => ({
       sparklineBuffers: {},
       flashDirection: {},
       selectedTicker: null,
+      selectedTab: 'chart',
+      tradeFlash: {},
     });
   },
 
   setSelectedTicker: (t) => set({ selectedTicker: t }),
+
+  setSelectedTab: (t) => set({ selectedTab: t }),
+
+  flashTrade: (ticker, dir) => {
+    set((s) => ({ tradeFlash: { ...s.tradeFlash, [ticker]: dir } }));
+    const prev = tradeFlashTimers.get(ticker);
+    if (prev) clearTimeout(prev);
+    const handle = setTimeout(() => {
+      set((s) => {
+        const cleared = { ...s.tradeFlash };
+        delete cleared[ticker];
+        return { tradeFlash: cleared };
+      });
+      tradeFlashTimers.delete(ticker);
+    }, TRADE_FLASH_MS);
+    tradeFlashTimers.set(ticker, handle);
+  },
 }));
 
 /** Subscribe to a single ticker's Tick. Returns undefined before first tick. */
@@ -181,3 +212,12 @@ export const selectFlash =
 
 /** Subscribe to the user-selected ticker for the MainChart panel. */
 export const selectSelectedTicker = (s: PriceStoreState): string | null => s.selectedTicker;
+
+/** Subscribe to a single ticker's transient trade flash (separate from price flash). 800ms duration. */
+export const selectTradeFlash =
+  (ticker: string) =>
+  (s: PriceStoreState): 'up' | 'down' | undefined =>
+    s.tradeFlash[ticker];
+
+/** Subscribe to the user-selected center-column tab (Chart / Heatmap / P&L). */
+export const selectSelectedTab = (s: PriceStoreState): 'chart' | 'heatmap' | 'pnl' => s.selectedTab;
