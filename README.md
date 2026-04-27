@@ -16,11 +16,16 @@ Built entirely by coding agents as the capstone for an agentic AI course.
 ## Quick Start
 
 ```bash
-cp .env.example .env     # add OPENROUTER_API_KEY
-./scripts/start_mac.sh   # or scripts/start_windows.ps1
+cp .env.example .env                # add OPENROUTER_API_KEY
+./scripts/start_mac.sh              # macOS / Linux
+./scripts/stop_mac.sh               # macOS / Linux (when done)
+scripts/start_windows.ps1           # Windows PowerShell
+scripts/stop_windows.ps1            # Windows PowerShell (when done)
 ```
 
 Open http://localhost:8000. You start with a 10-ticker watchlist and $10,000 in virtual cash.
+
+For the full Docker reference (image layout, volume semantics, troubleshooting, Windows variants), see [`docs/DOCKER.md`](docs/DOCKER.md).
 
 ## Environment
 
