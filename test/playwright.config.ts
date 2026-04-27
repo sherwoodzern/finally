@@ -69,8 +69,17 @@ export default defineConfig({
   outputDir: 'test-results',
 
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox',  use: { ...devices['Desktop Firefox'] } },
-    { name: 'webkit',   use: { ...devices['Desktop Safari'] } },
+    // CONTEXT D-02 full browser matrix. Explicit viewport: 1440x900 overrides
+    // the default 1280x720 from devices['Desktop Chrome' | 'Desktop Firefox'
+    // | 'Desktop Safari'] and aligns the test environment with the production
+    // design contract from `planning/PLAN.md` §10 ("desktop-first ... wide
+    // screens"). Below 1440 the Terminal.tsx 3-col grid (320px / 1fr / 360px)
+    // plus the ChatDrawer flex sibling overflows and the right-column
+    // PositionsTable visually overlaps the center-column TabBar (10-VERIFICATION
+    // .md Mode A — corrected diagnosis). Override is per-project and applied
+    // after the device spread so it wins.
+    { name: 'chromium', use: { ...devices['Desktop Chrome'],  viewport: { width: 1440, height: 900 } } },
+    { name: 'firefox',  use: { ...devices['Desktop Firefox'], viewport: { width: 1440, height: 900 } } },
+    { name: 'webkit',   use: { ...devices['Desktop Safari'],  viewport: { width: 1440, height: 900 } } },
   ],
 });
