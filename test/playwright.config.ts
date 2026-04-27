@@ -14,16 +14,21 @@ export default defineConfig({
   // flakiness without masking real bugs (D-09 wording).
   retries: process.env.CI ? 1 : 0,
 
-  // D-07: "workers: 1 within a Playwright project; cross-browser projects parallel".
-  // Playwright DOES NOT support per-project worker caps. The intent is achieved
-  // with workers = (number of projects) + fullyParallel: false:
-  //   - workers: 3  -> three concurrent worker processes
-  //   - fullyParallel: false (default) -> tests in a single file run serially
-  //     within one worker; each worker picks up one whole spec file at a time
-  //   - 7 specs x 3 projects = 21 (file, project) tasks distributed greedily
-  //     across the 3 workers; D-08's per-spec unique tickers prevent any
-  //     cross-spec collision regardless of which browser picks them up first.
-  workers: 3,
+  // D-07 (corrected): A single worker process serialises ALL 21 (spec,
+  // project) pairs across the 3 browser projects, eliminating cross-spec
+  // contention on shared SQLite state (cash_balance, default seed-watchlist
+  // positions). Cross-browser projects are still defined as separate
+  // Playwright projects below; with workers: 1 they run sequentially within
+  // the same `up` invocation rather than in parallel. Original config used
+  // workers: 3 + fullyParallel: false in an attempt to realise D-07's
+  // "workers: 1 within a Playwright project; cross-browser projects parallel"
+  // wording, but Playwright does not support per-project worker caps and
+  // the result was three concurrent workers picking up different spec files
+  // against the same backend (8 of 9 failures in 10-VERIFICATION.md Gap
+  // Group A). Single-worker serialisation is the simplest fix and is the
+  // right answer for a single-user demo project — the runtime cost (a few
+  // extra seconds end-to-end) is irrelevant; reproducible green is.
+  workers: 1,
   fullyParallel: false,
 
   // Forbid `test.only` from sneaking into a green-bar commit.
