@@ -1,0 +1,61 @@
+# test/docker-compose.test.yml
+# Phase 10 E2E harness. Run from repo root:
+#   docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright
+#
+# CONTEXT.md: D-01 (no custom Dockerfile under test/), D-02 (full browser matrix),
+# D-03 (one-command UX), D-04 (build from local Dockerfile), D-05 (LLM_MOCK=true),
+# D-06 (anonymous volume per run), D-09 (baseURL http://app:8000), D-10 (compose-side
+# HEALTHCHECK only), D-13 (Phase 2 seed assumed).
+
+services:
+  app:
+    # D-04: build from repo-root Dockerfile, not a registry pull.
+    # `..` is relative to this compose file's directory, i.e. the repo root.
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    # No image: tag - compose synthesises one as `<projectname>-app`. We never
+    # need to reference the image elsewhere.
+    environment:
+      LLM_MOCK: "true"          # D-05: deterministic mock chat path
+      OPENROUTER_API_KEY: ""    # set explicitly empty; suppresses Phase 5 warning
+      MASSIVE_API_KEY: ""       # empty -> SimulatorDataSource
+      DB_PATH: /app/db/finally.db
+      PYTHONUNBUFFERED: "1"
+    # D-06: NO `volumes:` mapping for /app/db -> compose creates a fresh
+    # anonymous volume per `up` invocation. Each run starts with a clean
+    # SQLite (Phase 2 lazy init re-seeds the 10-ticker watchlist + $10k cash).
+    # D-10: compose-side HEALTHCHECK only - the production Dockerfile
+    # deliberately omits HEALTHCHECK (Phase 9 / D-08 of Phase 9 CONTEXT).
+    healthcheck:
+      # python3 ships in python:3.12-slim runtime stage; curl does NOT.
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/api/health', timeout=2).status==200 else 1)\""]
+      interval: 5s
+      timeout: 3s
+      retries: 12        # 12 * 5s = 60s total budget after start_period
+      start_period: 15s  # grace window for FastAPI lifespan + DB seed
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.59.1-jammy
+    depends_on:
+      app:
+        condition: service_healthy   # D-10
+    working_dir: /work
+    volumes:
+      - ../test:/work     # mount the test/ directory itself (host-relative to compose file)
+    environment:
+      # Override Playwright config baseURL via env (config also hardcodes
+      # http://app:8000 via D-09 - this is belt-and-suspenders).
+      BASE_URL: "http://app:8000"
+      # Disable Playwright's "you should run `npx playwright install`" nag:
+      # the image already has all browsers installed.
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
+      # CI=1 turns on Playwright's CI defaults (forbidOnly, retries, etc.)
+      # AND keys our `retries: process.env.CI ? 1 : 0` config switch.
+      CI: "1"
+    # Run install + tests as a single command so we can stream npm output to
+    # compose stdout. `npm ci` is reproducible from package-lock.json.
+    command: >
+      sh -c "npm ci && npx playwright test"
+    # If the container errors before tests run, exit propagates via
+    # --exit-code-from playwright.
