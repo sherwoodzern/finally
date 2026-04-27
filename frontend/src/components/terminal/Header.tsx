@@ -40,13 +40,13 @@ export function Header() {
       <ConnectionDot />
       <div className="flex items-baseline gap-2">
         <span className="text-sm text-foreground-muted">Total</span>
-        <span className="font-mono tabular-nums text-lg">
+        <span className="font-mono tabular-nums text-lg" data-testid="header-total">
           {formatMoney(totalValue)}
         </span>
       </div>
       <div className="flex items-baseline gap-2">
         <span className="text-sm text-foreground-muted">Cash</span>
-        <span className="font-mono tabular-nums text-lg">
+        <span className="font-mono tabular-nums text-lg" data-testid="header-cash">
           {formatMoney(cashBalance)}
         </span>
       </div>
