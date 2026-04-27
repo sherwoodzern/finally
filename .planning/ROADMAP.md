@@ -185,7 +185,14 @@ Plans:
   1. `test/docker-compose.test.yml` spins up the app container (`LLM_MOCK=true`) plus a Playwright container, keeping browser dependencies out of the production image.
   2. The Playwright suite covers a fresh start (default watchlist visible, $10k balance, streaming prices), watchlist add + remove, buy shares (cash decreases, position appears), sell shares (cash increases, position updates or disappears), heatmap + P&L chart rendering, mocked chat with a visible trade execution, and SSE disconnect + automatic reconnect.
   3. Running the full E2E pack is a single command and finishes green locally against the freshly built image, with reproducible results on repeat runs.
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+- [ ] 10-00-PLAN.md — Frontend test-id additions (Header/TabBar/Watchlist/PositionsTable/TradeBar) for stable selectors (Wave 0)
+- [ ] 10-01-PLAN.md — Foundation: test/package.json + playwright.config.ts + docker-compose.test.yml + README.md + .gitignore additions (Wave 1)
+- [ ] 10-02-PLAN.md — Specs 01-fresh-start + 02-watchlist-crud (seed assertions + REST add/remove PYPL) (Wave 2)
+- [ ] 10-03-PLAN.md — Specs 03-buy + 04-sell (TradeBar UI: NVDA buy + JPM buy-then-sell) (Wave 2)
+- [ ] 10-04-PLAN.md — Specs 05-portfolio-viz + 06-chat (heatmap/PnL render via META + mock chat buy AMZN 1) (Wave 2)
+- [ ] 10-05-PLAN.md — Spec 07-sse-reconnect (context.route abort+unroute) + full one-command harness gate (Wave 2)
 
 ## Progress
 
@@ -203,4 +210,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Market Data & Trading UI | 8/8 | Complete    | 2026-04-25 |
 | 8. Portfolio Visualization & Chat UI | 8/8 | Complete | 2026-04-26 |
 | 9. Dockerization & Packaging | 0/4 | Not started | - |
-| 10. E2E Validation | 0/TBD | Not started | - |
+| 10. E2E Validation | 0/6 | Not started | - |
