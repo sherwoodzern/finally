@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: gaps_found
-stopped_at: "Phase 10 EXECUTED with gaps_found (12/21 (spec, project) pairs green). All 6 plans completed atomically; foundation HSTS rename landed centrally (commit 22ac1a4); verifier produced 10-VERIFICATION.md scoring 2/3 must-haves. Two gap groups: (A) cross-spec parallelism contention — playwright.config.ts workers:3 contradicts CONTEXT.md D-07 'workers:1 per project' + hardcoded $10k cash assertions in 03-buy/04-sell + unscoped getByRole('Select <ticker>') in 01-fresh-start; (B) 05-portfolio-viz Recharts tooltip intercepts tab-pnl click on all 3 browsers. Specs that pass cleanly: 02-watchlist-crud (3/3), 06-chat (3/3), 07-sse-reconnect (3/3). Next: /gsd-plan-phase 10 --gaps to create 10.1 gap-closure plans."
-last_updated: "2026-04-27T18:30:00.000Z"
+status: ready_to_execute
+stopped_at: "Phase 10 gap-closure plans created (10-06, 10-07) and verified by plan-checker (PASSED). 10-06 closes Gap Group A: workers:1 in playwright.config.ts (realises CONTEXT D-07), watchlist-panel-scoped Select selectors in 01-fresh-start, drop hardcoded $10k pre-trade assertion in 03-buy, relative-delta qty assertion in 04-sell. 10-07 closes Gap Group B: page.keyboard.press('Escape') tooltip dismissal in 05-portfolio-viz before tab-pnl click + owns the canonical-command 21/21 green gate. Sequential dependency 10-06 → 10-07. Next: /gsd-execute-phase 10 to run the two new plans, then re-verify."
+last_updated: "2026-04-27T14:42:00.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 10
   completed_phases: 9
-  total_plans: 43
+  total_plans: 45
   completed_plans: 37
-  percent: 86
+  percent: 82
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-19)
 
 **Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf.
-**Current focus:** Phase 10 — E2E Validation (executed; gaps_found — gap closure pending)
+**Current focus:** Phase 10 — E2E Validation (gap-closure plans 10-06, 10-07 ready to execute)
 
 ## Current Position
 
 Phase: 10
-Plan: All 6 Phase 10 plans executed and committed. Foundation HSTS rename (22ac1a4) landed centrally. Verifier produced 10-VERIFICATION.md scoring 2/3 must-haves (status: gaps_found). Two gap groups for /gsd-plan-phase 10 --gaps: (A) parallelism config + spec-design defects (8/9 failures); (B) 05-portfolio-viz Recharts tooltip intercept (1/9 × 3 browsers).
-Status: Phase 10 verification gaps_found. Canonical harness exits 1 with 12/21 (spec, project) pairs green. SC#1 (compose stack) PASSED, SC#2 (suite covers 7 scenarios) PASSED, SC#3 (single command finishes green reproducibly) FAILED. Specs that pass cleanly across all 3 browsers: 02-watchlist-crud, 06-chat, 07-sse-reconnect. Specs needing gap closure: 01-fresh-start (firefox+webkit), 03-buy (firefox+webkit), 04-sell (firefox+webkit), 05-portfolio-viz (all 3 browsers).
+Plan: 8 plans total (10-00..10-05 executed; 10-06, 10-07 newly planned for gap closure and verified). 10-06 fixes Gap Group A (parallelism + spec assertions across playwright.config.ts, 01-fresh-start, 03-buy, 04-sell). 10-07 fixes Gap Group B (05-portfolio-viz tooltip dismissal) and owns the canonical-command 21/21 green gate. Sequential dependency 10-06 → 10-07.
+Status: Phase 10 ready_to_execute (gap-closure plans). Verification will re-run after 10-06 + 10-07 land. Expected outcome: canonical harness exits 0 with 21 (spec, project) pairs passing on chromium + firefox + webkit, closing SC#3.
 Last activity: 2026-04-27
 
-Progress: [##########] 100% of Phase 10 plans executed; verification: 2/3 must-haves PASS, gap closure pending
+Progress: [##########] Original 6 Phase 10 plans executed; gap-closure plans 10-06 + 10-07 planned and verified, ready for execution (8 of 8 plans now defined)
 
 ## Performance Metrics
 
