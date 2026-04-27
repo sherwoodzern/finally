@@ -19,6 +19,7 @@ const ERROR_TEXT: Record<string, string> = {
   insufficient_shares: "You don't have that many shares to sell.",
   unknown_ticker: 'No such ticker.',
   price_unavailable: 'Price unavailable right now — try again.',
+  invalid_quantity: 'Enter a positive quantity.',
 };
 const DEFAULT_ERROR = 'Something went wrong. Try again.';
 
@@ -60,7 +61,10 @@ export function TradeBar() {
         return;
       }
       const q = parseFloat(quantity);
-      if (!(q > 0)) return;
+      if (!Number.isFinite(q) || q <= 0) {
+        setErrorCode('invalid_quantity');
+        return;
+      }
       setPendingSide(side);
       setErrorCode(null);
       mutation.mutate({ ticker, side, quantity: q });
