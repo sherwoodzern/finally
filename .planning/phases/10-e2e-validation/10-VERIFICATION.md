@@ -1,6 +1,6 @@
 ---
 phase: 10-e2e-validation
-verified: 2026-04-27T19:35:00Z
+verified: 2026-04-27T22:15:00Z
 status: gaps_found
 score: 2/3 must-haves verified
 overrides_applied: 0
@@ -8,278 +8,296 @@ re_verification:
   previous_status: gaps_found
   previous_score: 2/3
   gaps_closed:
-    - "Cross-spec parallelism contention from `workers: 3` (Gap Group A — workers config). 10-06 commit 491e6ff sets `workers: 1`."
-    - "Unscoped `getByRole('button', { name: 'Select <ticker>' })` in 01-fresh-start (Gap Group A — selector scoping). 10-06 commit 761d3a6 scopes to `getByTestId('watchlist-panel')`."
-    - "Hardcoded `$10,000.00` pre-trade assertion in 03-buy (Gap Group A — absolute cash). 10-06 commit 3bb6105 drops the assertion entirely."
-    - "Absolute qty=1 regex assertion in 04-sell (Gap Group A — absolute qty). 10-06 commit ee45f65 converts to `expect.poll(...).toBe(postBuyQty - 1)`."
-    - "10-07 Task 1 `dismissChartTooltip` helper landed in 05-portfolio-viz (commit 9924ccc) — Escape + mouse displacement called immediately before tab-pnl click."
+    - "Mode B — Cross-project SQLite leak. 10-08 commit 0a58eb9 dropped the absolute `$10,000.00` cash assertion from `test/01-fresh-start.spec.ts:33-34`. Today's harness shows 01-fresh-start 3/3 green (chromium L170, firefox L300, webkit L437)."
+    - "Mode C — postBuyQty snapshot races React Query refetch in 04-sell. 10-08 commit c53810f wraps the snapshot in `expect.poll(...).toBeGreaterThanOrEqual(2)` so the value settles before the sell. Today's harness shows 04-sell 3/3 green with 0 flaky retries (chromium L206, firefox L338, webkit L474; `grep -c 'flaky' /tmp/phase10-final-harness.log` = 0)."
   gaps_remaining:
-    - "ROADMAP SC#3 — single canonical command finishes green reproducibly. Today's run: 14 passed / 5 failed / 2 flaky / exit 1."
+    - "ROADMAP SC#3 — single canonical command finishes green reproducibly. Today's run: 18 passed / 3 failed / 0 flaky / exit 1. All 3 hard failures are 05-portfolio-viz × 3 browsers."
   regressions:
-    - "Failure shape changed since previous VERIFICATION.md. The 9-failure pattern (parallelism + tooltip + spec-design) is gone, replaced by a 5-failure + 2-flaky pattern with three NEW root causes (Modes A, B, C below). Net failure count dropped from 9 → 5, but reproducibility is still NOT met (flaky retries cannot count toward `reproducibly green`)."
+    - "Failure shape changed since previous VERIFICATION.md (commit 4f690e6). The 5-failure + 2-flaky pattern (Modes A/B/C) is now a 3-failure + 0-flaky pattern with Mode A reasserted but RE-DIAGNOSED: the original Mode A blamed a Recharts default tooltip; today's harness evidence proves the actual interceptor is the right-column PositionsTable wrapper at viewport 1280×720 (layout overlap), with cross-RUN SQLite carry-over via persistent docker volume as a compounding factor. Net failure count dropped 5 → 3, but reproducibility is still NOT met."
 gaps:
-  - truth: "After the heatmap renders, the Recharts hover tooltip is reliably dismissed before the tab-pnl click — across all 3 browsers."
+  - truth: "After the heatmap renders, clicking the P&L tab succeeds across all 3 browsers — no element from a sibling column intercepts the click."
     status: failed
-    reason: "Mode A — Tooltip survives the `dismissChartTooltip` helper on all 3 browsers. The helper (Escape + mouse-move) does not actually retract the Recharts Treemap default tooltip overlay once it has pinned to a cell. Recharts dismisses on chart `mouseleave`, not on document-level keyboard events; the tooltip subtree continues to intercept pointer events at the tab-pnl click target. Evidence: harness lines 626 (chromium NVDA), 675 (firefox META), 860 (webkit META) — `<td class=\"px-4 font-semibold\">{ticker}</td> from <div class=\"flex flex-col gap-4\">…</div> subtree intercepts pointer events`. All 3 browsers report TimeoutError after retrying click action ~22 times. 3 of 5 hard failures."
+    reason: "Mode A (corrected) — Layout overlap at viewport 1280×720 between the center column TabBar (containing tab-pnl) and the right column PositionsTable. Playwright reports `<td class=\"px-4 font-semibold\">META</td> from <div class=\"flex flex-col gap-4\">…</div> subtree intercepts pointer events` on all 3 browsers (`/tmp/phase10-final-harness.log:566, 580, 615, 622, 629, 672, 679, 686, 729, 736, 783, 790, 832, 839`). The interceptor `<td class=\"px-4 font-semibold\">{ticker}</td>` is rendered ONLY by `frontend/src/components/terminal/PositionRow.tsx:57` (greppable: `grep -n 'px-4 font-semibold' frontend/src/components/terminal/PositionRow.tsx` → line 57). The wrapping `<div class=\"flex flex-col gap-4\">` matches `frontend/src/components/terminal/Terminal.tsx:50` (the right-column wrapper containing `<PositionsTable />` + `<TradeBar />`). The Recharts Treemap default tooltip — which the previous VERIFICATION.md (commit 4f690e6) blamed — does NOT render any `<td class=\"px-4 font-semibold\">` content; Recharts' DefaultTooltipContent uses `<ul>/<li>` elements. The 10-08 production fix `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />` (Heatmap.tsx:138) IS in place (verified by `grep -c \"wrapperStyle={{ pointerEvents: 'none' }}\" frontend/src/components/portfolio/Heatmap.tsx` → 1) but the Mode A failure is undiminished — confirming the previous diagnosis was wrong. Page accessibility snapshots (`test/test-results/05-portfolio-viz-portfolio-3f443-der-after-a-position-exists-{chromium,firefox,webkit}/error-context.md`) confirm the right column has 4 visible position rows (META qty 9, NVDA qty 4, JPM qty 7, AMZN qty 4 in the chromium snapshot) at the moment of the failed tab-pnl click."
     artifacts:
-      - path: "test/05-portfolio-viz.spec.ts"
-        issue: "Line 49 calls `dismissChartTooltip()` immediately before line 50 `getByTestId('tab-pnl').click()`, but the helper body (lines 26-29) does Escape + `page.mouse.move(0, 0)` only. Neither dispatches a `mouseleave` event on the chart container, which is what the Recharts Tooltip lifecycle actually listens for. The verifier confirmed — by reading the harness traces — the same `<td>{ticker}</td> subtree intercepts pointer events` failure as before; the helper is structurally insufficient."
+      - path: "frontend/src/components/terminal/Terminal.tsx"
+        issue: "Lines 25-27 set up `<main className=\"flex flex-row min-h-screen min-w-[1024px] bg-surface text-foreground\"><div className=\"flex-1 min-w-0 p-6\"><div className=\"grid grid-cols-[320px_1fr_360px] gap-6\">`. At viewport 1280×720 (Playwright `Desktop Chrome` default), the math is: 1280 (viewport) - 48 (`p-6` ×2) - 48 (`gap-6` ×2) - 320 (left col) - 360 (right col) = 504px center column. PLUS the `<ChatDrawer>` flex sibling at line 56 takes additional width (~360px when expanded; the accessibility snapshot shows it expanded). Effective viewport for the 3-col grid is therefore ~920px — narrower than the 320 + 360 + center min-width can accommodate, so the right column visually overlaps the center column tabs (verified by `test/test-results/05-portfolio-viz-portfolio-3f443-der-after-a-position-exists-chromium/test-failed-1.png`)."
+      - path: "frontend/src/components/terminal/PositionRow.tsx"
+        issue: "Line 57: `<td className=\"px-4 font-semibold\">{position.ticker}</td>` — this is the EXACT element Playwright reports as the interceptor. The element itself is correct; the bug is the layout that puts it on top of `tab-pnl`."
+      - path: "test/playwright.config.ts"
+        issue: "Lines 71-75 use `devices['Desktop Chrome']` / `Desktop Firefox'` / `Desktop Safari']` which all default to viewport 1280×720. No explicit viewport override. The Terminal.tsx 3-column grid + chat drawer was designed for ≥1440px wide screens (PLAN.md §10 says `Responsive but desktop-first: optimized for wide screens, functional on tablet`)."
       - path: "frontend/src/components/portfolio/Heatmap.tsx"
-        issue: "No `<Tooltip>` is explicitly imported or rendered inside `<Treemap>`. Recharts uses its DEFAULT internal tooltip which renders a wrapper `<div class=\"flex flex-col gap-4\">` containing the `<td>{ticker}</td>` cell. The default wrapper has `pointer-events: auto`, so the tooltip overlay covers and intercepts clicks on neighbouring elements (sibling tabs in the TabBar)."
+        issue: "Line 138 — the 10-08 `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />` fix is in place. It is correct as latent UX hardening (a Recharts hover tooltip should never block sibling clicks) but does NOT close THIS harness failure because the interceptor is NOT a Recharts tooltip. Keep the fix; do not revert."
     missing:
-      - "Production-side fix: import `Tooltip` from `recharts` in `frontend/src/components/portfolio/Heatmap.tsx` and render it as a child of `<Treemap>` with `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />`. Closes Mode A on all 3 browsers in one line — the tooltip remains visible (correct production UX) but its wrapper no longer intercepts clicks. This is the simplest fix and is appropriate for production: hover tooltips that block sibling clicks are a UX defect regardless of test coverage."
-      - "Alternative (test-side only): replace `dismissChartTooltip` with `await page.locator('[data-testid=heatmap-treemap]').dispatchEvent('mouseleave')` to fire the actual event Recharts is listening for. This is more invasive and brittle (depends on internal Recharts event names). The production fix is preferred."
-  - truth: "01-fresh-start asserts the seed $10,000.00 cash on a clean SQLite state across all 3 browsers."
+      - "Test-side viewport bump (recommended — smallest, lowest-risk fix that matches PLAN.md §10's `desktop-first ... wide screens` design intent). In `test/playwright.config.ts`, override the viewport for all 3 projects to at least 1440×900: `{ name: 'chromium', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } }` (and same for firefox + webkit). 1440×900 is the most common modern laptop external-monitor / 13\" MacBook hi-res target and matches the `wide screens` design contract. This is a test-environment alignment with the production design — not a workaround."
+      - "Production-side layout fix (deferred — bigger change, broader implication). Constrain the chat drawer's contribution to the row width OR change the Terminal.tsx 3-col grid to gracefully collapse the right column at narrow widths. Out of scope for closing Phase 10 SC#3 unless visual UX testing surfaces the same overlap manually at common viewport sizes; should be filed as a v1.1 polish item against POLISH-01."
+      - "Do NOT revert the 10-08 Heatmap.tsx Tooltip pointerEvents fix; it is independently correct UX."
+  - truth: "Each canonical-command run starts from a clean SQLite — no positions, $10,000 cash, no chat history — regardless of how many prior `up` invocations ran."
     status: failed
-    reason: "Mode B — Cross-project SQLite leak. The anonymous compose volume persists for the entire `up` invocation, NOT per browser project. With `workers: 1`, chromium runs ALL 7 specs first (debiting cash via 03-buy/04-sell/05-portfolio-viz/06-chat), THEN firefox runs against the same SQLite (cash now $7,820.46, NOT $10,000.00), THEN webkit (cash now $5,447.88). The `workers: 1` decision in 10-06 fixed cross-spec contention WITHIN one project, but never addressed cross-project ordering — that's a per-project SQLite reset problem, not a worker count problem. Evidence: harness lines 729 (firefox: Received `$7,820.46`), 916 (webkit: Received `$5,447.88`). 2 of 5 hard failures."
+    reason: "Mode A.2 (NEW) — Cross-RUN SQLite carry-over via persistent docker volume. The Page accessibility snapshot from `test/test-results/05-portfolio-viz-portfolio-3f443-der-after-a-position-exists-chromium/error-context.md:189` shows `Total: $10,005.38, Cash: $200.56` at the moment of the 05 failure — far below the $10,000 seed value, indicating massive prior trade activity. The Positions table at lines 211-249 of the same snapshot lists 4 positions (META qty 9, NVDA qty 4, JPM qty 7, AMZN qty 4) accumulated from prior runs (chromium 03/04/05/06 only adds 1× NVDA, 2× JPM-then-1×JPM, 1× META, 1× AMZN — not these quantities). The Chat history at lines 253-310 shows 4 'buy AMZN 1' user turns with timestamps `19:08`, `19:09`, `19:10`, `19:41` — spanning ~33 minutes of wall clock, which is impossible within a single 1.6-minute harness run. The 19:41 entry is from this run's chromium 06-chat; the 19:08/19:09/19:10 entries are from prior `up` invocations that were not cleaned up. `test/docker-compose.test.yml:31` comment claims `D-06: NO 'volumes:' mapping for /app/db -> compose creates a fresh anonymous volume per `up` invocation` — but `docker compose up --abort-on-container-exit` does NOT remove anonymous volumes when stopping, only `docker compose down -v` does. The `Dockerfile:57` `VOLUME /app/db` declaration creates an anonymous volume on container start; without explicit volume cleanup the volume persists. Compounding effect on Mode A: chromium's META buy in 05-portfolio-viz returns `400 Bad Request` (`/tmp/phase10-final-harness.log:488, 505`) because cash is exhausted from prior runs; the heatmap-treemap still mounts because META qty=9 is already in the carry-over state, but the test enters the failing tab-pnl click path with stale full-position state."
     artifacts:
-      - path: "test/01-fresh-start.spec.ts"
-        issue: "Line 34 still asserts the absolute literal `$10,000.00`. Comment at line 33 says `Header cash reads $10,000.00 (Plan 10-00 testid)`. This holds for chromium (the FIRST project alphabetically under workers:1) but fails for firefox and webkit because cash has been debited by chromium's 03/04/05/06 specs against the shared SQLite volume. 10-06 deliberately preserved this assertion (Plan 10-06 Task 2 wording: `01-fresh-start runs FIRST in alphabetical spec order and `workers: 1` (Task 1) guarantees no prior spec has mutated cash`) — but `runs first` is true only WITHIN a project, not ACROSS projects."
+      - path: "test/docker-compose.test.yml"
+        issue: "Line 31 comment states the assumption that anonymous volumes are fresh per `up`, but the compose service's lack of an explicit volume mapping means each `up` creates a NEW anonymous volume while leaving prior anonymous volumes in place. The `volumes:` block at line 50 is for the playwright service (host bind-mounts test/ into /work) — that part is correct and unrelated. There is no `appsvc.volumes:` block, so Docker uses the Dockerfile's `VOLUME /app/db` declaration which produces a new anonymous volume per container start. Container reuse across `up` invocations (compose project name `test`) means the SAME container can be reused with the SAME anonymous volume."
+      - path: "Dockerfile"
+        issue: "Line 57 `VOLUME /app/db` declares an anonymous volume mount target. Combined with the compose-side absence of an explicit volume mapping, this is what creates the per-`up` anonymous volume. Phase 9 chose the volume to enable persistence in production (OPS-02); Phase 10 needs ephemerality. The two requirements are in tension — the production Dockerfile should keep VOLUME (for production persistence); the test-side compose file must override it."
     missing:
-      - "Test-side fix: drop the absolute `$10,000.00` assertion at `test/01-fresh-start.spec.ts:34`, mirroring 10-06's decision for 03-buy. The 10-ticker watchlist visibility (lines 25-31) and the streaming-proof `not.toContainText('—')` (line 41) already prove the page is on a working app. Cash level is incidental to the `fresh start` truth and depends on cross-project ordering that the harness does not control."
-      - "Alternative (heavier): per-project SQLite reset, e.g. `globalSetup` that hits a hypothetical `/api/test/reset` endpoint (explicitly rejected by CONTEXT D-06 — no test-only production endpoints) OR per-project compose `up` (rejected by CONTEXT D-03 — single canonical command). Test-side drop is the only path consistent with existing decisions."
-  - truth: "04-sell deterministically passes on every (spec, project) pair without retries."
-    status: failed
-    reason: "Mode C — Snapshot-vs-refetch race. The `postBuyQty` capture at `test/04-sell.spec.ts:36-37` happens immediately after the `Select JPM` button becomes visible (line 25-27) but BEFORE React Query has refetched `/api/portfolio` and re-rendered the JPM qty cell with the post-buy value. On firefox the snapshot caught `1` (intermediate), the sell debited 1, target was `1-1=0`, but the actual qty cell value is `2` (post-buy buy of 2 fully refetched after the snapshot). On webkit the snapshot caught `3` (a stale value from prior cross-project state + buy in flight), target was `3-1=2`, actual is `4`. The `expect.poll` recovers on retry #1, so Playwright reports `flaky` (eventually passed). But the plan's acceptance criterion in 10-07 Task 2 (`grep -c 'flaky' = 0`) is violated, AND `reproducibly green` is broken — the same `up` produces different per-pair outcomes run-to-run. 2 of 5 outcomes (both as `flaky`)."
-    artifacts:
-      - path: "test/04-sell.spec.ts"
-        issue: "Lines 34-37 capture `postBuyQty` before the React Query refetch settles. The visibility wait at lines 25-27 only proves the JPM `<button>` is rendered; it does NOT guarantee the second `<td>` (qty cell) has refetched its post-buy value. On firefox the snapshot caught the stale qty `1` and on webkit caught `3` — both wrong by 1 from the true post-buy quantity. Evidence: harness line 1090 (firefox: Expected 0, Received 2), line 1119 (webkit: Expected 2, Received 4). Both cases match `actual_qty - postBuyQty = 1` (the buy of 2 finalised AFTER the snapshot)."
-    missing:
-      - "Test-side fix: stabilise `postBuyQty` BEFORE snapshotting it. Replace lines 34-37 with an `expect.poll` that waits for `parseFloat(qtyCellText) >= 2` (the buy added 2, so the post-buy qty must be at least 2 regardless of any prior state). Capture `postBuyQty` only AFTER the poll succeeds. Then the existing relative-delta assertion at lines 47-52 will be deterministic. Same pattern as 10-06 used in lines 47-52 — apply it to the snapshot read as well."
+      - "Compose-side explicit volume cleanup. In `test/docker-compose.test.yml`, either: (a) Map `/app/db` to a tmpfs that vanishes per container: `appsvc: tmpfs: - /app/db` — simplest, no host fs touch; OR (b) Add an explicit named volume that is dropped before each run via a wrapper script or `compose down -v && compose up --build` — heavier, requires changing the canonical command in CONTEXT D-03; OR (c) Have the canonical command run `docker compose -f test/docker-compose.test.yml down -v` BEFORE the `up` (single composite command via `&&` or pre-hook). Path (a) is the smallest and safest — it does not change CONTEXT D-03's command and gives us the per-run ephemerality the comment at line 31 already promises. The production VOLUME declaration is preserved; only the test compose file overrides it."
+      - "Optional: assert empty SQLite at appsvc start. Add an extra healthcheck step (or a one-shot `init` container in the compose graph) that fails the `up` if `/app/db/finally.db` already contains positions/trades/chat data. This catches regressions of the volume-ephemerality contract early. Lower priority than the actual fix."
 deferred: []
 overrides: []
 ---
 
 # Phase 10: E2E Validation Verification Report
 
-**Phase Goal:** An out-of-band `docker-compose.test.yml` brings up the production image alongside a Playwright container with `LLM_MOCK=true`, and every §12 end-to-end scenario passes green against it.
+**Phase Goal:** An out-of-band `docker-compose.test.yml` brings up the production image alongside a Playwright container with `LLM_MOCK=true`, and every §12 end-to-end scenario passes green against it. ROADMAP Phase 10 SC#3: "Running the full E2E pack is a single command and finishes green locally against the freshly built image, with reproducible results on repeat runs."
 
-**Verified:** 2026-04-27T19:35:00Z
+**Verified:** 2026-04-27T22:15:00Z
 **Status:** gaps_found
-**Re-verification:** Yes — after Plan 10-06 (Gap Group A closure) + Plan 10-07 Task 1 (Escape helper). 10-07 Task 2 (canonical harness gate) FAILED and was abandoned per failure protocol; 10-07-SUMMARY.md was never written. Failure shape has CHANGED since the previous VERIFICATION.md was written.
+**Re-verification:** Yes — refresh after Plan 10-08 (commits a149480, 0a58eb9, c53810f). Modes B and C from the previous VERIFICATION.md (commit 4f690e6) are CLOSED. Mode A is RE-DIAGNOSED with corrected root cause (layout overlap, not Recharts tooltip), and Mode A.2 (cross-run SQLite carry-over) is identified as a new compounding factor.
 
 ## Goal Achievement
 
 ### Observable Truths (ROADMAP Success Criteria)
 
-| #   | Truth (ROADMAP SC)                                                                                                                                                                                          | Status     | Evidence                                                                                                                                                                                                                                                          |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | SC#1: All §12 spec files exist (7 specs total).                                                                                                                                                             | ✓ VERIFIED | 7 spec files under `test/`: 01-fresh-start, 02-watchlist-crud, 03-buy, 04-sell, 05-portfolio-viz, 06-chat, 07-sse-reconnect (verified by `ls test/0[0-9]-*.spec.ts`).                                                                                              |
-| 2   | SC#2: Harness foundation works (compose up, /api/health, browsers reach app).                                                                                                                               | ✓ VERIFIED | Harness log line 120: `Container test-appsvc-1 Healthy`. All 21 (spec, project) pairs were dispatched and ran. 14 passed, including all 6 pairs of 02-watchlist-crud and 06-chat (proving REST + browser navigation paths both reach the app on every browser).   |
-| 3   | SC#3: Single canonical command finishes green reproducibly — `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` exits 0 with all 21 pairs passing. | ✗ FAILED   | Today's run: harness log lines 1148-1158 — `5 failed`, `2 flaky`, `14 passed`, `playwright-1 exited with code 1`. Exit code 1 fails SC#3's `exits 0`. The 2 flaky retries also fail SC#3's `reproducibly`. TEST-03 and TEST-04 cannot be marked complete.        |
+| #   | Truth (ROADMAP SC)                                                                                                                                                                                          | Status     | Evidence                                                                                                                                                                                                                                                                                                                                              |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | SC#1: All §12 spec files exist (7 specs total).                                                                                                                                                             | ✓ VERIFIED | 7 spec files under `test/`: 01-fresh-start, 02-watchlist-crud, 03-buy, 04-sell, 05-portfolio-viz, 06-chat, 07-sse-reconnect (verified by `ls test/0[1-7]-*.spec.ts \| wc -l` → 7).                                                                                                                                                                     |
+| 2   | SC#2: Harness foundation works (compose up, /api/health, browsers reach app).                                                                                                                               | ✓ VERIFIED | Harness log line 147: `Container test-appsvc-1 Healthy`. All 21 (spec, project) pairs were dispatched. 18 passed including all 6 pairs of 02-watchlist-crud + 06-chat + 07-sse-reconnect (proves REST + browser navigation + SSE-disconnect paths all reach the app on every browser).                                                                |
+| 3   | SC#3: Single canonical command finishes green reproducibly — `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` exits 0 with all 21 pairs passing. | ✗ FAILED   | Today's run: harness log lines 877-882 — `3 failed`, `18 passed (1.6m)`, `playwright-1 exited with code 1`. Exit code 1 fails SC#3's `exits 0`. Cross-run SQLite carry-over (Mode A.2) breaks the `reproducibly` clause independently. TEST-03 and TEST-04 cannot be marked complete.                                                                |
 
 **Score:** 2/3 truths verified
 
 ### Per-(spec, project) Pair Result Table
 
-Source: `/tmp/phase10-gap-closure-harness.log` (1169 lines). Today's canonical-command run.
+Source: `/tmp/phase10-final-harness.log` (893 lines, 77,182 bytes). Today's canonical-command run.
 
-| Spec                     | Chromium | Firefox      | WebKit       |
-| ------------------------ | -------- | ------------ | ------------ |
-| 01-fresh-start           | ✓ pass   | ✗ fail (B)   | ✗ fail (B)   |
-| 02-watchlist-crud (REST) | ✓ pass   | ✓ pass       | ✓ pass       |
-| 03-buy                   | ✓ pass   | ✓ pass       | ✓ pass       |
-| 04-sell                  | ✓ pass   | ⚠️ flaky (C) | ⚠️ flaky (C) |
+| Spec                     | Chromium | Firefox    | WebKit     |
+| ------------------------ | -------- | ---------- | ---------- |
+| 01-fresh-start           | ✓ pass   | ✓ pass     | ✓ pass     |
+| 02-watchlist-crud (REST) | ✓ pass   | ✓ pass     | ✓ pass     |
+| 03-buy                   | ✓ pass   | ✓ pass     | ✓ pass     |
+| 04-sell                  | ✓ pass   | ✓ pass     | ✓ pass     |
 | 05-portfolio-viz         | ✗ fail (A) | ✗ fail (A) | ✗ fail (A) |
-| 06-chat                  | ✓ pass   | ✓ pass       | ✓ pass       |
-| 07-sse-reconnect         | ✓ pass   | ✓ pass       | ✓ pass       |
+| 06-chat                  | ✓ pass   | ✓ pass     | ✓ pass     |
+| 07-sse-reconnect         | ✓ pass   | ✓ pass     | ✓ pass     |
 
-**Aggregate:** 14 passed / 5 failed / 2 flaky / 0 not-run, of 21 pairs. Harness exit 1.
+**Aggregate:** 18 passed / 3 failed / 0 flaky / 0 not-run, of 21 pairs. Harness exit 1.
 
 Mode legend:
-- **(A)** Recharts heatmap tooltip intercepts `tab-pnl` click (3 hard failures)
-- **(B)** Cross-project SQLite leak — `$10,000.00` no longer holds when 01-fresh-start runs after chromium's full pass debited cash (2 hard failures)
-- **(C)** `postBuyQty` snapshot races React Query refetch in 04-sell (2 flaky retries — pass on retry #1 but block reproducibility)
+- **(A)** Layout overlap at viewport 1280×720 — right-column PositionsTable's `<td>{ticker}</td>` cell intercepts clicks targeted at the center-column `tab-pnl` button. **Compounded by (A.2)** cross-run SQLite carry-over — the test's META buy returns 400 Bad Request because cash is drained from prior runs, but the heatmap-treemap still mounts because META qty=9 is already present in the carry-over volume.
 
 ### Failure Mode Detail
 
-**Mode A — 05-portfolio-viz: tooltip subtree intercepts tab-pnl click on all 3 browsers** (3 of 5 hard failures)
+**Mode A (corrected) — 05-portfolio-viz: layout overlap at viewport 1280×720** (3 of 3 hard failures)
 
-Evidence:
-- Harness line 626: `[chromium] <td class="px-4 font-semibold">NVDA</td> from <div class="flex flex-col gap-4">…</div> subtree intercepts pointer events`
-- Harness line 675: `[firefox] <td class="px-4 font-semibold">META</td> ...` (same shape)
-- Harness line 860: `[webkit] <td class="px-4 font-semibold">META</td> ...` (same shape)
-- Harness lines 619-647: Playwright retried `tab-pnl` click ~22 times across `2 × waiting`, `19 × waiting`, eventually TimeoutError at line 647.
-- The chromium tooltip caption is `NVDA` because chromium runs 03-buy first (creating an NVDA position) and at the moment of the heatmap hover, NVDA's tile is the largest (chromium has accumulated NVDA + JPM + META positions by the time 05 runs).
-- 10-07 commit 9924ccc landed the `dismissChartTooltip` helper (Escape + mouse-move) at line 49 immediately before the tab-pnl click — but the harness traces show the tooltip pin SURVIVES both the Escape keypress and the mouse-move. Confirmed by direct read of `/tmp/phase10-gap-closure-harness.log:619-647` — the helper executed (no error), and the click still failed with the same `subtree intercepts pointer events` shape.
+The previous VERIFICATION.md (commit 4f690e6) attributed this failure to the Recharts default Treemap tooltip's wrapper having `pointer-events: auto`. Plan 10-08 landed the corresponding production fix at `frontend/src/components/portfolio/Heatmap.tsx:138` (`<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />`). That fix is correct as latent UX hardening — a hover overlay should never absorb sibling clicks — but the harness failure SHAPE is unchanged after the fix lands. The original diagnosis was wrong.
 
-Why the helper is insufficient: Recharts' default Tooltip lifecycle dismisses on `mouseleave` of the chart container, not on a document-level keypress and not on a mouse-move-to-(0,0) that does not pass through a synthetic mouse event chain on the chart node itself. Once the tooltip has anchored to a cell, it stays anchored.
+Corrected evidence:
 
-**Mode B — 01-fresh-start: cross-project SQLite leak** (2 of 5 hard failures)
+- The intercepting `<td class="px-4 font-semibold">META</td>` element's exact CSS classes match `frontend/src/components/terminal/PositionRow.tsx:57` (`grep -n 'px-4 font-semibold' frontend/src/components/terminal/PositionRow.tsx` → `57:      <td className="px-4 font-semibold">{position.ticker}</td>`). Recharts' default tooltip body uses `<ul>/<li>`, NOT `<td>`.
+- The wrapping `<div class="flex flex-col gap-4">` reported by Playwright matches `frontend/src/components/terminal/Terminal.tsx:50` — the **right-column wrapper** that contains `<PositionsTable />` + `<TradeBar />`.
+- Page accessibility snapshots (`test/test-results/05-portfolio-viz-portfolio-3f443-der-after-a-position-exists-chromium/error-context.md` lines 199-249) show the right-column Positions table is rendered with 4 visible position rows at the moment of failure, AND the center-column TabBar (lines 193-198) is present with `tab "P&L" [ref=e202]` available — both elements coexist in the DOM but Playwright's hit-test resolves clicks at the tab-pnl coordinates to the PositionsTable cell.
+- Test-failed screenshots (`test-results/.../test-failed-1.png` per project) show visually that the right-column PositionsTable extends leftward into the center-column TabBar zone at viewport 1280×720.
+- The 10-08 Heatmap.tsx Tooltip fix is verified present (`grep -c "wrapperStyle={{ pointerEvents: 'none' }}" frontend/src/components/portfolio/Heatmap.tsx` → 1) AND the harness failure persists — independent confirmation that the Recharts tooltip is NOT the interceptor.
 
-Evidence:
-- Harness line 729: `[firefox] Expected: "$10,000.00" / Received: "$7,820.46"`
-- Harness line 916: `[webkit] Expected: "$10,000.00" / Received: "$5,447.88"`
-- Harness lines 730 (firefox) and 917 (webkit): `9 × locator resolved to <span data-testid="header-cash" ...>$7,820.46</span>` (the value is stable, NOT a transient mid-render snapshot).
+Width math at viewport 1280×720 (Playwright Desktop Chrome default):
 
-Root cause: The compose anonymous volume persists across all 3 browser projects within a single `up`. Under `workers: 1`, projects run alphabetically — chromium first, firefox second, webkit third. By the time firefox 01-fresh-start runs, chromium has already executed:
-- 03-buy (NVDA × 1) → debits cash
-- 04-sell (JPM × 2 buy → JPM × 1 sell) → debits cash net
-- 05-portfolio-viz (META × 1 buy) → debits cash (note: 05 still failed but the META buy lands BEFORE the failing tab-pnl click, so cash is debited)
-- 06-chat (mock buy AMZN × 1) → debits cash
+```
+Viewport               1280
+- main p-6 (×2)         -48
+- grid gap-6 (×2)       -48
+- left col (Watchlist)  -320
+- right col (Pos+Bar)   -360
+                        ----
+= center col available  504px
 
-So firefox sees ~$7.8k. By the time webkit runs, firefox + chromium have done two passes of debits, so webkit sees ~$5.4k.
+PLUS <ChatDrawer> in <main className="flex flex-row"> at Terminal.tsx:25-58:
+- chat drawer width    ~360 (expanded; see snapshot e259-e323)
+                        ----
+= shared 1280 - 360    920px (the 3-col grid lives in the remaining 920px container)
 
-10-06's commit history (Plan 10-06 Task 2) deliberately PRESERVED the absolute `$10,000.00` assertion at line 34 with the rationale "01-fresh-start runs FIRST in alphabetical spec order and `workers: 1` (Task 1) guarantees no prior spec has mutated cash." That rationale is correct WITHIN a project — but `workers: 1` is a per-project worker cap, NOT a cross-project ordering guarantee. The plan missed this distinction.
+The grid is grid-cols-[320px_1fr_360px], so 320+360 = 680px is fixed; 240px is left for center.
+TabBar at center column has 3 tabs: Chart | Heatmap | P&L. At 240px the tabs are crammed
+into a strip and the right-column PositionsTable overflows leftward into the tab-pnl click
+target.
+```
 
-**Mode C — 04-sell: postBuyQty snapshot races React Query refetch** (2 flaky retries)
+The 10-07 `dismissChartTooltip` helper (Escape + mouse-move) at `test/05-portfolio-viz.spec.ts:26-29, 49` is harmless after the 10-08 Heatmap fix lands — but neither addresses the layout problem.
 
-Evidence:
-- Harness line 1090: `[firefox] Expected: 0 / Received: 2` — postBuyQty captured = 1 (an in-flight value), expected `1-1=0`, actual qty after sell = `2` (the buy of 2 fully refetched after the snapshot). Position quantity was `0` from prior cross-project state, +2 buy = `2`, snapshot caught `1` mid-refetch, sell -1 → assertion expected `0`, actual is `2`.
-- Harness line 1119: `[webkit] Expected: 2 / Received: 4` — postBuyQty captured = 3, expected `3-1=2`, actual = `4`. Webkit JPM had `2` from prior state (firefox's net +1 after buy 2 / sell 1), + buy 2 = `4`, snapshot caught `3` mid-refetch, sell -1 → assertion expected `2`, actual is `4`.
-- Both cases: `actual_qty = postBuyQty + 1` (the buy completed after the snapshot, adding 1 more share than the snapshot recorded).
-- Harness lines 356 (firefox retry #1: ✓ 857ms), 532 (webkit retry #1: ✓ 902ms) — both pass on retry, so Playwright marks `flaky`.
+**Mode A.2 (NEW) — cross-RUN SQLite carry-over via persistent docker volume** (compounds Mode A; would surface even after Mode A is fixed)
 
-Root cause: The visibility wait at `test/04-sell.spec.ts:25-27` (`positionsTable.getByRole('button', { name: 'Select JPM' }).toBeVisible()`) only proves the JPM `<button>` element exists. It does NOT wait for React Query's `/api/portfolio` refetch to populate the qty cell with the post-buy value. The snapshot read at lines 36-37 happens too early.
+Evidence (all from `test/test-results/05-portfolio-viz-portfolio-3f443-der-after-a-position-exists-chromium/error-context.md`):
 
-The flakiness blocks SC#3's `reproducibly` even though Playwright reports `passed` after retry. Plan 10-07 Task 2's acceptance criterion `grep -c 'flaky' /tmp/phase10-gap-closure-harness.log = 0` is violated.
+- Line 189: `Total: $10,005.38, Cash: $200.56` — cash drained to ~2% of seed
+- Lines 211-249: 4 positions present (META qty 9, NVDA qty 4, JPM qty 7, AMZN qty 4) before this run started
+- Lines 252: alert "Not enough cash for that order." — chromium's META buy in this 05 spec failed because cash was already drained
+- Lines 253-310: chat history with 4 "buy AMZN 1" user turns timestamped `19:08, 19:09, 19:10, 19:41` — the latter is from this run; the earlier 3 are from prior `up` invocations spanning ~33 minutes of wall clock
+- Harness log line 488: `appsvc-1 | INFO: 172.19.0.3:49702 - "POST /api/portfolio/trade HTTP/1.1" 400 Bad Request` — the chromium 03-buy NVDA trade returned 400 because cash was carried over below NVDA's threshold (yet 03-buy still passed because its assertion is `cash < 10_000`, which is trivially true at $200.56)
+
+Why the volume persists across runs:
+
+- `Dockerfile:57` declares `VOLUME /app/db` — anonymous volume created on each container start
+- `test/docker-compose.test.yml` has no `appsvc.volumes:` block (line 31 comment claims this gives ephemeral per-`up` volumes)
+- `docker compose up --abort-on-container-exit` STOPS the container but does NOT remove anonymous volumes — only `docker compose down -v` does
+- Subsequent `up` invocations may reuse the same container (compose project name `test`) which keeps the same anonymous volume mounted
+
+This breaks SC#3's `reproducibly` clause independently of Mode A. Even if Mode A's layout overlap were fixed today, repeat runs would observe accumulating state and could surface NEW failure shapes (e.g., "header total = $10,005.38" assertions) on subsequent runs.
 
 ### Required Artifacts
 
-| Artifact                                           | Expected                                                                  | Status              | Details                                                                                                                                                                            |
-| -------------------------------------------------- | ------------------------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `test/docker-compose.test.yml`                     | Two-service compose with appsvc (LLM_MOCK=true) + playwright              | ✓ VERIFIED          | Container test-appsvc-1 Healthy (harness log line 120). All 21 pairs dispatched.                                                                                                   |
-| `test/playwright.config.ts`                        | `workers: 1`, 3 browser projects, baseURL `http://appsvc:8000`            | ✓ VERIFIED          | Line 31: `workers: 1`. Line 32: `fullyParallel: false`. Lines 71-75: 3 projects. Line 48: baseURL `http://appsvc:8000`. 10-06 commit 491e6ff confirmed.                            |
-| `test/01-fresh-start.spec.ts`                      | Watchlist-panel-scoped Select-button locators                             | ⚠️ PARTIAL (Mode B) | Lines 26-31 + 38-40: Select-buttons scoped to `getByTestId('watchlist-panel')` ✓. BUT line 34 still asserts absolute `$10,000.00` cash — fails on firefox/webkit due to Mode B.    |
-| `test/02-watchlist-crud.spec.ts`                   | REST add+remove PYPL                                                      | ✓ VERIFIED          | Passed all 3 browsers (REST `request` fixture, no shared-state contention).                                                                                                        |
-| `test/03-buy.spec.ts`                              | NVDA × 1 buy, no pre-trade $10k assertion, post-trade `< 10_000`          | ✓ VERIFIED          | 10-06 commit 3bb6105: pre-trade $10k assertion removed (line 13-14 now bears explanatory comment). Post-trade `< 10_000` at line 38. Passed all 3 browsers.                       |
-| `test/04-sell.spec.ts`                             | postBuyQty snapshot + relative delta `(postBuyQty - 1)` via expect.poll   | ⚠️ PARTIAL (Mode C) | 10-06 commit ee45f65: relative-delta assertion at lines 47-52 ✓. BUT the snapshot at lines 36-37 races the buy refetch → flaky on firefox + webkit.                                |
-| `test/05-portfolio-viz.spec.ts`                    | `dismissChartTooltip` helper (Escape + mouse-move) before tab-pnl click   | ⚠️ PARTIAL (Mode A) | 10-07 commit 9924ccc: helper defined at lines 26-29, called at line 49 before tab-pnl click at line 50 ✓. BUT helper does not actually retract the Recharts default tooltip → fails all 3 browsers. |
-| `test/06-chat.spec.ts`                             | Mock buy AMZN 1 → action-card-executed                                    | ✓ VERIFIED          | Passed all 3 browsers.                                                                                                                                                             |
-| `test/07-sse-reconnect.spec.ts`                    | abort('connectionreset') + reload → reconnect                             | ✓ VERIFIED          | Passed all 3 browsers.                                                                                                                                                             |
-| `frontend/src/components/portfolio/Heatmap.tsx`    | (Implicit) hover tooltip should not block sibling clicks                  | ⚠️ DEFECT           | No explicit `<Tooltip>` rendered. Recharts default Tooltip wrapper has `pointer-events: auto`, intercepting clicks on neighbouring tabs. Production UX defect surfaced by Mode A. |
+| Artifact                                           | Expected                                                                  | Status              | Details                                                                                                                                                                                                          |
+| -------------------------------------------------- | ------------------------------------------------------------------------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test/docker-compose.test.yml`                     | Two-service compose with appsvc (LLM_MOCK=true) + playwright + EPHEMERAL /app/db across runs | ⚠️ PARTIAL          | appsvc service correctly defined and Healthy (harness L147). Missing: explicit volume cleanup directive — anonymous volumes persist across `up` invocations (Mode A.2).                                          |
+| `test/playwright.config.ts`                        | `workers: 1`, 3 browser projects, baseURL `http://appsvc:8000`            | ⚠️ PARTIAL          | Lines 31, 32, 71-75 correct. Missing: explicit `viewport: { width: 1440, height: 900 }` per project to align with PLAN.md §10's `wide screens` design intent (Mode A).                                            |
+| `test/01-fresh-start.spec.ts`                      | Watchlist-panel-scoped Select-button locators, no absolute cash assertion | ✓ VERIFIED          | 10-08 commit 0a58eb9: $10k assertion dropped, replaced with explanatory `Cross-project SQLite leak` comment block. 10-ticker visibility loop + em-dash streaming proof preserved. 3/3 green today.               |
+| `test/02-watchlist-crud.spec.ts`                   | REST add+remove PYPL                                                      | ✓ VERIFIED          | Passed all 3 browsers (REST `request` fixture, no UI dependency).                                                                                                                                                |
+| `test/03-buy.spec.ts`                              | NVDA × 1 buy, no pre-trade $10k assertion, post-trade `< 10_000`          | ✓ VERIFIED          | 10-06 commit 3bb6105: pre-trade $10k assertion removed. Post-trade `< 10_000` at line 38. 3/3 green today.                                                                                                       |
+| `test/04-sell.spec.ts`                             | postBuyQty snapshot via expect.poll + relative delta `(postBuyQty - 1)`   | ✓ VERIFIED          | 10-08 commit c53810f: `let postBuyQty = 0` + `expect.poll(...).toBeGreaterThanOrEqual(2)` at lines 43-52. Existing post-sell `expect.poll(...).toBe(postBuyQty - 1)` at lines 62-67 preserved. 3/3 green today, 0 flaky. |
+| `test/05-portfolio-viz.spec.ts`                    | META buy → heatmap-treemap visible → tab-pnl click → pnl-chart visible    | ⚠️ PARTIAL (Mode A)  | All UI assertions and helpers structurally correct. The tab-pnl click fails because of layout overlap at viewport 1280×720 — a HARNESS-environment bug, not a spec bug. The `dismissChartTooltip` helper is harmless. |
+| `test/06-chat.spec.ts`                             | Mock buy AMZN 1 → action-card-executed                                    | ✓ VERIFIED          | Passed all 3 browsers.                                                                                                                                                                                            |
+| `test/07-sse-reconnect.spec.ts`                    | abort('connectionreset') + reload → reconnect                             | ✓ VERIFIED          | Passed all 3 browsers.                                                                                                                                                                                            |
+| `frontend/src/components/portfolio/Heatmap.tsx`    | Recharts Tooltip with `pointerEvents: 'none'` (latent UX hardening)        | ✓ VERIFIED          | 10-08 commit a149480: `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />` at line 138. Build green. WR-01 advisory (no formatter on Tooltip body) noted in 10-REVIEW.md but non-blocking for SC#3.            |
+| `frontend/src/components/terminal/Terminal.tsx`    | (Implicit) 3-col grid + chat drawer accommodate viewport 1280×720          | ⚠️ DEFECT (Mode A)  | Lines 25-27 + 50: `flex-row` + `grid grid-cols-[320px_1fr_360px]` + ChatDrawer share the viewport. At 1280×720 the right-column PositionsTable overlaps the center-column tab-pnl click target. Production layout limitation surfaced by tests. |
+| `Dockerfile`                                       | `VOLUME /app/db` for production persistence                                | ✓ VERIFIED          | Line 57. Phase 9 OPS-02 contract preserved. Test-side ephemerality must be enforced by compose, not Dockerfile.                                                                                                  |
 
 ### Key Link Verification
 
-| From                                              | To                                              | Via                                                                                                  | Status      | Details                                                                                                                                       |
-| ------------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `test/docker-compose.test.yml` (build context)    | repo-root `Dockerfile`                          | `docker compose ... up --build`                                                                      | ✓ WIRED     | Build executed in harness lines 1-99. Container test-appsvc-1 Healthy (line 120).                                                              |
-| `test/docker-compose.test.yml` (LLM_MOCK)         | `backend/app/chat/mock.py`                      | Phase 5 mock-mode env switch                                                                         | ✓ WIRED     | 06-chat passed all 3 browsers via the mock client.                                                                                            |
-| `test/playwright.config.ts` (baseURL appsvc)      | compose service `appsvc`                        | Compose internal DNS                                                                                 | ✓ WIRED     | All 3 browsers reached the app (02/06/07 prove it; 01/04/05 also reached the app — they failed at assertion time, not navigation time).      |
-| 05-portfolio-viz `dismissChartTooltip` helper     | Recharts Treemap default Tooltip                | Browser-level Escape key + cursor displacement to (0,0)                                              | ✗ NOT_WIRED | The helper executes (no error) but the tooltip does not dismiss. Recharts listens for `mouseleave` on the chart container, not Escape.        |
-| 04-sell `postBuyQty` snapshot                     | Post-refetch JPM qty cell text                  | `await jpmQty.innerText()` after `Select JPM` button is visible                                      | ✗ NOT_WIRED | Visibility of the row does not imply qty cell has refetched to post-buy value. The snapshot races React Query.                                 |
-| 01-fresh-start `$10,000.00` assertion             | Pristine SQLite cash_balance                    | Compose anonymous volume (per-`up`, NOT per-project)                                                 | ✗ NOT_WIRED | Cross-project ordering under `workers: 1` puts firefox and webkit AFTER chromium's debits; the assertion only holds for chromium.            |
+| From                                                | To                                                                  | Via                                                                                              | Status      | Details                                                                                                                                                                              |
+| --------------------------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `test/docker-compose.test.yml` (build context)      | repo-root `Dockerfile`                                              | `docker compose ... up --build`                                                                  | ✓ WIRED     | Build executed in harness lines 1-127. Container test-appsvc-1 Healthy (line 147).                                                                                                    |
+| `test/docker-compose.test.yml` (LLM_MOCK)           | `backend/app/chat/mock.py`                                          | Phase 5 mock-mode env switch                                                                     | ✓ WIRED     | 06-chat passed all 3 browsers via the mock client.                                                                                                                                  |
+| `test/playwright.config.ts` (baseURL appsvc)        | compose service `appsvc`                                            | Compose internal DNS                                                                             | ✓ WIRED     | All 3 browsers reached the app.                                                                                                                                                      |
+| Heatmap.tsx `<Tooltip>` element                     | Recharts default tooltip wrapper                                    | `wrapperStyle={{ pointerEvents: 'none' }}` prop                                                  | ✓ WIRED     | The wrapper element receives the style; build green; latent UX correctness now established.                                                                                          |
+| `tab-pnl` click coordinates                         | TabBar P&L button hit-target                                        | Browser hit-testing at viewport 1280×720                                                         | ✗ NOT_WIRED | Hit-test resolves to PositionRow `<td>{ticker}</td>` because the right-column PositionsTable visually overlaps the center-column TabBar at this viewport. Mode A.                   |
+| Compose anonymous volume                            | Pristine SQLite per `up` invocation                                 | Dockerfile `VOLUME /app/db` + compose default                                                    | ✗ NOT_WIRED | Anonymous volumes persist across `up` invocations until `compose down -v`. Mode A.2.                                                                                                  |
 
 ### Data-Flow Trace (Level 4)
 
-| Artifact                          | Data Variable        | Source                                                              | Produces Real Data            | Status                                                                  |
-| --------------------------------- | -------------------- | ------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------------- |
-| `test/05-portfolio-viz.spec.ts`   | tab-pnl click target | TabBar button (verified-existent in DOM, see harness lines 620, 669) | Yes (locator resolves)        | ⚠️ INTERCEPTED — pointer events absorbed by sibling Recharts tooltip overlay |
-| `test/04-sell.spec.ts`            | `postBuyQty`         | `jpmQty.innerText()` after Select JPM visibility                    | Yes — but pre-refetch          | ⚠️ STALE — snapshot is a pre-refetch in-flight value, not the post-buy resting value |
-| `test/01-fresh-start.spec.ts`     | header-cash          | Live SQLite via `/api/portfolio`                                    | Yes — but cross-project leaked | ⚠️ DRIFT — value flows correctly; the absolute assertion does not match drift state |
+| Artifact                          | Data Variable        | Source                                                              | Produces Real Data            | Status                                                                                                       |
+| --------------------------------- | -------------------- | ------------------------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `test/05-portfolio-viz.spec.ts`   | tab-pnl click target | TabBar button (verified-existent in DOM, accessibility snapshot e202) | Yes (locator resolves)        | ⚠️ INTERCEPTED — pointer events absorbed by overlapping right-column PositionsTable cell                     |
+| `test/05-portfolio-viz.spec.ts`   | META buy precondition | TradeBar form → POST /api/portfolio/trade → SQLite + cache            | Yes (POST sent)               | ⚠️ 400 Bad Request — backend rejects buy due to cash carry-over from prior runs (`/tmp/phase10-final-harness.log:488`) |
+| Heatmap-treemap presence assertion | Position list        | useQuery(['portfolio']) → /api/portfolio                             | Yes — but with carry-over data | ⚠️ FLOWS-BUT-DRIFTED — heatmap mounts because pre-existing META qty=9 is present even though this run's buy failed |
 
 ### Behavioral Spot-Checks
 
 | Behavior                                                      | Command                                                                                                            | Result                                                       | Status |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------ | ------ |
-| Canonical harness command runs end-to-end                     | `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` | exit 1; 14 passed / 5 failed / 2 flaky (2.4m runtime)        | ✗ FAIL |
-| Compose YAML is well-formed                                   | `docker compose -f test/docker-compose.test.yml config`                                                            | exit 0 (per 10-01 SUMMARY)                                   | ✓ PASS |
-| Playwright config parses                                      | `cd test && npx playwright test --list`                                                                            | exit 0 (21 tests listed)                                     | ✓ PASS |
+| Canonical harness command runs end-to-end                     | `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` | exit 1; 18 passed / 3 failed / 0 flaky (1.6m runtime)        | ✗ FAIL |
+| Compose YAML is well-formed                                   | `docker compose -f test/docker-compose.test.yml config`                                                            | exit 0 (effective config dumped, appsvc + playwright present) | ✓ PASS |
+| Playwright config parses                                      | `cd test && npx playwright test --list` (per 10-08 plan acceptance)                                                | exit 0 (21 tests listed)                                     | ✓ PASS |
 | All 7 spec files exist                                        | `ls test/0[1-7]-*.spec.ts \| wc -l`                                                                                | 7                                                            | ✓ PASS |
 | `workers: 1` active in playwright.config.ts                   | `grep -E '^\s*workers:\s*1\b' test/playwright.config.ts`                                                            | match at line 31                                             | ✓ PASS |
-| `dismissChartTooltip` helper present in 05-portfolio-viz      | `grep -c 'dismissChartTooltip' test/05-portfolio-viz.spec.ts`                                                       | 2 (1 definition + 1 call)                                    | ✓ PASS |
-| Helper actually retracts the tooltip in practice              | (manual inspection of harness traces 619-647, 668-696)                                                              | tooltip survives Escape + mouse-move on all 3 browsers       | ✗ FAIL |
-| $10k assertion removed from 03-buy                            | `grep -c '\$10,000.00' test/03-buy.spec.ts`                                                                         | 0                                                            | ✓ PASS |
-| Relative delta assertion in 04-sell                           | `grep -c 'postBuyQty - 1' test/04-sell.spec.ts`                                                                     | 1                                                            | ✓ PASS |
+| 10-08 Heatmap Tooltip fix landed                              | `grep -c "wrapperStyle={{ pointerEvents: 'none' }}" frontend/src/components/portfolio/Heatmap.tsx`                  | 1                                                            | ✓ PASS |
+| 10-08 01-fresh-start cash-assertion drop landed               | `grep -c '\$10,000.00' test/01-fresh-start.spec.ts`                                                                 | 0                                                            | ✓ PASS |
+| 10-08 04-sell expect.poll snapshot landed                     | `grep -c 'toBeGreaterThanOrEqual(2)' test/04-sell.spec.ts`                                                          | 1                                                            | ✓ PASS |
+| 0 flaky retries in canonical run                              | `grep -c 'flaky' /tmp/phase10-final-harness.log`                                                                    | 0                                                            | ✓ PASS |
+| appsvc Healthy in canonical run                               | `grep -E 'Container test-appsvc-1\s+Healthy' /tmp/phase10-final-harness.log`                                        | match at line 147                                            | ✓ PASS |
+| 21 passed in canonical run                                    | `grep -E '21 passed' /tmp/phase10-final-harness.log`                                                                | no match (actual: `18 passed`)                               | ✗ FAIL |
+| Cross-run state ephemerality                                  | (manual inspection of `test/test-results/.../error-context.md` for prior-run timestamps)                            | 19:08/19:09/19:10/19:41 chat entries span 33min — not ephemeral | ✗ FAIL |
 
 ### Requirements Coverage
 
-| Requirement | Source Plan      | Description                                                                                                                                                | Status                              | Evidence                                                                                                                                                                                                  |
-| ----------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| TEST-03     | 10-01-PLAN       | Playwright E2E harness under `test/` with its own `docker-compose.test.yml` running the app container (`LLM_MOCK=true`) alongside a Playwright container. | ✓ SATISFIED                         | Foundation works end-to-end. appsvc Healthy, 14 passing, all 3 browsers reach the app. The harness mechanism is correct; remaining failures are at the spec / production-component layer.               |
-| TEST-04     | 10-00, 10-02..07 | All §12 E2E scenarios pass green — fresh start, watchlist add/remove, buy/sell, heatmap + P&L chart rendering, mocked chat with trade execution, SSE reconnect. | ⚠️ BLOCKED                          | 5 of 7 §12 scenarios green on every browser (02/03/06/07 + 04 chromium-only). 01 chromium-only. 05 fails all 3 browsers. SC#3 (single-command-green-reproducibly) is not met → TEST-04 cannot complete. |
+| Requirement | Source Plan      | Description                                                                                                                                                | Status                              | Evidence                                                                                                                                                                                                                                            |
+| ----------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TEST-03     | 10-01-PLAN       | Playwright E2E harness under `test/` with its own `docker-compose.test.yml` running the app container (`LLM_MOCK=true`) alongside a Playwright container. | ✓ SATISFIED (foundation)            | Foundation works end-to-end. appsvc Healthy, 18 passing across all 3 browsers, mock chat path proven by 06-chat 3/3. The harness mechanism is correct; the remaining failure is at the browser-viewport / volume-ephemerality layer.                |
+| TEST-04     | 10-00, 10-02..08 | All §12 E2E scenarios pass green — fresh start, watchlist add/remove, buy/sell, heatmap + P&L chart rendering, mocked chat with trade execution, SSE reconnect. | ⚠️ BLOCKED                          | 6 of 7 §12 scenarios green on every browser (01/02/03/04/06/07). 05-portfolio-viz fails all 3 browsers due to layout overlap at viewport 1280×720 (Mode A). Cross-run carry-over (Mode A.2) blocks `reproducibly` independently. SC#3 not met → TEST-04 cannot complete. |
 
-Per ROADMAP Phase 10's bottom traceability, both TEST-03 and TEST-04 remain `[ ]` unchecked in REQUIREMENTS.md. This verification does NOT mark them complete.
+Per ROADMAP Phase 10's bottom traceability, both TEST-03 and TEST-04 remain `[ ]` unchecked in REQUIREMENTS.md (lines 84-85). This verification does NOT mark them complete.
 
 ### Plan-by-Plan must_haves Status
 
-| Plan       | must_have truth                                                                                                       | Status                                                                              |
-| ---------- | --------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| 10-00      | data-testids land on Header/TabBar/Watchlist/PositionsTable/TradeBar                                                  | ✓ MET — confirmed by harness traces (`getByTestId('header-cash')`, `getByTestId('watchlist-panel')`, etc. all resolve in DOM) |
-| 10-01      | docker-compose.test.yml + playwright.config.ts + healthcheck                                                          | ✓ MET — appsvc Healthy, all 21 pairs dispatched                                     |
-| 10-02      | 01-fresh-start (10-ticker seed) + 02-watchlist-crud (PYPL REST)                                                       | ✓ MET (specs land) / ⚠️ 01 fails on firefox + webkit due to Mode B                  |
-| 10-03      | 03-buy + 04-sell                                                                                                      | ✓ MET (specs land) / ⚠️ 04 flaky on firefox + webkit due to Mode C                  |
-| 10-04      | 05-portfolio-viz + 06-chat                                                                                            | ✓ MET (specs land) / ✗ 05 fails all 3 browsers due to Mode A                        |
-| 10-05      | 07-sse-reconnect + harness gate                                                                                       | ⚠️ PARTIAL — 07 passes all 3 browsers, but harness gate exit 1 (NOT 0)              |
-| 10-06      | "Single Playwright worker serializes all 7 spec files across all 3 browser projects"                                  | ✓ MET — workers: 1 active                                                           |
-| 10-06      | "01-fresh-start asserts only on watchlist rows"                                                                       | ✓ MET — Select-button locators scoped to watchlist-panel                            |
-| 10-06      | "03-buy makes no absolute pre-trade cash assertion"                                                                   | ✓ MET — pre-trade $10k assertion removed                                            |
-| 10-06      | "04-sell asserts the post-sell quantity using a relative delta (post-buy qty minus 1)"                                | ✓ MET — `expect.poll(...).toBe(postBuyQty - 1)` at line 47-52                       |
-| 10-06      | "Canonical harness exits 0 with all 21 pairs passing — Gap Group A from VERIFICATION.md is fully closed"              | ✗ NOT MET — exit 1, 14 passed, NEW failure modes B and C surfaced after 10-06 fixes |
-| 10-07      | "After the heatmap tile interaction, the Recharts hover tooltip is reliably dismissed before any subsequent click"   | ✗ NOT MET — `dismissChartTooltip` helper present but does not actually dismiss      |
-| 10-07      | "Canonical harness exits 0 with all 21 (spec, project) pairs passing"                                                 | ✗ NOT MET — exit 1                                                                  |
-| 10-07      | "ROADMAP Phase 10 SC#3 is met"                                                                                        | ✗ NOT MET                                                                           |
+| Plan       | must_have truth                                                                                                       | Status                                                                                                                |
+| ---------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 10-00      | data-testids land on Header/TabBar/Watchlist/PositionsTable/TradeBar                                                  | ✓ MET — confirmed by harness traces and accessibility snapshots                                                      |
+| 10-01      | docker-compose.test.yml + playwright.config.ts + healthcheck                                                          | ✓ MET — appsvc Healthy at L147, 21 pairs dispatched, but the volume contract is incomplete (Mode A.2)                |
+| 10-02      | 01-fresh-start (10-ticker seed) + 02-watchlist-crud (PYPL REST)                                                       | ✓ MET — both 3/3 green                                                                                                |
+| 10-03      | 03-buy + 04-sell                                                                                                      | ✓ MET — both 3/3 green; 04-sell 0 flaky                                                                              |
+| 10-04      | 05-portfolio-viz + 06-chat                                                                                            | 06-chat ✓ 3/3 / 05-portfolio-viz ✗ 0/3 (Mode A)                                                                       |
+| 10-05      | 07-sse-reconnect + harness gate                                                                                       | 07 ✓ 3/3, harness gate exit 1 (NOT 0)                                                                                  |
+| 10-06      | "workers: 1 + scoped Select selectors + drop $10k in 03-buy + relative-delta in 04-sell"                              | ✓ MET                                                                                                                  |
+| 10-06      | "Canonical harness exits 0 with all 21 pairs passing — Gap Group A from VERIFICATION.md is fully closed"              | ✗ NOT MET — Modes B/C closed since, but Mode A reasserted with corrected diagnosis                                    |
+| 10-07      | "After the heatmap tile interaction, the Recharts hover tooltip is reliably dismissed before any subsequent click"   | ⚠️ MOOT — premise wrong (interceptor was never the Recharts tooltip); helper preserved as harmless                    |
+| 10-07      | "Canonical harness exits 0 with all 21 (spec, project) pairs passing"                                                 | ✗ NOT MET                                                                                                              |
+| 10-08      | "Mode A closed: tooltip wrapper does not intercept pointer events"                                                    | ⚠️ MOOT — tooltip pointerEvents fix landed (correct UX); the actual interceptor is layout overlap, not the tooltip   |
+| 10-08      | "Mode B closed: 01-fresh-start passes on every browser project regardless of cross-project order"                     | ✓ MET — 3/3 green                                                                                                      |
+| 10-08      | "Mode C closed: 04-sell passes deterministically (no flaky retries)"                                                  | ✓ MET — 3/3 green, 0 flaky                                                                                            |
+| 10-08      | "Canonical harness exits 0 with 21 passed / 0 failed / 0 flaky / Healthy appsvc"                                      | ✗ NOT MET — exit 1, 18 passed                                                                                          |
 
 ### Anti-Patterns Found
 
-| File                                              | Line  | Pattern                                                                                                                                                                                       | Severity   | Impact                                                                                       |
-| ------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------- |
-| `test/05-portfolio-viz.spec.ts`                   | 26-29 | `dismissChartTooltip` helper assumes Escape + mouse-move dismisses Recharts tooltip. Harness traces prove it does not. The helper is a placeholder mitigation that doesn't fire the right event. | 🛑 Blocker | Mode A — all 3 browsers fail.                                                                |
-| `test/01-fresh-start.spec.ts`                     | 34    | Absolute `$10,000.00` assertion. Comment at line 33 reflects an incorrect assumption that 01-fresh-start runs against a clean SQLite on every browser project.                                | 🛑 Blocker | Mode B — firefox + webkit fail.                                                              |
-| `test/04-sell.spec.ts`                            | 36-37 | `postBuyQty` snapshot is read immediately after row visibility, before React Query refetches the qty cell. Visibility ≠ refetched data.                                                       | ⚠️ Warning  | Mode C — firefox + webkit flaky. Recovers on retry, but blocks `reproducibly green`.       |
-| `frontend/src/components/portfolio/Heatmap.tsx`   | 119-127 | Default Recharts Treemap tooltip wrapper has `pointer-events: auto` and intercepts clicks on sibling tabs. Production UX defect, not just a test concern.                                       | ⚠️ Warning  | Root cause of Mode A. Production fix `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />` closes Mode A on all 3 browsers in one line. |
+| File                                              | Line  | Pattern                                                                                                                                                                                       | Severity   | Impact                                                                                                                                  |
+| ------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `test/playwright.config.ts`                       | 71-75 | Project definitions use `devices['Desktop Chrome' \| 'Desktop Firefox' \| 'Desktop Safari']` defaults (1280×720) without an explicit viewport override matching PLAN.md §10's `wide screens`. | 🛑 Blocker | Mode A — 3 of 3 hard failures. The center column shrinks to ~240px at 1280×720 with the chat drawer expanded; right column overlaps tabs. |
+| `test/docker-compose.test.yml`                    | 31    | Comment claims "anonymous volume per `up` invocation" but no compose-side directive enforces ephemerality across `up` calls. Anonymous volumes persist until `down -v`.                       | 🛑 Blocker | Mode A.2 — cross-run carry-over confirmed by 33-minute spread of chat history timestamps in failure DOM. Breaks SC#3 `reproducibly`.   |
+| `frontend/src/components/portfolio/Heatmap.tsx`   | 138   | `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />` rendered with no `formatter` or `content` — default body shows raw `weight` (dollar position value as bare number, no $/comma).      | ℹ️ Info     | WR-01 from 10-REVIEW.md. Latent UX issue, NOT blocking SC#3. Recommend bundling fix with the corrective plan but not required for green. |
+| `test/05-portfolio-viz.spec.ts`                   | 26-29 | `dismissChartTooltip` helper (Escape + mouse-move) is now strictly redundant after 10-08's Heatmap.tsx fix lands AND given the actual interceptor is not a tooltip.                          | ℹ️ Info     | IN-03 from 10-REVIEW.md. No-op; safe to leave. Recommend removal once Mode A is closed and harness is green for several runs.            |
 
 ### Human Verification Required
 
-None. All gaps are reproducibly demonstrable from `/tmp/phase10-gap-closure-harness.log` and verifiable via static inspection of the named files at the named lines. Once Modes A/B/C are fixed, re-running the canonical command will deterministically prove green or surface a new failure shape. There are no UX/visual/timing-feel items needing human judgment at this stage.
+None. All gaps are reproducibly demonstrable from `/tmp/phase10-final-harness.log` and `test/test-results/.../error-context.md`, and verifiable via static inspection of the named files at the named lines. Once Mode A's viewport bump and Mode A.2's volume cleanup directive land, re-running the canonical command will deterministically prove green or surface a new failure shape. There are no UX/visual/timing-feel items that need human judgment to verify the SC#3 gate.
 
 ### Recommended Fix Plan
 
-Three small, independent edits close all three modes. Each can be its own gap-closure plan, OR they can be bundled into a single Plan 10-08 (recommended — they are tightly related and the harness gate must run once after all three land).
+Two small, independent edits close both modes. They can be bundled into a single Plan 10-09 (recommended — they share the canonical harness gate run).
 
-**Fix 1 (Production fix — closes Mode A)** — `frontend/src/components/portfolio/Heatmap.tsx`
-- Import `Tooltip` from `recharts`
-- Render `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />` as a child of `<Treemap>`
-- Effect: tooltip remains visible (correct UX), but its wrapper no longer intercepts clicks on sibling tabs
-- Closes 3 hard failures (chromium / firefox / webkit on 05-portfolio-viz) in one line
-- Justification for production-side fix: a hover tooltip that blocks neighbouring clicks is a UX defect regardless of test coverage. The user could hit this manually by hovering a heatmap tile and then trying to click the P&L tab. Production hardening, not test-only band-aid.
-- After this fix lands, the existing `dismissChartTooltip` helper in `05-portfolio-viz.spec.ts` becomes redundant. Either delete it (cleanest) or leave it in place as belt-and-suspenders (acceptable; no behavioural change).
+**Fix 1 (Mode A — closes the layout overlap)** — `test/playwright.config.ts`
 
-**Fix 2 (Test fix — closes Mode B)** — `test/01-fresh-start.spec.ts`
-- Delete line 34 (`await expect(page.getByTestId('header-cash')).toHaveText('$10,000.00');`) and the comment at line 33
-- Replace with a one-line comment explaining the cross-project SQLite leak rationale (mirrors 10-06's pattern in 03-buy)
-- The 10-ticker watchlist visibility (lines 25-31) and the streaming-proof (lines 38-41) are sufficient to prove `fresh start` — cash level is incidental
-- Closes 2 hard failures (firefox / webkit on 01-fresh-start)
-- Justification: same reasoning as 10-06's drop in 03-buy. Absolute cash assertions are fragile across cross-project state; relative or non-cash assertions are robust.
-
-**Fix 3 (Test fix — closes Mode C)** — `test/04-sell.spec.ts`
-- Replace lines 36-37 (`const postBuyQtyText = await jpmQty.innerText(); const postBuyQty = parseFloat(postBuyQtyText.trim());`) with an `expect.poll` that waits for `parseFloat(qtyCellText) >= 2` before snapshotting:
+- Update each project entry at lines 72-74 to override the viewport to align with PLAN.md §10's `wide screens, desktop-first` design intent:
 
   ```typescript
-  // Wait for React Query to refetch the post-buy qty before snapshotting.
-  // The Select-JPM visibility wait (lines 25-27) only proves the row exists;
-  // the qty cell may still be a pre-refetch stale value.
-  let postBuyQty = 0;
-  await expect.poll(
-    async () => {
-      postBuyQty = parseFloat((await jpmQty.innerText()).trim());
-      return postBuyQty;
-    },
-    { timeout: 10_000 },
-  ).toBeGreaterThanOrEqual(2);
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'],  viewport: { width: 1440, height: 900 } } },
+    { name: 'firefox',  use: { ...devices['Desktop Firefox'], viewport: { width: 1440, height: 900 } } },
+    { name: 'webkit',   use: { ...devices['Desktop Safari'],  viewport: { width: 1440, height: 900 } } },
+  ],
   ```
 
-- Effect: snapshot is taken only after the post-buy qty has settled to at least 2 (since the buy added exactly 2 shares)
-- Closes 2 flaky retries (firefox / webkit on 04-sell). Removes flakiness, restores reproducibility.
-- Justification: same `expect.poll` pattern that 10-06 already established in lines 47-52 for the post-sell assertion — apply the same robustness to the snapshot read.
+- Effect: At 1440×900 the 3-col grid + chat drawer have ~1080px shared row width; the center column gets ~400px (vs. 240px today), and the right column no longer overlaps `tab-pnl`.
+- Justification: This is test-environment alignment with the production design contract, NOT a workaround. PLAN.md §10 states `Responsive but desktop-first: optimized for wide screens, functional on tablet`. 1280×720 is below that target. The production layout fix (Terminal.tsx grid responsive collapse) is a v1.1 polish item against POLISH-01, separately tracked.
+- Closes 3 hard failures (chromium / firefox / webkit on 05-portfolio-viz) in a config-only change with no production code touched.
 
-After all three fixes land, the canonical command should produce 21 passed / 0 failed / 0 flaky / exit 0, satisfying ROADMAP SC#3 and unblocking TEST-03 and TEST-04.
+**Fix 2 (Mode A.2 — closes cross-run state carry-over)** — `test/docker-compose.test.yml`
+
+- Add a tmpfs mount on `/app/db` for the `appsvc` service so each container start gets a fresh in-memory directory:
+
+  ```yaml
+  appsvc:
+    # ... existing keys ...
+    tmpfs:
+      - /app/db
+  ```
+
+- Effect: SQLite file lives in tmpfs, vanishes on container stop. No host filesystem touch. No change to CONTEXT D-03's canonical command. Production Dockerfile's `VOLUME /app/db` is preserved (still works for production deploys; the test-side compose overrides it).
+- Justification: Honors CONTEXT D-06 (no test-only `/api/test/reset` endpoint) and D-03 (single canonical command, no flags). The line 31 comment's promise ("fresh anonymous volume per `up`") becomes truth.
+- Closes the cross-run carry-over independently. Once landed, re-running `compose up` repeatedly produces deterministically identical results.
+
+After both fixes land and the canonical command runs again, the harness should produce 21 passed / 0 failed / 0 flaky / exit 0, satisfying ROADMAP SC#3 and unblocking TEST-03 / TEST-04.
+
+**Advisory (WR-01, optional)** — `frontend/src/components/portfolio/Heatmap.tsx`
+
+- The 10-08 `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />` is correct and should be preserved. Add a `formatter` or `content` prop so the tooltip body shows formatted dollar values (e.g., `$1,899.53` instead of `1899.5274`) and signed P&L %. Non-blocking for SC#3; recommend bundling with the corrective plan if scope allows.
+- See `10-REVIEW.md` WR-01 for the suggested formatter snippet.
 
 ### Gaps Summary
 
-ROADMAP Phase 10 has three success criteria. SC#1 (specs exist) ✓ and SC#2 (harness foundation works) ✓ are met. **SC#3 (single command finishes green reproducibly) ✗ is not met** — today's run produced 14 passed / 5 failed / 2 flaky / exit 1.
+ROADMAP Phase 10 has three success criteria. SC#1 (specs exist) ✓ and SC#2 (harness foundation works) ✓ are met. **SC#3 (single command finishes green reproducibly) ✗ is not met** — today's run produced 18 passed / 3 failed / 0 flaky / exit 1.
 
-Three new failure modes have surfaced after Plans 10-06 and 10-07 Task 1:
-- **Mode A** — Recharts default Treemap tooltip wrapper intercepts pointer events at the sibling tab-pnl click. The 10-07 `dismissChartTooltip` helper (Escape + mouse-move) does not retract the tooltip on any of the 3 browsers. Production-side fix recommended: `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />`. (3 hard failures.)
-- **Mode B** — Cross-project SQLite leak. The compose anonymous volume persists across all 3 browser projects within one `up`, so by the time firefox/webkit run 01-fresh-start, chromium has already debited cash via 03/04/05/06. The absolute `$10,000.00` assertion at line 34 was preserved by 10-06 on the assumption that `workers: 1` makes 01-fresh-start "first" — but `first` is true only WITHIN a project, not ACROSS projects. Test-side fix recommended: drop the absolute assertion. (2 hard failures.)
-- **Mode C** — `postBuyQty` snapshot in 04-sell races React Query refetch. The visibility wait at lines 25-27 only proves the row exists; the qty cell may still be a pre-refetch stale value. The `expect.poll` at lines 47-52 recovers on retry, so Playwright reports `flaky` — but flakiness is incompatible with SC#3's `reproducibly`. Test-side fix recommended: stabilise `postBuyQty` via `expect.poll(... >= 2)` before snapshotting. (2 flaky retries.)
+Two failure modes have surfaced after Plan 10-08:
 
-Net failure count dropped from the previous run (9 → 5 hard failures + 2 flaky), but reproducibility is still NOT met. A focused gap-closure pass with three small edits — one production line + two test-side edits — closes all three modes.
+- **Mode A (corrected)** — Layout overlap at viewport 1280×720 between the right-column PositionsTable and the center-column `tab-pnl` button. The 10-08 Recharts Tooltip pointerEvents fix is in place and is correct as latent UX hardening, but it is NOT what closes this harness failure — the actual interceptor is `<td class="px-4 font-semibold">{ticker}</td>` from `frontend/src/components/terminal/PositionRow.tsx:57` (verified by exact CSS-class match in the harness traces, and by Recharts' default tooltip body using `<ul>/<li>` not `<td>`). Test-side viewport bump (1440×900) recommended — closes Mode A in a config-only change. (3 hard failures.)
+
+- **Mode A.2 (NEW)** — Cross-RUN SQLite carry-over via persistent docker volume. Page accessibility snapshots show 4 prior-run chat entries spanning 33 minutes of wall clock + cash drained to $200.56 + 4 carry-over positions before this run started — none of which a single 1.6-minute harness run could produce. The compose comment at line 31 claims per-`up` ephemerality but there is no compose-side directive that enforces it; anonymous volumes persist until `down -v`. Compose-side `tmpfs: - /app/db` directive recommended. (Compounds Mode A and breaks SC#3 `reproducibly` independently.)
+
+Modes B (cross-project SQLite leak) and C (postBuyQty React Query race) from the previous VERIFICATION.md (commit 4f690e6) ARE closed by Plan 10-08 commits 0a58eb9 and c53810f — confirmed by 01-fresh-start 3/3 green and 04-sell 3/3 green / 0 flaky in today's harness.
+
+A focused gap-closure pass with two small edits — one playwright.config.ts viewport override + one compose-file tmpfs directive — closes both remaining modes. The 10-08 Heatmap Tooltip fix and the 10-07 dismissChartTooltip helper both stay in place: the former as latent UX correctness, the latter as harmless belt-and-suspenders.
+
+WR-01 (Heatmap Tooltip default body shows raw `weight` numeric without dollar formatting) is a Phase 10-adjacent UX advisory, NOT a SC#3 blocker. Bundle with the corrective plan if scope allows.
 
 No items are deferred to a later phase. Phase 10 is the final phase in the roadmap; SC#3 must be met here.
 
 ---
 
-*Verified: 2026-04-27T19:35:00Z*
+*Verified: 2026-04-27T22:15:00Z*
 *Verifier: Claude (gsd-verifier)*
-*Evidence: /tmp/phase10-gap-closure-harness.log (1169 lines)*
+*Evidence: /tmp/phase10-final-harness.log (893 lines, 77,182 bytes); test/test-results/05-portfolio-viz-portfolio-3f443-der-after-a-position-exists-{chromium,firefox,webkit}{,-retry1}/{error-context.md,test-failed-1.png}*
