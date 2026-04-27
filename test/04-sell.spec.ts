@@ -26,18 +26,28 @@ test('sell JPM 1 after buying 2: position quantity drops to 1', async ({ page })
     positionsTable.getByRole('button', { name: 'Select JPM' }),
   ).toBeVisible({ timeout: 10_000 });
 
+  // PositionRow column order (PositionRow.tsx:57-76): ticker, quantity,
+  // avg_cost, current_price, pnl, pct. Scope to the second <td> (qty cell).
+  //
+  // Capture post-buy JPM qty so the post-sell assertion can be a relative
+  // delta rather than an absolute `1`. Robust to any prior state on JPM.
+  const jpmRow = positionsTable.getByRole('button', { name: 'Select JPM' });
+  const jpmQty = jpmRow.locator('td').nth(1);
+  const postBuyQtyText = await jpmQty.innerText();
+  const postBuyQty = parseFloat(postBuyQtyText.trim());
+
   // Sell 1. TradeBar clears its inputs onSuccess (verified TradeBar.tsx:48-49)
   // so we explicitly re-fill rather than relying on residual state.
   await page.getByLabel('Ticker').fill('JPM');
   await page.getByLabel('Quantity').fill('1');
   await page.getByRole('button', { name: 'Sell' }).click();
 
-  // PositionRow column order (PositionRow.tsx:57-76): ticker, quantity,
-  // avg_cost, current_price, pnl, pct. Scope the assertion to the second
-  // <td> (qty cell) so the \b1\b regex works — against the full row text
-  // "JPM1$195.02..." the leading \b boundary fails (M and 1 are both
-  // word chars). Regex tolerates "1", "1.0", "1.00" rendering variants.
-  const jpmRow = positionsTable.getByRole('button', { name: 'Select JPM' });
-  const jpmQty = jpmRow.locator('td').nth(1);
-  await expect(jpmQty).toHaveText(/^\s*1(?:\.0+)?\s*$/, { timeout: 10_000 });
+  // Post-sell qty == post-buy qty - 1 (we sold 1 of the 2 we bought).
+  // Use a generous timeout for the React Query refetch + render after sell.
+  await expect
+    .poll(
+      async () => parseFloat((await jpmQty.innerText()).trim()),
+      { timeout: 10_000 },
+    )
+    .toBe(postBuyQty - 1);
 });
