@@ -25,7 +25,10 @@ export function PositionsTable() {
   );
 
   return (
-    <section className="flex-1 bg-surface border border-border-muted rounded overflow-hidden flex flex-col min-h-[240px]">
+    <section
+      className="flex-1 bg-surface border border-border-muted rounded overflow-hidden flex flex-col min-h-[240px]"
+      data-testid="positions-table"
+    >
       <h2 className="text-xl font-semibold px-4 py-3 border-b border-border-muted">
         Positions
       </h2>

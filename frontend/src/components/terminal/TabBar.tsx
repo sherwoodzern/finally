@@ -31,6 +31,7 @@ export function TabBar() {
             type="button"
             role="tab"
             id={`tab-${t.id}`}
+            data-testid={`tab-${t.id}`}
             aria-selected={active}
             aria-controls={`panel-${t.id}`}
             tabIndex={active ? 0 : -1}

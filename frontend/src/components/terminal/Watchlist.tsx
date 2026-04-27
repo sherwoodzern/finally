@@ -22,7 +22,10 @@ export function Watchlist() {
   const setSelectedTicker = usePriceStore((s) => s.setSelectedTicker);
 
   return (
-    <aside className="flex-1 bg-surface border border-border-muted rounded overflow-hidden flex flex-col">
+    <aside
+      className="flex-1 bg-surface border border-border-muted rounded overflow-hidden flex flex-col"
+      data-testid="watchlist-panel"
+    >
       <h2 className="text-xl font-semibold px-4 py-3 border-b border-border-muted">
         Watchlist
       </h2>

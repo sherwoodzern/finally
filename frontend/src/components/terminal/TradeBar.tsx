@@ -79,7 +79,10 @@ export function TradeBar() {
   const errText = errorMessage(errorCode);
 
   return (
-    <section className="bg-surface-alt border border-border-muted rounded p-4">
+    <section
+      className="bg-surface-alt border border-border-muted rounded p-4"
+      data-testid="trade-bar"
+    >
       <form className="flex flex-col gap-3">
         <label className="flex flex-col gap-1 text-sm text-foreground-muted">
           Ticker
