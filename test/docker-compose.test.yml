@@ -55,7 +55,10 @@ services:
       CI: "1"
     # Run install + tests as a single command so we can stream npm output to
     # compose stdout. `npm ci` is reproducible from package-lock.json.
+    # --pass-with-no-tests keeps the harness green during Wave 1 (foundation
+    # only, no specs yet); Wave 2 plans add the seven §12 specs which the
+    # testMatch regex picks up automatically.
     command: >
-      sh -c "npm ci && npx playwright test"
+      sh -c "npm ci && npx playwright test --pass-with-no-tests"
     # If the container errors before tests run, exit propagates via
     # --exit-code-from playwright.
