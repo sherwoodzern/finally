@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 6: Frontend Scaffold & SSE** - Next.js TypeScript static-export project with Tailwind theme and the live-price SSE client (completed 2026-04-24)
 - [x] **Phase 7: Market Data & Trading UI** - Watchlist panel with sparklines, main chart, positions table, trade bar, header with live totals and connection dot (completed 2026-04-25)
 - [x] **Phase 8: Portfolio Visualization & Chat UI** - Heatmap, P&L chart, collapsible AI chat panel, demo polish, static frontend mounted into FastAPI, frontend component tests (completed 2026-04-26)
-- [ ] **Phase 9: Dockerization & Packaging** - Multi-stage Dockerfile, canonical `docker run` invocation, start/stop scripts, `.env.example`
+- [x] **Phase 9: Dockerization & Packaging** - Multi-stage Dockerfile, canonical `docker run` invocation, start/stop scripts, `.env.example` (completed 2026-04-27)
 - [ ] **Phase 10: E2E Validation** - Playwright harness with `docker-compose.test.yml` and all §12 scenarios against the mocked-LLM image
 
 ## Phase Details
@@ -172,10 +172,10 @@ Plans:
   4. A committed `.env.example` with safe placeholder values is present at the repo root, `.env` is gitignored, and copying `.env.example` → `.env` is sufficient to run the simulator-mode demo.
 **Plans**: 4 plans
 Plans:
-- [ ] 09-01-PLAN.md — Multi-stage Dockerfile (Node 20 slim → Python 3.12 slim) + aggressive .dockerignore (Wave 1)
-- [ ] 09-02-PLAN.md — .env.example with simulator-safe defaults + SC#4 boot validation (Wave 1)
-- [ ] 09-03-PLAN.md — Cross-platform start/stop scripts (mac bash + Windows PowerShell) + canonical-run integration test (Wave 2)
-- [ ] 09-04-PLAN.md — docs/DOCKER.md long-form reference + README Quick Start update (Wave 3)
+- [x] 09-01-PLAN.md — Multi-stage Dockerfile (Node 20 slim → Python 3.12 slim) + aggressive .dockerignore (Wave 1) (completed 2026-04-27)
+- [x] 09-02-PLAN.md — .env.example with simulator-safe defaults + SC#4 boot validation (Wave 1) (completed 2026-04-27)
+- [x] 09-03-PLAN.md — Cross-platform start/stop scripts (mac bash + Windows PowerShell) + canonical-run integration test (Wave 2) (completed 2026-04-27)
+- [x] 09-04-PLAN.md — docs/DOCKER.md long-form reference + README Quick Start update (Wave 3) (completed 2026-04-27)
 
 ### Phase 10: E2E Validation
 **Goal**: An out-of-band `docker-compose.test.yml` brings up the production image alongside a Playwright container with `LLM_MOCK=true`, and every §12 end-to-end scenario passes green against it.

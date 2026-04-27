@@ -72,10 +72,10 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 ### Packaging & Ops
 
-- [ ] **OPS-01**: Multi-stage `Dockerfile` — Node 20 slim builds the Next.js static export; Python 3.12 slim installs the `uv`-managed backend and copies the frontend build into `static/`
-- [ ] **OPS-02**: Single-container runtime — `docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally` works as the canonical invocation
-- [ ] **OPS-03**: Idempotent start/stop scripts — `scripts/start_mac.sh`, `scripts/stop_mac.sh`, `scripts/start_windows.ps1`, `scripts/stop_windows.ps1`
-- [ ] **OPS-04**: `.env.example` committed with safe placeholder values; `.env` listed in `.gitignore`
+- [x] **OPS-01**: Multi-stage `Dockerfile` — Node 20 slim builds the Next.js static export; Python 3.12 slim installs the `uv`-managed backend and copies the frontend build into `/app/frontend/out/` (Phase 9)
+- [x] **OPS-02**: Single-container runtime — `docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally` works as the canonical invocation (Phase 9)
+- [x] **OPS-03**: Idempotent start/stop scripts — `scripts/start_mac.sh`, `scripts/stop_mac.sh`, `scripts/start_windows.ps1`, `scripts/stop_windows.ps1` (Phase 9)
+- [x] **OPS-04**: `.env.example` committed with safe placeholder values; `.env` listed in `.gitignore` (Phase 9)
 
 ### Testing
 
@@ -159,10 +159,10 @@ Which phases cover which requirements. Populated during roadmap creation.
 | FE-09 | Phase 8 | Complete (08-06 chat shell + 08-07 ChatThread/ChatInput orchestration) |
 | FE-10 | Phase 7 | Pending |
 | FE-11 | Phase 8 | Complete (08-02/05/06/07/08 motion primitives + skeletons + flash parity; HUMAN-UAT pending) |
-| OPS-01 | Phase 9 | Pending |
-| OPS-02 | Phase 9 | Pending |
-| OPS-03 | Phase 9 | Pending |
-| OPS-04 | Phase 9 | Pending |
+| OPS-01 | Phase 9 | Complete (09-01 Dockerfile + .dockerignore; cold build 162s, image 124 MB) |
+| OPS-02 | Phase 9 | Complete (09-03 integration test PASS; HUMAN-UAT pending for browser auto-open + visual UI) |
+| OPS-03 | Phase 9 | Complete (09-03 four cross-platform scripts; HUMAN-UAT pending for Windows pwsh runtime) |
+| OPS-04 | Phase 9 | Complete (09-02 .env.example with safe placeholders; .gitignore:141 preserves .env ignore) |
 | TEST-01 | Phase 5 | Pending |
 | TEST-02 | Phase 8 | Complete (111/111 Vitest across 19 files) |
 | TEST-03 | Phase 10 | Pending |

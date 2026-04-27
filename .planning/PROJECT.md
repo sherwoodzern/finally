@@ -40,6 +40,10 @@ A user runs one Docker command, opens `http://localhost:8000`, and within second
 - ✓ **FE-09**: AI chat panel — docked/collapsible sidebar, scrolling history, send box, loading indicator, inline confirmations for executed trades + watchlist changes — Phase 8 (08-06 shell + 08-07 orchestration; XSS guarded)
 - ✓ **FE-11**: Demo-grade polish — smooth transitions, loading skeletons, chat-panel micro-interactions, visible trade-execution moments — Phase 8 (08-02/05/06/07/08 motion primitives + flash parity; perceptual feel items in 08-HUMAN-UAT.md)
 - ✓ **TEST-02**: Frontend component tests — price flash, watchlist CRUD, portfolio display, chat rendering + loading state — Phase 8 (111/111 Vitest across 19 files)
+- ✓ **OPS-01**: Multi-stage `Dockerfile` — Node 20 slim builds the Next.js static export, Python 3.12 slim installs the `uv`-managed backend and copies the frontend build into `/app/frontend/out/` — Phase 9 (09-01: cold build 162s, image 124 MB content)
+- ✓ **OPS-02**: Single-container run — `docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally` — Phase 9 (09-03 integration test: /api/health 1s, GET / 12,830 bytes HTML, SSE data: frames, volume persistence cash 10000 -> 9809.98 -> 9809.98 across stop+restart)
+- ✓ **OPS-03**: Idempotent start/stop scripts for macOS/Linux (`scripts/start_mac.sh`, `scripts/stop_mac.sh`) and Windows (`scripts/start_windows.ps1`, `scripts/stop_windows.ps1`) — Phase 9 (09-03; bash 3.2 portable; `--build` and `--no-open` flags; PowerShell 5.1+ mirror with `[switch]$Build`/`[switch]$NoOpen`)
+- ✓ **OPS-04**: `.env.example` committed with safe placeholders; `.env` gitignored at `.gitignore:141` — Phase 9 (09-02; cp .env.example .env boots simulator-mode demo with no edits)
 
 ### Active
 
@@ -63,10 +67,7 @@ A user runs one Docker command, opens `http://localhost:8000`, and within second
 - [ ] **FE-10**: Header — live-updating total portfolio value, cash balance, and a connection-status dot (green connected / yellow reconnecting / red disconnected)
 
 **Packaging & ops**
-- [ ] **OPS-01**: Multi-stage `Dockerfile` — Node 20 slim builds the Next.js static export, Python 3.12 slim installs the `uv`-managed backend and copies the frontend build into `static/`
-- [ ] **OPS-02**: Single-container run — `docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally` — no docker-compose in production
-- [ ] **OPS-03**: Idempotent start/stop scripts for macOS/Linux (`scripts/start_mac.sh`, `scripts/stop_mac.sh`) and Windows (`scripts/start_windows.ps1`, `scripts/stop_windows.ps1`)
-- [ ] **OPS-04**: `.env.example` committed; `.env` gitignored
+- (all OPS-01..OPS-04 validated in Phase 9 — see Validated section above)
 
 **Testing**
 - [ ] **TEST-01**: Backend unit tests extending the existing pytest suite — portfolio math, trade execution, trade validation, LLM response parsing, API routes, LLM mock mode
