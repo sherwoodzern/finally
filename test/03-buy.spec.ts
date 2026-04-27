@@ -10,10 +10,10 @@ import { test, expect } from '@playwright/test';
 test('buy NVDA 1: cash decreases, position appears', async ({ page }) => {
   await page.goto('/');
 
-  // Pre-trade sanity: page loaded with full starting cash. Guards against a
-  // dirty (re-used) volume — D-06 says compose creates a fresh volume per up,
-  // but this assertion fails loudly if that ever regresses.
-  await expect(page.getByText('$10,000.00')).toBeVisible();
+  // Pre-trade sanity: page loaded with full starting cash. Scoped to
+  // header-cash because the page also renders header-total = $10,000.00 on
+  // a fresh boot (no positions yet), and getByText would fail strict-mode.
+  await expect(page.getByTestId('header-cash')).toHaveText('$10,000.00');
 
   // TradeBar uses <label>Ticker</label> wrapping <input>; getByLabel resolves
   // through the accessibility tree (PATTERNS.md selector hierarchy rule 2).
@@ -21,11 +21,15 @@ test('buy NVDA 1: cash decreases, position appears', async ({ page }) => {
   await page.getByLabel('Quantity').fill('1');
   await page.getByRole('button', { name: 'Buy' }).click();
 
-  // PositionRow renders <tr role="button" aria-label="Select NVDA">. The
-  // 10s timeout absorbs the trade roundtrip + React Query refetch + render
-  // (cold cache 1-3s, WebKit slower).
+  // PositionRow renders <tr role="button" aria-label="Select NVDA">. NVDA
+  // is also in the default watchlist seed (same aria-label there), so we
+  // scope to data-testid="positions-table" (Plan 10-00) to avoid strict-
+  // mode violation. 10s timeout absorbs trade roundtrip + React Query
+  // refetch + render (cold cache 1-3s, WebKit slower).
   await expect(
-    page.getByRole('button', { name: 'Select NVDA' }),
+    page
+      .getByTestId('positions-table')
+      .getByRole('button', { name: 'Select NVDA' }),
   ).toBeVisible({ timeout: 10_000 });
 
   // Cash strictly less than $10,000 — RELATIVE assertion. Simulator price
