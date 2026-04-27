@@ -7,7 +7,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { ResponsiveContainer, Treemap } from 'recharts';
+import { ResponsiveContainer, Tooltip, Treemap } from 'recharts';
 import { useShallow } from 'zustand/react/shallow';
 import { fetchPortfolio, type PositionOut } from '@/lib/api/portfolio';
 import { usePriceStore } from '@/lib/price-store';
@@ -124,7 +124,19 @@ export function Heatmap() {
             isAnimationActive
             animationDuration={300}
             onClick={(node) => handleHeatmapCellClick(node)}
-          />
+          >
+            {/*
+              Explicit Recharts Tooltip with wrapperStyle pointerEvents: 'none'.
+              The default Treemap tooltip wrapper has pointer-events: auto and
+              intercepts clicks on sibling tabs (10-VERIFICATION.md Mode A —
+              failed all 3 browsers in 05-portfolio-viz). With pointerEvents:
+              'none' the tooltip remains visible on hover but its wrapper no
+              longer absorbs clicks targeted at neighbouring elements. This is
+              also better production UX: a hover tooltip should never block a
+              click on something else.
+            */}
+            <Tooltip wrapperStyle={{ pointerEvents: 'none' }} />
+          </Treemap>
         </ResponsiveContainer>
       </div>
     </section>
