@@ -20,13 +20,22 @@ test('portfolio viz: heatmap and P&L chart render after a position exists', asyn
   await page.getByLabel('Ticker').fill('META');
   await page.getByLabel('Quantity').fill('1');
   await page.getByRole('button', { name: 'Buy' }).click();
+  // Scope to positions-table — the watchlist also renders a "Select META" row,
+  // so the unscoped locator hits a strict-mode collision.
   await expect(
-    page.getByRole('button', { name: 'Select META' }),
+    page
+      .getByTestId('positions-table')
+      .getByRole('button', { name: 'Select META' }),
   ).toBeVisible({ timeout: 10_000 });
 
   // Heatmap tab: click and assert the Recharts Treemap container is visible.
   await page.getByTestId('tab-heatmap').click();
   await expect(page.getByTestId('heatmap-treemap')).toBeVisible({ timeout: 10_000 });
+
+  // Move mouse out of the treemap before switching tabs — Recharts spawns a
+  // hover tooltip <td>{ticker}</td> that lingers after click and intercepts
+  // pointer events for the next click target on WebKit (cross-browser flake).
+  await page.mouse.move(0, 0);
 
   // P&L tab: click and assert both the chart container and the summary text.
   await page.getByTestId('tab-pnl').click();

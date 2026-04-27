@@ -37,13 +37,21 @@ test('chat trade execution: mock buy AMZN 1 produces inline action card', async 
   // KNOWN GAP — RESEARCH.md Pitfall 4 / CONTEXT.md D-05: assistant chat bubble
   // renders empty due to ChatResponse field-shape mismatch. DO NOT assert
   // bubble text. Stable signal is the action card.
-  await expect(page.getByTestId('action-card-executed')).toBeVisible({
+  // .first() — ChatThread.tsx merges historyQuery.data.messages with the
+  // optimistically appended assistant turn, so the same trade renders twice
+  // and an unscoped locator hits a strict-mode collision. Asserting the FIRST
+  // is sufficient (it is the rendered card from the auto-executed trade).
+  await expect(page.getByTestId('action-card-executed').first()).toBeVisible({
     timeout: 15_000,
   });
 
   // Bonus: the AMZN position row appears in the positions table — proves the
   // auto-execution path produced a real position, not just a UI confirmation.
+  // Scope to positions-table because the watchlist also renders a Select AMZN
+  // row (AMZN is in the seed watchlist), causing a strict-mode collision.
   await expect(
-    page.getByRole('button', { name: 'Select AMZN' }),
+    page
+      .getByTestId('positions-table')
+      .getByRole('button', { name: 'Select AMZN' }),
   ).toBeVisible({ timeout: 10_000 });
 });
