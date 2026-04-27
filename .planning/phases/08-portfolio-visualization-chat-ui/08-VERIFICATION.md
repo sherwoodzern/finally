@@ -1,8 +1,9 @@
 ---
 phase: 08-portfolio-visualization-chat-ui
 verified: 2026-04-26T13:30:00Z
-status: human_needed
-score: 5/5 must-haves verified (automated)
+human_uat_closed: 2026-04-26T15:30:00Z
+status: passed
+score: 5/5 must-haves verified (automated); 6/6 perceptual items verified (HUMAN-UAT closed; test 3 fixed via c2a2c88, test 6 fixed environmentally)
 overrides_applied: 0
 human_verification:
   - test: "Open http://localhost:8000 with backend running and visually confirm the portfolio heatmap rectangles render at correct relative sizes and recolor (green/red) as live tick prices flow"

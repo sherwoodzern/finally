@@ -1,9 +1,9 @@
 ---
-status: complete
+status: resolved
 phase: 08-portfolio-visualization-chat-ui
 source: [08-VERIFICATION.md]
 started: 2026-04-26T13:30:00Z
-updated: 2026-04-26T14:30:00Z
+updated: 2026-04-26T15:30:00Z
 ---
 
 ## Current Test
@@ -22,9 +22,8 @@ result: pass
 
 ### 3. Agentic-trade visual moment (chat → trade + watchlist + flash)
 expected: "ThinkingBubble appears within ~100ms of submit; assistant message + ActionCards render in the order watchlist_changes → trades; executed cards pulse for ~800ms; PositionRow flashes bg-up/20 simultaneously"
-result: issue
-reported: "fail - the purchase of NVDA did not work and PYPL was not added to the watchlist"
-severity: major
+result: pass
+fixed_by: "commit c2a2c88 (postChat body field rename content -> message); verified by user after rebuild"
 
 ### 4. Chat drawer collapse/expand transition feel
 expected: "w-[380px] ↔ w-12 transition runs over 300ms with no jank; under prefers-reduced-motion the transition is instant"
@@ -36,15 +35,14 @@ result: pass
 
 ### 6. G1 SSE dev fix end-to-end
 expected: "On `npm run dev` (Next dev :3000), EventSource against /api/stream/prices stays connected and SSE frames flow without the 308→307 redirect chain"
-result: issue
-reported: "fail - the prices no longer appear in the watchlist"
-severity: major
+result: pass
+fixed_by: "Environmental — clean dev restart (rm -rf frontend/.next + npm run dev). On-disk config unchanged. Verified by user after operational fix."
 
 ## Summary
 
 total: 6
-passed: 4
-issues: 2
+passed: 6
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
@@ -52,7 +50,7 @@ blocked: 0
 ## Gaps
 
 - truth: "Chat-driven trades execute and chat-driven watchlist changes are applied; assistant ActionCards reflect the executed actions; PositionRow + watchlist update simultaneously"
-  status: failed
+  status: resolved
   reason: "User reported: fail - the purchase of NVDA did not work and PYPL was not added to the watchlist. Follow-up: the chat request returned HTTP 422 (FastAPI body validation error)."
   severity: major
   test: 3
@@ -61,7 +59,7 @@ blocked: 0
   diagnosis_lead: "HTTP 422 on POST /api/chat → frontend request body shape mismatches backend ChatRequest Pydantic schema. Inspect frontend/src/lib/api/chat.ts postChat() body vs backend/app/chat/models.py ChatRequest."
 
 - truth: "On `npm run dev` (Next dev :3000), EventSource against /api/stream/prices stays connected and SSE frames flow continuously to the watchlist UI"
-  status: failed
+  status: resolved
   reason: "User reported: fail - the prices no longer appear in the watchlist"
   severity: major
   test: 6
