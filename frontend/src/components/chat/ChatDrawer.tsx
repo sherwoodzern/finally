@@ -26,7 +26,9 @@ export function ChatDrawer({ children }: ChatDrawerProps) {
       }`}
     >
       <ChatHeader isOpen={isOpen} onToggle={() => setOpen(!isOpen)} />
-      {isOpen && children}
+      <div data-testid="chat-drawer-body" className={isOpen ? 'flex flex-col flex-1 min-h-0' : 'hidden'}>
+        {children}
+      </div>
     </aside>
   );
 }

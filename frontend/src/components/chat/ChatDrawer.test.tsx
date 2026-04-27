@@ -15,7 +15,9 @@ describe('<ChatDrawer />', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Collapse chat' }));
     const aside = screen.getByTestId('chat-drawer');
     expect(aside.className).toContain('w-12');
-    // children body hidden when collapsed
-    expect(screen.queryByTestId('child-body')).toBeNull();
+    // children remain mounted (so local state survives collapse) but the
+    // wrapper carries the `hidden` class so they are visually hidden.
+    expect(screen.getByTestId('child-body')).toBeInTheDocument();
+    expect(screen.getByTestId('chat-drawer-body').className).toContain('hidden');
   });
 });
