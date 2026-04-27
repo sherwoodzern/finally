@@ -4,8 +4,9 @@ Discovered during execution but not fixed because the fix would touch files
 outside the executing plan's `files_modified` list. The orchestrator (or a
 follow-on plan) should address these.
 
-## D-10-A: HSTS preload upgrade blocks Chromium + Firefox against compose service `app`
+## D-10-A: HSTS preload upgrade blocks Chromium + Firefox against compose service `app` — RESOLVED (2026-04-27)
 
+- **Status: RESOLVED.** Compose service renamed `app` → `appsvc`; `BASE_URL` and `playwright.config.ts` `baseURL` updated to `http://appsvc:8000`. CONTEXT.md D-09 carries an override note pointing to this entry. Three independent Wave 2 executors (10-02, 10-03, 10-04) had previously reproduced the failure with trace evidence; the rename eliminates the HSTS preload match.
 - **Discovered during:** Plan 10-02, Task 3 (full 3-browser harness gate).
 - **Symptom:** `01-fresh-start.spec.ts` fails on chromium with
   `net::ERR_SSL_PROTOCOL_ERROR at http://app:8000/` and on firefox with

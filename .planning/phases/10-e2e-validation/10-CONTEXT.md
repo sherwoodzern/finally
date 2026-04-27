@@ -48,11 +48,11 @@ Browser-driven end-to-end validation that the shipped `finally:latest` Docker im
 
 - **D-09:** `test/playwright.config.ts` defines:
   - `testDir: '.'` (specs colocated under `test/`)
-  - `baseURL: 'http://app:8000'` (compose-internal DNS — the Playwright container reaches the app service by service name)
+  - `baseURL: 'http://appsvc:8000'` (compose-internal DNS — the Playwright container reaches the appsvc service by service name). **D-09 override (post-execution, 2026-04-27):** the original locked value `http://app:8000` triggered Chrome/Firefox HSTS preload upgrade because the bare hostname `app` matches the `.app` HSTS-preloaded TLD. Three independent Wave 2 executors reproduced `net::ERR_SSL_PROTOCOL_ERROR` / `SSL_ERROR_UNKNOWN` with trace evidence (`Non-Authoritative-Reason: HSTS`, `Location: https://app:8000/`). Renamed the compose service `app` → `appsvc` and updated `BASE_URL` accordingly. WebKit was unaffected (no preload list).
   - Three projects: `chromium`, `firefox`, `webkit`
   - `retries: 0` locally, `retries: 1` if `process.env.CI` (covers transient SSE-reconnect-test flakiness without masking real bugs)
   - `reporter: [['list'], ['html', { open: 'never' }]]` so failures dump readable output to compose stdout AND an inspectable HTML report under `test/playwright-report/`
-- **D-10:** `wait-for-it` style health-check is wired via the compose file's `depends_on.app.condition: service_healthy` — the app container's existing `/api/health` is wrapped in a HEALTHCHECK in the compose service definition (NOT in the production Dockerfile, which Phase 9 deliberately omits HEALTHCHECK from). The Playwright service waits for the app to be healthy before launching tests.
+- **D-10:** `wait-for-it` style health-check is wired via the compose file's `depends_on.appsvc.condition: service_healthy` — the appsvc container's existing `/api/health` is wrapped in a HEALTHCHECK in the compose service definition (NOT in the production Dockerfile, which Phase 9 deliberately omits HEALTHCHECK from). The Playwright service waits for the app to be healthy before launching tests.
 
 ### Scenario-to-spec mapping
 

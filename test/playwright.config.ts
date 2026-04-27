@@ -36,9 +36,11 @@ export default defineConfig({
   ],
 
   use: {
-    // D-09: compose-internal DNS - the playwright container reaches the app
-    // service by service name. Env override available for ad-hoc local runs.
-    baseURL: process.env.BASE_URL ?? 'http://app:8000',
+    // D-09 (override): compose-internal DNS - the playwright container reaches
+    // the appsvc service by service name. Env override available for ad-hoc
+    // local runs. Service is `appsvc` not `app` to avoid Chrome/Firefox HSTS
+    // preload upgrade on the `.app` TLD (see docker-compose.test.yml header).
+    baseURL: process.env.BASE_URL ?? 'http://appsvc:8000',
 
     // Trace on first retry only (cheap on green, full evidence on red).
     trace: 'on-first-retry',

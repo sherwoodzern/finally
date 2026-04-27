@@ -4,18 +4,24 @@
 #
 # CONTEXT.md: D-01 (no custom Dockerfile under test/), D-02 (full browser matrix),
 # D-03 (one-command UX), D-04 (build from local Dockerfile), D-05 (LLM_MOCK=true),
-# D-06 (anonymous volume per run), D-09 (baseURL http://app:8000), D-10 (compose-side
-# HEALTHCHECK only), D-13 (Phase 2 seed assumed).
+# D-06 (anonymous volume per run), D-09 (baseURL http://appsvc:8000 — see note),
+# D-10 (compose-side HEALTHCHECK only), D-13 (Phase 2 seed assumed).
+#
+# Service name `appsvc` (NOT `app`): the `.app` TLD is on the Chrome/Firefox
+# HSTS preload list, and a bare `app` hostname matches it. Browsers issue a
+# 307 Internal Redirect with reason HSTS to https://app:8000/, which the
+# FastAPI server doesn't speak — TLS handshake fails. Multi-label or non-app
+# hostnames bypass this. Override of CONTEXT.md D-09.
 
 services:
-  app:
+  appsvc:
     # D-04: build from repo-root Dockerfile, not a registry pull.
     # `..` is relative to this compose file's directory, i.e. the repo root.
     build:
       context: ..
       dockerfile: Dockerfile
-    # No image: tag - compose synthesises one as `<projectname>-app`. We never
-    # need to reference the image elsewhere.
+    # No image: tag - compose synthesises one as `<projectname>-appsvc`. We
+    # never need to reference the image elsewhere.
     environment:
       LLM_MOCK: "true"          # D-05: deterministic mock chat path
       OPENROUTER_API_KEY: ""    # set explicitly empty; suppresses Phase 5 warning
@@ -38,15 +44,15 @@ services:
   playwright:
     image: mcr.microsoft.com/playwright:v1.59.1-jammy
     depends_on:
-      app:
+      appsvc:
         condition: service_healthy   # D-10
     working_dir: /work
     volumes:
       - ../test:/work     # mount the test/ directory itself (host-relative to compose file)
     environment:
       # Override Playwright config baseURL via env (config also hardcodes
-      # http://app:8000 via D-09 - this is belt-and-suspenders).
-      BASE_URL: "http://app:8000"
+      # http://appsvc:8000 via D-09-override - this is belt-and-suspenders).
+      BASE_URL: "http://appsvc:8000"
       # Disable Playwright's "you should run `npx playwright install`" nag:
       # the image already has all browsers installed.
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
