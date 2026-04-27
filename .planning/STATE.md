@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 9 COMPLETE — all 4 plans executed; 11/11 mechanical verification truths PASS (cold build 162s, container /api/health 1s, GET / 12,830 bytes HTML, /api/stream/prices data: frames, --build forces rebuild, volume persistence cash 10000 -> 9809.98 -> 9809.98 across stop+restart, idempotent stop). Code review: clean (0 critical/0 warning/4 info). Verifier verdict: human_needed — 4 intrinsically-non-programmatic items persisted to 09-HUMAN-UAT.md (Windows pwsh runtime, browser auto-open, visual UI, cross-arch spot-check). Auto-approved under --auto / _auto_chain_active=true."
-last_updated: "2026-04-27T15:30:00.000Z"
+stopped_at: "Phase 10 PLANNED — 6 plans across 3 waves (Wave 0: 10-00 frontend test-id additions; Wave 1: 10-01 compose+playwright config foundation; Wave 2: 10-02..10-05 the seven §12 specs). Plan-checker verdict: 0 blockers, 4 warnings (W1 VALIDATION.md scaffold filled in; W4 multi-line grep tightened in 10-04; W2/W3 accepted as cosmetic + integration-tier latency). Pinned @playwright/test 1.59.1 + mcr.microsoft.com/playwright:v1.59.1-jammy. Auto-chain flag cleared (manual invocation). Ready to execute via /gsd-execute-phase 10."
+last_updated: "2026-04-27T17:00:00.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 10
   completed_phases: 9
-  total_plans: 37
+  total_plans: 43
   completed_plans: 37
-  percent: 100
+  percent: 86
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-19)
 
 **Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf.
-**Current focus:** Phase 10 — E2E Validation (next; TBD plans)
+**Current focus:** Phase 10 — E2E Validation (planning complete; ready to execute)
 
 ## Current Position
 
-Phase: 9 COMPLETE -> ready for Phase 10
-Plan: All 4 Phase 9 plans complete (09-01 Dockerfile + .dockerignore, 09-02 .env.example, 09-03 four cross-platform scripts, 09-04 docs/DOCKER.md + README Quick Start).
-Status: Phase 9 verified — 11/11 mechanical truths PASS; code review clean (0 critical/0 warning/4 info); 4 human-UAT items persisted to 09-HUMAN-UAT.md (Windows pwsh runtime, browser auto-open, visual UI, cross-arch). Auto-approved under --auto chain.
+Phase: 10
+Plan: All 6 Phase 10 plans created (10-00 frontend test-ids additive, 10-01 foundation, 10-02 fresh-start+watchlist-crud, 10-03 buy+sell, 10-04 portfolio-viz+chat, 10-05 sse-reconnect+full-suite gate). Ready to execute.
+Status: Phase 10 PLANNED + checker-verified (0 blockers, 4 warnings dispositioned). Wave structure: Wave 0 (10-00, parallel-safe with Wave 1), Wave 1 (10-01 foundation), Wave 2 (10-02..05 specs depending on 10-01). 18 tasks across 6 plans. VALIDATION.md filled in (nyquist_compliant: true). Auto-chain flag cleared.
 Last activity: 2026-04-27
 
-Progress: [##########] 100% of Phase 09 (4/4 plans executed and verified)
+Progress: [          ] 0% of Phase 10 (6 plans ready, 0 executed)
 
 ## Performance Metrics
 
