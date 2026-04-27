@@ -170,7 +170,12 @@ Plans:
   2. `docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally` starts the container; opening `http://localhost:8000` loads the terminal, SSE streams, and trades persist across container restarts on the same named volume.
   3. `scripts/start_mac.sh`, `scripts/stop_mac.sh`, `scripts/start_windows.ps1`, and `scripts/stop_windows.ps1` wrap the build/run/stop commands idempotently and are safe to re-run.
   4. A committed `.env.example` with safe placeholder values is present at the repo root, `.env` is gitignored, and copying `.env.example` → `.env` is sufficient to run the simulator-mode demo.
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 09-01-PLAN.md — Multi-stage Dockerfile (Node 20 slim → Python 3.12 slim) + aggressive .dockerignore (Wave 1)
+- [ ] 09-02-PLAN.md — .env.example with simulator-safe defaults + SC#4 boot validation (Wave 1)
+- [ ] 09-03-PLAN.md — Cross-platform start/stop scripts (mac bash + Windows PowerShell) + canonical-run integration test (Wave 2)
+- [ ] 09-04-PLAN.md — docs/DOCKER.md long-form reference + README Quick Start update (Wave 3)
 
 ### Phase 10: E2E Validation
 **Goal**: An out-of-band `docker-compose.test.yml` brings up the production image alongside a Playwright container with `LLM_MOCK=true`, and every §12 end-to-end scenario passes green against it.
@@ -197,5 +202,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Frontend Scaffold & SSE | 3/3 | Complete | 2026-04-24 |
 | 7. Market Data & Trading UI | 8/8 | Complete    | 2026-04-25 |
 | 8. Portfolio Visualization & Chat UI | 8/8 | Complete | 2026-04-26 |
-| 9. Dockerization & Packaging | 0/TBD | Not started | - |
+| 9. Dockerization & Packaging | 0/4 | Not started | - |
 | 10. E2E Validation | 0/TBD | Not started | - |
