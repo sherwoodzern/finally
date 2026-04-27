@@ -1,0 +1,64 @@
+# .dockerignore — FinAlly build-context filter (Phase 9, D-13).
+# Keeps build context small and reproducible. Stage 1 rebuilds frontend/out
+# fresh; Stage 2 installs deps from lockfiles. Host-side dev artifacts and
+# secrets must never enter the image.
+
+# VCS / IDE / agent metadata
+.git/
+.gitignore
+.github/
+.idea/
+.vscode/
+.claude/
+.planning/
+
+# Frontend dev artifacts (Stage 1 rebuilds these from source)
+**/node_modules/
+**/.next/
+frontend/out/
+frontend/coverage/
+frontend/tsconfig.tsbuildinfo
+
+# Backend dev artifacts (Stage 2 syncs from uv.lock)
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.ruff_cache/
+**/.coverage
+**/.coverage.*
+backend/.venv/
+backend/htmlcov/
+
+# Host runtime persistence (Pitfall 7 — never propagate into volume)
+db/
+**/*.sqlite3
+**/*.sqlite3-journal
+
+# Tests / specs / dev-only files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+**/tests/
+test/
+**/vitest.config.*
+**/vitest.setup.*
+
+# Markdown docs (keep README.md only — D-13 + D-14)
+docs/
+*.md
+!README.md
+planning/
+
+# Local secrets (D-06 — NEVER copied into image)
+.env
+.env.*
+!.env.example
+
+# Editor / OS junk
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.bak
+savedfiles/
