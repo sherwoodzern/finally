@@ -54,6 +54,10 @@ export function ChatThread() {
       const assistant = assistantFromResponse(res);
       setAppended((p) => [...p, assistant]);
       setFreshAssistantId(assistant.id);
+      // flashTrade direction encodes executed (up) vs failed (down), not
+      // buy/sell. Per 08-UI-SPEC §4.2 row D-12: every executed trade
+      // (buy AND sell) flashes bg-up/20 on the position row; failed
+      // trades are surfaced on the action card only, never on a row.
       for (const t of res.trades) {
         if (t.status === 'executed') {
           usePriceStore.getState().flashTrade(t.ticker, 'up');

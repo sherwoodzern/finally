@@ -39,6 +39,10 @@ export function TradeBar() {
   const mutation = useMutation({
     mutationFn: postTrade,
     onSuccess: async (res) => {
+      // flashTrade direction encodes executed (up) vs failed (down), not
+      // buy/sell. Per 08-UI-SPEC §4.2: manual trades are always 'up' on
+      // success (buy = adding a position, sell = realizing); failures
+      // surface via inline alert below, not the row flash.
       usePriceStore.getState().flashTrade(res.ticker, 'up');
       await qc.invalidateQueries({ queryKey: ['portfolio'] });
       setTicker('');
