@@ -18,15 +18,23 @@ const TABS: { id: TabId; label: string }[] = [
 export function TabBar() {
   const selectedTab = usePriceStore(selectSelectedTab);
   return (
-    <nav className="flex gap-2 border-b border-border-muted" aria-label="Center column tabs">
+    <div
+      role="tablist"
+      aria-label="Center column tabs"
+      className="flex gap-2 border-b border-border-muted"
+    >
       {TABS.map((t) => {
         const active = selectedTab === t.id;
         return (
           <button
             key={t.id}
             type="button"
+            role="tab"
+            id={`tab-${t.id}`}
+            aria-selected={active}
+            aria-controls={`panel-${t.id}`}
+            tabIndex={active ? 0 : -1}
             onClick={() => usePriceStore.getState().setSelectedTab(t.id)}
-            aria-pressed={active}
             className={`h-10 px-4 text-sm font-semibold border-b-2 -mb-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-blue ${
               active
                 ? 'border-accent-blue text-foreground'
@@ -37,6 +45,6 @@ export function TabBar() {
           </button>
         );
       })}
-    </nav>
+    </div>
   );
 }

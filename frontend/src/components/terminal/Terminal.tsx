@@ -31,9 +31,21 @@ export function Terminal() {
           <div className="flex flex-col gap-4 min-w-0">
             <Header />
             <TabBar />
-            {selectedTab === 'chart' && <MainChart />}
-            {selectedTab === 'heatmap' && <Heatmap />}
-            {selectedTab === 'pnl' && <PnLChart />}
+            {selectedTab === 'chart' && (
+              <div role="tabpanel" id="panel-chart" aria-labelledby="tab-chart">
+                <MainChart />
+              </div>
+            )}
+            {selectedTab === 'heatmap' && (
+              <div role="tabpanel" id="panel-heatmap" aria-labelledby="tab-heatmap">
+                <Heatmap />
+              </div>
+            )}
+            {selectedTab === 'pnl' && (
+              <div role="tabpanel" id="panel-pnl" aria-labelledby="tab-pnl">
+                <PnLChart />
+              </div>
+            )}
           </div>
           <div className="flex flex-col gap-4">
             <PositionsTable />
