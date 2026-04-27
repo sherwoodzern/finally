@@ -91,6 +91,7 @@ export function ChatThread() {
   return (
     <>
       <div
+        key="thread"
         ref={scrollRef}
         data-testid="chat-thread"
         className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3"
@@ -117,9 +118,9 @@ export function ChatThread() {
         {mutation.isPending && <ThinkingBubble />}
       </div>
       {submitError && (
-        <p role="alert" className="px-4 text-sm text-down">{submitError}</p>
+        <p key="error" role="alert" className="px-4 text-sm text-down">{submitError}</p>
       )}
-      <ChatInput onSubmit={submit} isPending={mutation.isPending} />
+      <ChatInput key="input" onSubmit={submit} isPending={mutation.isPending} />
     </>
   );
 }
