@@ -24,7 +24,9 @@ test('fresh start: default watchlist + $10k cash + streaming prices', async ({ p
   // 1. All 10 default-seed tickers render as watchlist rows.
   for (const ticker of SEED_TICKERS) {
     await expect(
-      page.getByRole('button', { name: `Select ${ticker}` }),
+      page
+        .getByTestId('watchlist-panel')
+        .getByRole('button', { name: `Select ${ticker}` }),
     ).toBeVisible({ timeout: 10_000 });
   }
 
@@ -33,6 +35,8 @@ test('fresh start: default watchlist + $10k cash + streaming prices', async ({ p
 
   // 3. At least one watchlist row leaves the '—' placeholder within 10s,
   //    proving the SSE stream is live.
-  const aaplRow = page.getByRole('button', { name: 'Select AAPL' });
+  const aaplRow = page
+    .getByTestId('watchlist-panel')
+    .getByRole('button', { name: 'Select AAPL' });
   await expect(aaplRow).not.toContainText('—', { timeout: 10_000 });
 });
