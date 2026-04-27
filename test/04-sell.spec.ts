@@ -33,8 +33,23 @@ test('sell JPM 1 after buying 2: position quantity drops to 1', async ({ page })
   // delta rather than an absolute `1`. Robust to any prior state on JPM.
   const jpmRow = positionsTable.getByRole('button', { name: 'Select JPM' });
   const jpmQty = jpmRow.locator('td').nth(1);
-  const postBuyQtyText = await jpmQty.innerText();
-  const postBuyQty = parseFloat(postBuyQtyText.trim());
+  // Wait for React Query to refetch the post-buy qty before snapshotting.
+  // The Select-JPM visibility wait above only proves the row exists; the
+  // qty cell may still be a pre-refetch stale value, which would race the
+  // sell mutation and produce flaky retries on firefox/webkit (see
+  // 10-VERIFICATION.md Mode C, commit 4f690e6). Poll until the qty parses
+  // to >= 2 (the buy added exactly 2 shares, so any settled post-buy state
+  // must be at least 2) and snapshot the latest value the poll observed.
+  let postBuyQty = 0;
+  await expect
+    .poll(
+      async () => {
+        postBuyQty = parseFloat((await jpmQty.innerText()).trim());
+        return postBuyQty;
+      },
+      { timeout: 10_000 },
+    )
+    .toBeGreaterThanOrEqual(2);
 
   // Sell 1. TradeBar clears its inputs onSuccess (verified TradeBar.tsx:48-49)
   // so we explicitly re-fill rather than relying on residual state.
