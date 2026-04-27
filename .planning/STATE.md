@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: ready_to_execute
-stopped_at: "Phase 10 gap-closure plans created (10-06, 10-07) and verified by plan-checker (PASSED). 10-06 closes Gap Group A: workers:1 in playwright.config.ts (realises CONTEXT D-07), watchlist-panel-scoped Select selectors in 01-fresh-start, drop hardcoded $10k pre-trade assertion in 03-buy, relative-delta qty assertion in 04-sell. 10-07 closes Gap Group B: page.keyboard.press('Escape') tooltip dismissal in 05-portfolio-viz before tab-pnl click + owns the canonical-command 21/21 green gate. Sequential dependency 10-06 → 10-07. Next: /gsd-execute-phase 10 to run the two new plans, then re-verify."
-last_updated: "2026-04-27T14:42:00.000Z"
+stopped_at: "Phase 10 Plan 06 (Gap Group A closure) executed sequentially on finally-gsd. Four atomic per-task commits: 491e6ff (workers=1), 761d3a6 (watchlist-panel-scoped Select selectors in 01-fresh-start), 3bb6105 (drop hardcoded $10k pre-trade assertion in 03-buy), ee45f65 (relative-delta qty assertion in 04-sell). Cross-cutting verification green: exactly 4 expected files changed, 21 tests in 7 files still discoverable across all 3 browser projects. 10-06-SUMMARY.md created and self-checked. Plan 10-07 (Gap Group B: tooltip dismissal in 05-portfolio-viz + canonical-command 21/21 green gate) is next in sequential dependency. Next: /gsd-execute-phase 10 with plan 10-07."
+last_updated: "2026-04-27T19:10:00.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 10
   completed_phases: 9
-  total_plans: 45
-  completed_plans: 37
-  percent: 82
+  total_plans: 47
+  completed_plans: 38
+  percent: 80
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 10
-Plan: 8 plans total (10-00..10-05 executed; 10-06, 10-07 newly planned for gap closure and verified). 10-06 fixes Gap Group A (parallelism + spec assertions across playwright.config.ts, 01-fresh-start, 03-buy, 04-sell). 10-07 fixes Gap Group B (05-portfolio-viz tooltip dismissal) and owns the canonical-command 21/21 green gate. Sequential dependency 10-06 → 10-07.
-Status: Phase 10 ready_to_execute (gap-closure plans). Verification will re-run after 10-06 + 10-07 land. Expected outcome: canonical harness exits 0 with 21 (spec, project) pairs passing on chromium + firefox + webkit, closing SC#3.
+Plan: 8 plans total (10-00..10-06 executed sequentially on finally-gsd; 10-07 still pending). 10-06 (Gap Group A closure) just landed: workers=1 in playwright.config.ts realising CONTEXT D-07 intent; watchlist-panel-scoped Select selectors in 01-fresh-start; hardcoded $10k pre-trade assertion dropped from 03-buy; relative-delta qty assertion in 04-sell via expect.poll. Four atomic commits 491e6ff, 761d3a6, 3bb6105, ee45f65. Cross-cutting verification green (4 files changed, 21 tests in 7 files). 10-07 (Gap Group B closure: tooltip dismissal in 05-portfolio-viz + canonical-command 21/21 green gate) is next in sequential dependency.
+Status: Phase 10 ready_to_execute (10-07 only remaining). Verification will re-run after 10-07 lands. Expected outcome: canonical harness exits 0 with 21 (spec, project) pairs passing on chromium + firefox + webkit, closing SC#3.
 Last activity: 2026-04-27
 
-Progress: [##########] Original 6 Phase 10 plans executed; gap-closure plans 10-06 + 10-07 planned and verified, ready for execution (8 of 8 plans now defined)
+Progress: [##########] 7 of 8 Phase 10 plans executed; 10-07 (Gap Group B + harness gate) pending
 
 ## Performance Metrics
 
@@ -147,6 +147,10 @@ Recent decisions affecting current work:
 - [Phase 08]: 08-08: TradeBar manual trades flash with direction `'up'` always (UI-SPEC §4.2). The trade-flash semantically expresses "something just executed," not P&L direction — so the constant `'up'` is correct even on losing sells. `onSuccess(res)` reads server-validated `res.ticker` and dispatches `usePriceStore.getState().flashTrade(res.ticker, 'up')` — same call-shape as `ChatThread.onSuccess` from Plan 07, giving manual + agentic trades visual parity.
 - [Phase 08]: 08-08: Phase 8 build gate closed — `npm run build` produces `frontend/out/index.html` (12,458 bytes); `backend/tests/test_static_mount.py::test_index_html_served_at_root` runs PASSED (no SKIPS) for the first time, asserting `GET /` returns 200 + text/html through the lifespan-mounted FastAPI StaticFiles. APP-02 fully closed across Plans 08-01 (mount registration) + 08-08 (build artifact + end-to-end serve).
 - [Phase 08]: 08-08: Pre-existing 5-error TSC baseline (Plan 06 / 07 origin in `MainChart.test.tsx` + `Sparkline.test.tsx`) carried into Phase 9 as a deferred item. The plan's acceptance criterion `tsc --noEmit exits 0` was technically inconsistent with the documented baseline; the actual production-build TypeScript step (which runs against the `next build` tsconfig that excludes `*.test.tsx`) passes cleanly, so the demo-readiness gate is met. Recommend a Phase 9-side cleanup task to either fix the 5 tuple-index errors or align the test-file tsconfig.
+- [Phase 10]: 10-06: Chose option (a) `workers: 1` over (b) per-project worker cap (Playwright doesn't support it), (c) per-spec compose run, (d) sharded specs. Single-worker serialisation is the simplest fix for cross-spec contention on shared SQLite state (cash_balance, default seed-watchlist positions); runtime cost is irrelevant for a single-user demo project. Reproducible green is the priority. Closes 6 of 8 Gap Group A failures (01-fresh-start firefox/webkit, 03-buy firefox/webkit, 04-sell firefox/webkit) by eliminating the cross-spec parallelism contention root cause.
+- [Phase 10]: 10-06: Dropped 03-buy pre-trade `$10,000.00` assertion entirely instead of moving it under a worker-isolated branch. Even under workers: 1 the absolute pre-trade sanity is fragile noise — the post-trade `cashAmount < 10_000` relative check is sufficient and would catch any regression where the trade fails to debit cash. Keeping a hardcoded $10k pre-trade assertion would couple the test to schedule details that can shift without breaking semantics.
+- [Phase 10]: 10-06: 04-sell switched to `expect.poll` relative-delta `postBuyQty - 1` to decouple the assertion from text-formatting variants (1 vs 1.0 vs 1.00). expect.poll evaluates a numeric callback (`parseFloat(...)`) on every iteration until it matches `postBuyQty - 1` or times out. Robust against any prior state on JPM (the buy adds exactly 2, the sell removes exactly 1, so post-sell == post-buy - 1) AND format-agnostic (1, 1.0, 1.00 all parse to the same Number).
+- [Phase 10]: 10-06: Pattern established — relative-delta assertions over absolute-value assertions when shared mutable state could leak across specs (cash_balance, position quantity); scope `getByRole` locators with parent `getByTestId` whenever the same accessible name appears in multiple regions of the same page (watchlist row vs positions row). Apply uniformly to any future Phase 10.x specs that touch shared SQLite state.
 
 ### Pending Todos
 
@@ -171,8 +175,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-26
-Stopped at: Phase 8 COMPLETE. Plan 08-08 closed: PositionRow now subscribes to `selectTradeFlash` and renders the 800ms `bg-up/20` / `bg-down/20` class alongside the existing 500ms `bg-up/10` / `bg-down/10` price-flash (FE-11 D-12); TradeBar `onSuccess(res)` calls `usePriceStore.getState().flashTrade(res.ticker, 'up')` for manual+agentic visual parity (UI-SPEC §4.2). Three commits sequentially on `finally-gsd`: `cfe7cf1` test:RED, `dc97581` feat:GREEN PositionRow, `c01c760` feat:TradeBar. Build gate cleared: full Vitest 111/111 (19 files; +1 file, +2 tests over 08-07's 109), full pytest 299/299, `frontend/out/index.html` produced (12,458 bytes), all 4 `tests/test_static_mount.py` PASSED — `test_index_html_served_at_root` ran for the first time (no skip). All 5 ROADMAP Phase 8 success criteria PASS.
+Last session: 2026-04-27
+Stopped at: Phase 10 Plan 06 (Gap Group A closure) executed sequentially on `finally-gsd`. Four atomic per-task commits land Gap Group A's full closure: `491e6ff` (workers=1 in test/playwright.config.ts realising CONTEXT D-07 intent), `761d3a6` (watchlist-panel-scoped Select-button locators in test/01-fresh-start.spec.ts), `3bb6105` (drop hardcoded $10,000.00 pre-trade assertion in test/03-buy.spec.ts), `ee45f65` (relative-delta `postBuyQty - 1` qty assertion via expect.poll in test/04-sell.spec.ts). Cross-cutting verification green: `git diff --name-only HEAD~4 HEAD` returns exactly the 4 expected paths; `cd test && npx playwright test --list 2>&1 | tail -1` reports `Total: 21 tests in 7 files` — no spec broken at parse time. 10-06-SUMMARY.md created and self-checked.
 
-Resume file: `.planning/phases/09-dockerization-packaging/` (TBD — Phase 9 not yet planned)
-Next action: Begin Phase 9 (Dockerization & Packaging) planning. Phase 9 needs: multi-stage Dockerfile (Node 20 → Python 3.12), canonical `docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally`, mac/windows start/stop scripts, committed `.env.example` with safe placeholder values. Carry forward to Phase 9: (a) the pre-existing 5-error TSC baseline in `MainChart.test.tsx` and `Sparkline.test.tsx` is documented in Phase 8 decisions but unfixed — either fix the tuple-index errors or align the test-file tsconfig as a Phase 9 cleanup task; (b) note that `frontend/out/` is gitignored — the Dockerfile must `RUN npm run build` in the Node stage, not rely on a checked-in artifact.
+Resume file: `.planning/phases/10-e2e-validation/10-07-PLAN.md`
+Next action: `/gsd-execute-phase 10` for Plan 10-07 (Gap Group B closure). 10-07 lands `page.keyboard.press('Escape')` tooltip dismissal in test/05-portfolio-viz.spec.ts before the tab-pnl click, AND owns the canonical-command 21/21 green gate (`docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright`). Expected outcome after 10-07 lands: harness exits 0 with all 21 (spec, project) pairs passing on chromium + firefox + webkit, closing ROADMAP Phase 10 SC#3 and the milestone. After 10-07: re-verify Phase 10, then `/gsd-transition` to milestone close.

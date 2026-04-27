@@ -185,14 +185,16 @@ Plans:
   1. `test/docker-compose.test.yml` spins up the app container (`LLM_MOCK=true`) plus a Playwright container, keeping browser dependencies out of the production image.
   2. The Playwright suite covers a fresh start (default watchlist visible, $10k balance, streaming prices), watchlist add + remove, buy shares (cash decreases, position appears), sell shares (cash increases, position updates or disappears), heatmap + P&L chart rendering, mocked chat with a visible trade execution, and SSE disconnect + automatic reconnect.
   3. Running the full E2E pack is a single command and finishes green locally against the freshly built image, with reproducible results on repeat runs.
-**Plans**: 6 plans
+**Plans**: 8 plans
 Plans:
-- [ ] 10-00-PLAN.md — Frontend test-id additions (Header/TabBar/Watchlist/PositionsTable/TradeBar) for stable selectors (Wave 0)
-- [ ] 10-01-PLAN.md — Foundation: test/package.json + playwright.config.ts + docker-compose.test.yml + README.md + .gitignore additions (Wave 1)
-- [ ] 10-02-PLAN.md — Specs 01-fresh-start + 02-watchlist-crud (seed assertions + REST add/remove PYPL) (Wave 2)
-- [ ] 10-03-PLAN.md — Specs 03-buy + 04-sell (TradeBar UI: NVDA buy + JPM buy-then-sell) (Wave 2)
-- [ ] 10-04-PLAN.md — Specs 05-portfolio-viz + 06-chat (heatmap/PnL render via META + mock chat buy AMZN 1) (Wave 2)
-- [ ] 10-05-PLAN.md — Spec 07-sse-reconnect (context.route abort+unroute) + full one-command harness gate (Wave 2)
+- [x] 10-00-PLAN.md — Frontend test-id additions (Header/TabBar/Watchlist/PositionsTable/TradeBar) for stable selectors (Wave 0) (completed 2026-04-27)
+- [x] 10-01-PLAN.md — Foundation: test/package.json + playwright.config.ts + docker-compose.test.yml + README.md + .gitignore additions (Wave 1) (completed 2026-04-27)
+- [x] 10-02-PLAN.md — Specs 01-fresh-start + 02-watchlist-crud (seed assertions + REST add/remove PYPL) (Wave 2) (completed 2026-04-27)
+- [x] 10-03-PLAN.md — Specs 03-buy + 04-sell (TradeBar UI: NVDA buy + JPM buy-then-sell) (Wave 2) (completed 2026-04-27)
+- [x] 10-04-PLAN.md — Specs 05-portfolio-viz + 06-chat (heatmap/PnL render via META + mock chat buy AMZN 1) (Wave 2) (completed 2026-04-27)
+- [x] 10-05-PLAN.md — Spec 07-sse-reconnect (context.route abort+unroute) + full one-command harness gate (Wave 2) (completed 2026-04-27)
+- [x] 10-06-PLAN.md — Gap Group A closure: workers=1 + watchlist-panel-scoped Select selectors + drop hardcoded $10k assertion + relative-delta qty assertion (Wave 3) (completed 2026-04-27)
+- [ ] 10-07-PLAN.md — Gap Group B closure: page.keyboard.press('Escape') tooltip dismissal in 05-portfolio-viz + canonical-command 21/21 green gate (Wave 3)
 
 ## Progress
 
@@ -210,4 +212,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Market Data & Trading UI | 8/8 | Complete    | 2026-04-25 |
 | 8. Portfolio Visualization & Chat UI | 8/8 | Complete | 2026-04-26 |
 | 9. Dockerization & Packaging | 0/4 | Not started | - |
-| 10. E2E Validation | 0/6 | Not started | - |
+| 10. E2E Validation | 7/8 | In Progress | - |
