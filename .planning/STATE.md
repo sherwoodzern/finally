@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: "Phase 10 PLANNED — 6 plans across 3 waves (Wave 0: 10-00 frontend test-id additions; Wave 1: 10-01 compose+playwright config foundation; Wave 2: 10-02..10-05 the seven §12 specs). Plan-checker verdict: 0 blockers, 4 warnings (W1 VALIDATION.md scaffold filled in; W4 multi-line grep tightened in 10-04; W2/W3 accepted as cosmetic + integration-tier latency). Pinned @playwright/test 1.59.1 + mcr.microsoft.com/playwright:v1.59.1-jammy. Auto-chain flag cleared (manual invocation). Ready to execute via /gsd-execute-phase 10."
-last_updated: "2026-04-27T17:00:00.000Z"
+status: gaps_found
+stopped_at: "Phase 10 EXECUTED with gaps_found (12/21 (spec, project) pairs green). All 6 plans completed atomically; foundation HSTS rename landed centrally (commit 22ac1a4); verifier produced 10-VERIFICATION.md scoring 2/3 must-haves. Two gap groups: (A) cross-spec parallelism contention — playwright.config.ts workers:3 contradicts CONTEXT.md D-07 'workers:1 per project' + hardcoded $10k cash assertions in 03-buy/04-sell + unscoped getByRole('Select <ticker>') in 01-fresh-start; (B) 05-portfolio-viz Recharts tooltip intercepts tab-pnl click on all 3 browsers. Specs that pass cleanly: 02-watchlist-crud (3/3), 06-chat (3/3), 07-sse-reconnect (3/3). Next: /gsd-plan-phase 10 --gaps to create 10.1 gap-closure plans."
+last_updated: "2026-04-27T18:30:00.000Z"
 last_activity: 2026-04-27
 progress:
   total_phases: 10
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-19)
 
 **Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf.
-**Current focus:** Phase 10 — E2E Validation (planning complete; ready to execute)
+**Current focus:** Phase 10 — E2E Validation (executed; gaps_found — gap closure pending)
 
 ## Current Position
 
 Phase: 10
-Plan: All 6 Phase 10 plans created (10-00 frontend test-ids additive, 10-01 foundation, 10-02 fresh-start+watchlist-crud, 10-03 buy+sell, 10-04 portfolio-viz+chat, 10-05 sse-reconnect+full-suite gate). Ready to execute.
-Status: Phase 10 PLANNED + checker-verified (0 blockers, 4 warnings dispositioned). Wave structure: Wave 0 (10-00, parallel-safe with Wave 1), Wave 1 (10-01 foundation), Wave 2 (10-02..05 specs depending on 10-01). 18 tasks across 6 plans. VALIDATION.md filled in (nyquist_compliant: true). Auto-chain flag cleared.
+Plan: All 6 Phase 10 plans executed and committed. Foundation HSTS rename (22ac1a4) landed centrally. Verifier produced 10-VERIFICATION.md scoring 2/3 must-haves (status: gaps_found). Two gap groups for /gsd-plan-phase 10 --gaps: (A) parallelism config + spec-design defects (8/9 failures); (B) 05-portfolio-viz Recharts tooltip intercept (1/9 × 3 browsers).
+Status: Phase 10 verification gaps_found. Canonical harness exits 1 with 12/21 (spec, project) pairs green. SC#1 (compose stack) PASSED, SC#2 (suite covers 7 scenarios) PASSED, SC#3 (single command finishes green reproducibly) FAILED. Specs that pass cleanly across all 3 browsers: 02-watchlist-crud, 06-chat, 07-sse-reconnect. Specs needing gap closure: 01-fresh-start (firefox+webkit), 03-buy (firefox+webkit), 04-sell (firefox+webkit), 05-portfolio-viz (all 3 browsers).
 Last activity: 2026-04-27
 
-Progress: [          ] 0% of Phase 10 (6 plans ready, 0 executed)
+Progress: [##########] 100% of Phase 10 plans executed; verification: 2/3 must-haves PASS, gap closure pending
 
 ## Performance Metrics
 
