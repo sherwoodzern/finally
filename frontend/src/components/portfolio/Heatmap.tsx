@@ -135,7 +135,19 @@ export function Heatmap() {
               also better production UX: a hover tooltip should never block a
               click on something else.
             */}
-            <Tooltip wrapperStyle={{ pointerEvents: 'none' }} />
+            <Tooltip
+              wrapperStyle={{ pointerEvents: 'none' }}
+              formatter={(value) => {
+                const n = typeof value === 'number' ? value : Number(value);
+                if (!Number.isFinite(n)) return String(value ?? '');
+                return new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(n);
+              }}
+            />
           </Treemap>
         </ResponsiveContainer>
       </div>
