@@ -28,9 +28,19 @@ services:
       MASSIVE_API_KEY: ""       # empty -> SimulatorDataSource
       DB_PATH: /app/db/finally.db
       PYTHONUNBUFFERED: "1"
-    # D-06: NO `volumes:` mapping for /app/db -> compose creates a fresh
-    # anonymous volume per `up` invocation. Each run starts with a clean
-    # SQLite (Phase 2 lazy init re-seeds the 10-ticker watchlist + $10k cash).
+    tmpfs:
+      - /app/db
+    # D-06: tmpfs at /app/db gives each `docker compose up` a fresh, empty
+    # in-memory directory mounted over the Dockerfile's `VOLUME /app/db`
+    # declaration. SQLite vanishes per container stop (FastAPI lifespan
+    # re-seeds the 10-ticker watchlist + $10k cash on the next start).
+    # The earlier `no volumes: mapping` approach was wrong: `compose up
+    # --abort-on-container-exit` does NOT remove anonymous volumes (only
+    # `compose down -v` does), so prior runs' SQLite carry-over leaked
+    # across `up` invocations and broke ROADMAP SC#3's `reproducibly`
+    # clause (10-VERIFICATION.md Mode A.2). Production `Dockerfile:57
+    # VOLUME /app/db` is preserved unchanged for production persistence
+    # (Phase 9 OPS-02); only this test-side compose overrides it.
     # D-10: compose-side HEALTHCHECK only - the production Dockerfile
     # deliberately omits HEALTHCHECK (Phase 9 / D-08 of Phase 9 CONTEXT).
     healthcheck:
