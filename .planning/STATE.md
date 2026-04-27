@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Phase 10 Plan 06 (Gap Group A closure) executed sequentially on `finally-gsd`. Four atomic per-task commits land Gap Group A's full closure: `491e6ff` (workers=1 in test/playwright.config.ts realising CONTEXT D-07 intent), `761d3a6` (watchlist-panel-scoped Select-button locators in test/01-fresh-start.spec.ts), `3bb6105` (drop hardcoded $10,000.00 pre-trade assertion in test/03-buy.spec.ts), `ee45f65` (relative-delta `postBuyQty - 1` qty assertion via expect.poll in test/04-sell.spec.ts). Cross-cutting verification green: `git diff --name-only HEAD~4 HEAD` returns exactly the 4 expected paths; `cd test && npx playwright test --list 2>&1 | tail -1` reports `Total: 21 tests in 7 files` — no spec broken at parse time. 10-06-SUMMARY.md created and self-checked."
-last_updated: "2026-04-27T22:19:20.168Z"
-last_activity: 2026-04-27 -- Phase 10 execution started
+stopped_at: "Phase 10 Plan 09 (Mode A re-diagnosis closure + Mode A.2 closure + WR-01 advisory bundle + 21/21 reproducibility gate) executed sequentially on `finally-gsd`. Three atomic per-task commits land the gap closure: `e18de22` (test(10-09): explicit viewport 1440x900 per Playwright project — closes Mode A by aligning the test environment with planning/PLAN.md §10's desktop-first wide-screens contract; the right-column PositionsTable cell no longer overlaps tab-pnl across chromium/firefox/webkit), `b7ef281` (chore(10-09): mount /app/db as tmpfs on appsvc test service — closes Mode A.2 by giving each `compose up` a fresh in-memory SQLite directory; production Dockerfile VOLUME /app/db preserved unchanged for OPS-02), `ff59954` (feat(10-09): format Heatmap tooltip weight as USD currency — closes WR-01 advisory; 10-08's wrapperStyle pointerEvents preserved unchanged; Rule 1 fix during build verification widened formatter signature to accept Recharts 3.x's ValueType | undefined). Task 4 verification gate proved the canonical command from CONTEXT D-03 — `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` — exits 0 on TWO consecutive runs with NO inter-run cleanup: both runs report `21 passed (24.6s)` / 0 failed / 0 flaky / `Container test-appsvc-1 Healthy`. Logs captured at /tmp/phase10-final-harness.log (40,647 bytes) and /tmp/phase10-final-harness-rerun.log (38,828 bytes). ROADMAP Phase 10 SC#3 (single command finishes green reproducibly) is now MET. 10-09-SUMMARY.md created and self-checked. TEST-03 and TEST-04 will be ticked in REQUIREMENTS.md by the verifier on its next pass."
+last_updated: "2026-04-27T23:30:00.000Z"
+last_activity: 2026-04-27 -- Phase 10 Plan 09 executed; canonical 21/21 reproducibility gate met
 progress:
   total_phases: 10
   completed_phases: 9
   total_plans: 47
-  completed_plans: 46
-  percent: 98
+  completed_plans: 47
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 
 ## Current Position
 
-Phase: 10 (e2e-validation) — EXECUTING
-Plan: 1 of 10
-Status: Executing Phase 10
-Last activity: 2026-04-27 -- Phase 10 execution started
+Phase: 10 (e2e-validation) — GATE GREEN, awaiting verifier pass
+Plan: 9 of 10 executed (10-09 lands the gap-closure trio + 21/21 reproducibility gate)
+Status: ROADMAP Phase 10 SC#3 met on two consecutive canonical-command runs
+Last activity: 2026-04-27 -- Phase 10 Plan 09 executed; canonical 21/21 reproducibility gate met
 
-Progress: [##########] 7 of 8 Phase 10 plans executed; 10-07 (Gap Group B + harness gate) pending
+Progress: [##########] 9 of 10 Phase 10 plans executed (10-08 marked superseded by 10-09 / partial closure of Modes B+C). Phase 10 SC#3 met. Verifier pass next: tick TEST-03 / TEST-04 in REQUIREMENTS.md and move Phase 10 verification status to `verified`.
 
 ## Performance Metrics
 
@@ -151,6 +151,10 @@ Recent decisions affecting current work:
 - [Phase 10]: 10-06: Dropped 03-buy pre-trade `$10,000.00` assertion entirely instead of moving it under a worker-isolated branch. Even under workers: 1 the absolute pre-trade sanity is fragile noise — the post-trade `cashAmount < 10_000` relative check is sufficient and would catch any regression where the trade fails to debit cash. Keeping a hardcoded $10k pre-trade assertion would couple the test to schedule details that can shift without breaking semantics.
 - [Phase 10]: 10-06: 04-sell switched to `expect.poll` relative-delta `postBuyQty - 1` to decouple the assertion from text-formatting variants (1 vs 1.0 vs 1.00). expect.poll evaluates a numeric callback (`parseFloat(...)`) on every iteration until it matches `postBuyQty - 1` or times out. Robust against any prior state on JPM (the buy adds exactly 2, the sell removes exactly 1, so post-sell == post-buy - 1) AND format-agnostic (1, 1.0, 1.00 all parse to the same Number).
 - [Phase 10]: 10-06: Pattern established — relative-delta assertions over absolute-value assertions when shared mutable state could leak across specs (cash_balance, position quantity); scope `getByRole` locators with parent `getByTestId` whenever the same accessible name appears in multiple regions of the same page (watchlist row vs positions row). Apply uniformly to any future Phase 10.x specs that touch shared SQLite state.
+- [Phase 10]: 10-09: Mode A re-diagnosed as a viewport-driven layout overlap, not a Recharts tooltip. The interceptor at viewport 1280x720 was the right-column PositionsTable cell `<td class="px-4 font-semibold">{ticker}</td>` from `frontend/src/components/terminal/PositionRow.tsx:57`, not the Treemap tooltip wrapper. Fix: explicit per-project `viewport: { width: 1440, height: 900 }` in `test/playwright.config.ts` aligning the test env with `planning/PLAN.md` §10's `desktop-first ... wide screens` contract. The 10-08 `<Tooltip wrapperStyle={{ pointerEvents: 'none' }} />` fix is preserved unchanged (latent UX hardening — a hover tooltip should never block clicks on neighboring elements; not the closer for Mode A but correct on its own merits).
+- [Phase 10]: 10-09: Mode A.2 (cross-run SQLite carry-over) closed at the container-storage layer via compose-side `tmpfs: - /app/db` on the appsvc service. `docker compose up --abort-on-container-exit` does NOT remove anonymous volumes (only `compose down -v` does), so the original line-31 comment was wrong. Tmpfs is the only fix path consistent with both locked CONTEXT decisions D-03 (no flags / wrapper on canonical command) and D-06 (no test-only application-layer reset endpoint). Production `Dockerfile:57 VOLUME /app/db` preserved unchanged for production persistence (Phase 9 OPS-02); only the test compose overrides it.
+- [Phase 10]: 10-09: Pattern established — when the production design contract documents a target viewport, the Playwright `projects` array must explicitly set that viewport per project (after the `...devices[...]` spread so the override wins). Compose-side `tmpfs:` is the right primitive for per-`up` ephemerality without changing the canonical command (no host filesystem touch, no wrapper scripts, no test-only application endpoints). Recharts 3.x `<Tooltip formatter={...}>` callback signature must accept `ValueType | undefined` (not `number`) to satisfy `tsc --noEmit`; coerce + `Number.isFinite` guard before formatting to avoid `$NaN`.
+- [Phase 10]: 10-09: Canonical-command gate proved both `single command finishes green` and `reproducibly` clauses of ROADMAP SC#3 with TWO consecutive runs (no inter-run cleanup), each `21 passed (24.6s)` / 0 failed / 0 flaky / appsvc Healthy. The identical 24.6s wall-time on both runs is reassuring: warm Docker layer cache + tmpfs-backed SQLite + simulator-mode market data combine into a deterministic runtime profile. Logs at /tmp/phase10-final-harness.log + /tmp/phase10-final-harness-rerun.log are the verifier's audit trail.
 
 ### Pending Todos
 
@@ -176,7 +180,7 @@ Items acknowledged and carried forward from previous milestone close:
 ## Session Continuity
 
 Last session: 2026-04-27
-Stopped at: Phase 10 Plan 06 (Gap Group A closure) executed sequentially on `finally-gsd`. Four atomic per-task commits land Gap Group A's full closure: `491e6ff` (workers=1 in test/playwright.config.ts realising CONTEXT D-07 intent), `761d3a6` (watchlist-panel-scoped Select-button locators in test/01-fresh-start.spec.ts), `3bb6105` (drop hardcoded $10,000.00 pre-trade assertion in test/03-buy.spec.ts), `ee45f65` (relative-delta `postBuyQty - 1` qty assertion via expect.poll in test/04-sell.spec.ts). Cross-cutting verification green: `git diff --name-only HEAD~4 HEAD` returns exactly the 4 expected paths; `cd test && npx playwright test --list 2>&1 | tail -1` reports `Total: 21 tests in 7 files` — no spec broken at parse time. 10-06-SUMMARY.md created and self-checked.
+Stopped at: Phase 10 Plan 09 (Mode A re-diagnosis closure + Mode A.2 closure + WR-01 advisory bundle + canonical 21/21 reproducibility gate) executed sequentially on `finally-gsd`. Three atomic per-task commits: `e18de22` (test(10-09): explicit viewport 1440x900 per Playwright project), `b7ef281` (chore(10-09): mount /app/db as tmpfs on appsvc test service), `ff59954` (feat(10-09): format Heatmap tooltip weight as USD currency). Task 4 verification gate: TWO consecutive canonical-command runs from CONTEXT D-03, no inter-run cleanup, both exit 0 with `21 passed (24.6s)` / 0 failed / 0 flaky / `Container test-appsvc-1 Healthy`. Logs preserved at /tmp/phase10-final-harness.log + /tmp/phase10-final-harness-rerun.log. ROADMAP Phase 10 SC#3 met. 10-09-SUMMARY.md created (frontmatter + 4 key decisions + 3 patterns + harness-gate evidence with both `21 passed` and `Healthy` lines copied verbatim from both logs + Self-Check: PASSED). Cross-cutting verification green: `git diff --stat HEAD~3 HEAD` returns exactly 3 file paths (test/playwright.config.ts, test/docker-compose.test.yml, frontend/src/components/portfolio/Heatmap.tsx); `grep -c 'VOLUME /app/db' Dockerfile` outputs 1 (production unchanged); all 7 depends_on sanity-checks for 10-06/10-07/10-08 carry-forward green.
 
-Resume file: `.planning/phases/10-e2e-validation/10-07-PLAN.md`
-Next action: `/gsd-execute-phase 10` for Plan 10-07 (Gap Group B closure). 10-07 lands `page.keyboard.press('Escape')` tooltip dismissal in test/05-portfolio-viz.spec.ts before the tab-pnl click, AND owns the canonical-command 21/21 green gate (`docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright`). Expected outcome after 10-07 lands: harness exits 0 with all 21 (spec, project) pairs passing on chromium + firefox + webkit, closing ROADMAP Phase 10 SC#3 and the milestone. After 10-07: re-verify Phase 10, then `/gsd-transition` to milestone close.
+Resume file: `.planning/phases/10-e2e-validation/10-VERIFICATION.md` (verifier owns the next pass)
+Next action: `/gsd-verify-phase 10` (or equivalent) to flip Phase 10 verification status from `gaps_found` to `verified` and tick TEST-03 / TEST-04 in REQUIREMENTS.md. After verifier pass: `/gsd-transition` to milestone close.

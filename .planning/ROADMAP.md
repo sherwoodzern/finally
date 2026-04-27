@@ -196,7 +196,7 @@ Plans:
 - [x] 10-06-PLAN.md — Gap Group A closure: workers=1 + watchlist-panel-scoped Select selectors + drop hardcoded $10k assertion + relative-delta qty assertion (Wave 3) (completed 2026-04-27)
 - [~] 10-07-PLAN.md — Gap Group B closure: page.keyboard.press('Escape') tooltip dismissal in 05-portfolio-viz + canonical-command 21/21 green gate (Wave 3) (Task 1 landed commit 9924ccc; Task 2 harness gate failed and was abandoned per failure protocol — superseded by 10-08)
 - [~] 10-08-PLAN.md — Gap closure (second iteration): production fix for Recharts heatmap tooltip pointer-events (Heatmap.tsx wrapperStyle) + drop $10,000.00 cash assertion in 01-fresh-start + expect.poll-stabilised postBuyQty snapshot in 04-sell + canonical-command 21/21 green gate (Wave 4) (Tasks 1-3 landed commits a149480/0a58eb9/c53810f — Modes B+C closed, 01-fresh-start 3/3 + 04-sell 3/3 + 0 flaky; Task 4 harness gate failed 18/21 because Mode A was misdiagnosed by 10-VERIFICATION.md — actual interceptor is Terminal.tsx right-column wrapper at viewport 1280×720 plus cross-run SQLite carry-over via persistent docker volume; corrective 10-09 plan needed)
-- [ ] 10-09-PLAN.md — Gap closure (third iteration): per-project Playwright viewport bump 1280x720 -> 1440x900 (closes Mode A re-diagnosed as layout overlap) + tmpfs /app/db on appsvc service in docker-compose.test.yml (closes Mode A.2 cross-run SQLite carry-over) + WR-01 advisory bundle (Heatmap Tooltip formatter for USD-formatted weight) + canonical-command 21/21 green gate on two consecutive runs to prove the reproducibly clause (Wave 5)
+- [x] 10-09-PLAN.md — Gap closure (third iteration): per-project Playwright viewport bump 1280x720 -> 1440x900 (closes Mode A re-diagnosed as layout overlap) + tmpfs /app/db on appsvc service in docker-compose.test.yml (closes Mode A.2 cross-run SQLite carry-over) + WR-01 advisory bundle (Heatmap Tooltip formatter for USD-formatted weight) + canonical-command 21/21 green gate on two consecutive runs to prove the reproducibly clause (Wave 5) (completed 2026-04-27 — both canonical-command runs exit 0 with 21 passed / 0 failed / 0 flaky / appsvc Healthy; ROADMAP Phase 10 SC#3 met)
 
 ## Progress
 
@@ -214,4 +214,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Market Data & Trading UI | 8/8 | Complete    | 2026-04-25 |
 | 8. Portfolio Visualization & Chat UI | 8/8 | Complete | 2026-04-26 |
 | 9. Dockerization & Packaging | 0/4 | Not started | - |
-| 10. E2E Validation | 7/10 | In Progress | - |
+| 10. E2E Validation | 8/10 | In Progress | - |
