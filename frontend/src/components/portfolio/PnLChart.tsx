@@ -90,7 +90,7 @@ export function PnLChart() {
   }
 
   return panelChrome(
-    <div className="flex-1 w-full" data-testid="pnl-chart">
+    <div className="h-[360px] w-full" data-testid="pnl-chart">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={snapshots}>
           <CartesianGrid stroke="#30363d" strokeDasharray="2 2" />

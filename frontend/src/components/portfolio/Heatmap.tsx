@@ -114,7 +114,7 @@ export function Heatmap() {
   return (
     <section className="flex-1 bg-surface border border-border-muted rounded p-4 flex flex-col min-h-[400px]">
       <h2 className="text-xl font-semibold mb-3">Heatmap</h2>
-      <div className="flex-1 w-full" data-testid="heatmap-treemap">
+      <div className="h-[360px] w-full" data-testid="heatmap-treemap">
         <ResponsiveContainer width="100%" height="100%">
           <Treemap
             data={treeData}
