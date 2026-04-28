@@ -104,8 +104,12 @@ No MILESTONE-AUDIT.md was generated for this milestone. `/gsd-audit-milestone` i
 - **Phase 5 (AI chat) has no VERIFICATION.md.** The chat works (proven by `06-chat.spec.ts` green across all 3 browsers + 16 Vitest tests in Phase 8) but no formal verifier pass exists. Run `/gsd-verify-work 5` to backfill.
 - **Phase 7 (market-data trading UI) and Phase 9 (dockerization) have `status: human_needed`** in their VERIFICATION.md — automated checks pass but human acceptance was never recorded. Run `/gsd-verify-work 7` and `/gsd-verify-work 9`.
 
+**Closure (2026-04-28):** Recorded as planning deltas under Phase 11 - see `.planning/phases/11-milestone-v1.0-closure/`. Phase 11 plan 11-01 backfills `05-VERIFICATION.md` (G1). Phase 11 plan 11-03 records explicit indefinite human acceptance with rationale on Phase 7 and Phase 9 VERIFICATION.md frontmatter (G3 + G4) - `status: human_needed` is preserved as the honest enum value; the new `human_acceptance:` sibling key carries the decision.
+
 ### 6.2 — REQUIREMENTS.md drift
 15 of 40 requirements remain unticked despite the implementation existing and passing tests. Recommend a sweep pass to reconcile REQUIREMENTS.md with reality (see Section 4 table).
+
+**Closure (2026-04-28):** Phase 11 plan 11-02 sweeps the 15 drift IDs (DB-01..03, PORT-05, WATCH-01..03, CHAT-01..06, FE-03/04/07/08/10, TEST-01) to `Complete (NN-MM, ...)` with plan-ID evidence. Coverage count remains 40/40 (math unchanged - the satisfied set was already complete; this is a status-line refresh, not new coverage). G2 closed.
 
 ### 6.3 — Post-milestone fixes not retrofitted into a phase
 Two source-impacting commits landed AFTER the verifier marked Phase 10 `passed`. Both are green under the canonical harness, but neither belongs to a phase:
@@ -115,7 +119,7 @@ Two source-impacting commits landed AFTER the verifier marked Phase 10 `passed`.
 | `73abc58` | Heatmap + P&L charts render at deterministic 360px height | The Playwright spec asserted `toBeVisible()` on the wrapper div, which passed even when Recharts emitted a 0×0 inner div under React 19 + ResponsiveContainer + flex-1 parent. The user noticed the empty charts in the live demo. **Verification gap also closed in `05-portfolio-viz.spec.ts` (now asserts `svg rect` and `svg path` count > 0).** |
 | `e79ad18` | Light theme (white surfaces / dark text) | User-requested polish after verification; not a regression. CSS variable flip in `globals.css` + matching hex updates in chart components. |
 
-If a v1.1 / Phase 10.1 is desired, both commits can be retroactively assigned. Otherwise, surface them as pre-archive notes.
+**Closure (2026-04-28):** Recorded as planning delta under Phase 11 - see `.planning/phases/11-milestone-v1.0-closure/`. Both commits remain green under the canonical harness (21 passed x 2 consecutive runs, 0 failed, 0 flaky, Container test-appsvc-1 Healthy) so no Phase 10.1 SUMMARY is created (would break ROADMAP plan count and STATE.md `completed_plans` invariants). The Section 6.3 table above is the authoritative paper trail. G5 closed.
 
 ### 6.4 — Verification gaps to watch
 - **`toBeVisible()` is insufficient for SVG-rendered components.** Always pair it with a content-presence assertion (e.g. `svg rect`, `svg path` count > 0).
