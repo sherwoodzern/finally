@@ -131,39 +131,39 @@ Which phases cover which requirements. Populated during roadmap creation.
 | APP-02 | Phase 8 | Complete (08-01 mount + G1 fix; 08-08 final build artifact) |
 | APP-03 | Phase 1 | Complete (01-01, 01-02) |
 | APP-04 | Phase 1 | Complete (01-03) |
-| DB-01 | Phase 2 | Pending |
-| DB-02 | Phase 2 | Pending |
-| DB-03 | Phase 2 | Pending |
+| DB-01 | Phase 2 | Complete (02-01, 02-02) |
+| DB-02 | Phase 2 | Complete (02-01, 02-02) |
+| DB-03 | Phase 2 | Complete (02-02; volume persistence proven by 09-VERIFICATION SC#6) |
 | PORT-01 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP route) |
 | PORT-02 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP route) |
 | PORT-03 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP mapping) |
 | PORT-04 | Phase 3 | Complete (03-02 service layer; 03-03 adds HTTP route) |
-| PORT-05 | Phase 3 | Pending (03-03 — observer wiring) |
-| WATCH-01 | Phase 4 | In progress (04-01 service layer; 04-02 adds HTTP route) |
-| WATCH-02 | Phase 4 | In progress (04-01 service layer; 04-02 adds HTTP route) |
-| WATCH-03 | Phase 4 | In progress (04-01 service layer; 04-02 adds HTTP route) |
-| CHAT-01 | Phase 5 | Pending |
-| CHAT-02 | Phase 5 | Pending |
-| CHAT-03 | Phase 5 | Pending |
-| CHAT-04 | Phase 5 | Pending |
-| CHAT-05 | Phase 5 | Pending |
-| CHAT-06 | Phase 5 | Pending |
+| PORT-05 | Phase 3 | Complete (03-02 inline post-trade snapshot; 03-03 60s observer in lifespan) |
+| WATCH-01 | Phase 4 | Complete (04-01, 04-02) |
+| WATCH-02 | Phase 4 | Complete (04-01, 04-02) |
+| WATCH-03 | Phase 4 | Complete (04-01, 04-02) |
+| CHAT-01 | Phase 5 | Complete (05-03) |
+| CHAT-02 | Phase 5 | Complete (05-01) |
+| CHAT-03 | Phase 5 | Complete (05-01) |
+| CHAT-04 | Phase 5 | Complete (05-02) |
+| CHAT-05 | Phase 5 | Complete (05-02, 05-03) |
+| CHAT-06 | Phase 5 | Complete (05-01) |
 | FE-01 | Phase 6 | Validated (06-01 scaffold + theme + static export) |
 | FE-02 | Phase 6 | Validated (06-02 store + provider; 06-03 tests + /debug page) |
-| FE-03 | Phase 7 | Pending |
-| FE-04 | Phase 7 | Pending |
+| FE-03 | Phase 7 | Complete (07-01, 07-03) |
+| FE-04 | Phase 7 | Complete (07-04) |
 | FE-05 | Phase 8 | Complete (08-03 Heatmap + 08-05 TabBar wiring) |
 | FE-06 | Phase 8 | Complete (08-04 PnLChart + 08-05 TabBar wiring) |
-| FE-07 | Phase 7 | Pending |
-| FE-08 | Phase 7 | Pending |
+| FE-07 | Phase 7 | Complete (07-05) |
+| FE-08 | Phase 7 | Complete (07-06) |
 | FE-09 | Phase 8 | Complete (08-06 chat shell + 08-07 ChatThread/ChatInput orchestration) |
-| FE-10 | Phase 7 | Pending |
+| FE-10 | Phase 7 | Complete (07-07) |
 | FE-11 | Phase 8 | Complete (08-02/05/06/07/08 motion primitives + skeletons + flash parity; HUMAN-UAT pending) |
 | OPS-01 | Phase 9 | Complete (09-01 Dockerfile + .dockerignore; cold build 162s, image 124 MB) |
 | OPS-02 | Phase 9 | Complete (09-03 integration test PASS; HUMAN-UAT pending for browser auto-open + visual UI) |
 | OPS-03 | Phase 9 | Complete (09-03 four cross-platform scripts; HUMAN-UAT pending for Windows pwsh runtime) |
 | OPS-04 | Phase 9 | Complete (09-02 .env.example with safe placeholders; .gitignore:141 preserves .env ignore) |
-| TEST-01 | Phase 5 | Pending |
+| TEST-01 | Phase 5 | Complete (05-03; 295/295 backend tests + 99.17% app.chat coverage per 05-VALIDATION.md) |
 | TEST-02 | Phase 8 | Complete (111/111 Vitest across 19 files) |
 | TEST-03 | Phase 10 | Complete (10-01 harness foundation; 10-09 closes SC#3 reproducibility gate) |
 | TEST-04 | Phase 10 | Complete (10-02..10-05 spec authoring; 10-06..10-09 stabilisation; 21/21 green × 2 consecutive runs) |
@@ -175,4 +175,4 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-19*
-*Last updated: 2026-04-26 after Phase 8 completion (APP-02, FE-05, FE-06, FE-09, FE-11, TEST-02 validated; 5/5 automated must-haves PASSED, 6 perceptual items deferred to 08-HUMAN-UAT.md)*
+*Last updated: 2026-04-28 after Phase 11 milestone-closure sweep (G2 — flipped 19 status-drift rows from Pending/In progress to Complete with plan-ID evidence; coverage count unchanged at 40/40)*
