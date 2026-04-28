@@ -2,6 +2,16 @@
 phase: 07-market-data-trading-ui
 verified: 2026-04-24T23:45:00Z
 status: human_needed
+human_acceptance: indefinite
+human_acceptance_recorded: 2026-04-28
+human_acceptance_rationale: |
+  All 6 human_verification items are visual-feel checks (CSS price-flash cadence,
+  Lightweight Charts sparkline canvas, click-to-select cross-panel flow, instant-fill
+  UX, EventSource reconnect state-machine dot, three-column Bloomberg-style aesthetic).
+  The runtime behavior underlying every item is exercised by the canonical Phase 10
+  harness (7 specs x 3 browsers x 2 consecutive runs = 21 passed x 2, 0 failed, 0 flaky,
+  Container test-appsvc-1 Healthy). The "feel" is the only deferred item. Recorded
+  here as accepted policy debt for v1.0 milestone closure (Phase 11 G3).
 score: 5/5 must-haves verified
 overrides_applied: 0
 re_verification:

@@ -2,6 +2,17 @@
 phase: 09-dockerization-packaging
 verified: 2026-04-27T11:25:00Z
 status: human_needed
+human_acceptance: indefinite
+human_acceptance_recorded: 2026-04-28
+human_acceptance_rationale: |
+  All 4 human_verification items are platform/visual checks (Windows pwsh runtime,
+  macOS browser auto-open, visual UI of the live terminal, cross-arch buildx). The
+  structural validation in 09-VERIFICATION.md SC#1 through SC#11 passes (Dockerfile
+  invariants, .dockerignore exclusions, .env.example shape, idempotent scripts,
+  integration-test PASS on the canonical run command). The macOS/Linux demo path is
+  fully proven; the Windows pwsh runtime, browser auto-open, and visual UI are
+  deferred to per-host human spot-check. Recorded here as accepted policy debt for
+  v1.0 milestone closure (Phase 11 G4).
 score: 11/11 must-haves verified
 overrides_applied: 0
 human_verification:
