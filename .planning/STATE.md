@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Closure & Doc Sweep
-status: executing
-stopped_at: "Phase 11 Plan 03 (G3 + G4 closure — Phase 7 + Phase 9 VERIFICATION.md indefinite human acceptance via Option B from 11-RESEARCH.md Pattern 3) completed on `finally-gsd`. One atomic commit: `b0ae5a9` (docs(11-03): record indefinite human acceptance on Phase 7 + Phase 9 VERIFICATION.md (G3+G4 closure)). Modified files: `07-VERIFICATION.md` (+10/-0: 3 sibling keys human_acceptance: indefinite + recorded date + multi-line rationale citing canonical Phase 10 harness 21 passed x 2) and `09-VERIFICATION.md` (+11/-0: same 3 keys with Phase-9-specific rationale citing Windows pwsh + browser auto-open + visual UI + cross-arch buildx as deferred). All 12 acceptance grep checks pass (6 per task): both files have new keys, status: human_needed enum unchanged on both (Pitfall 3 — closed enum {passed, gaps_found, human_needed}), human_verification: lists intact (Phase 7: 6 items; Phase 9: 4 items), file bodies untouched. Doc-only execution: zero production source touched. Plan 11-03 SUMMARY created with `requirements-completed: [OPS-02, OPS-03]`. Next: Plan 11-04 (G5 closure — planning record for post-milestone commits 73abc58 + e79ad18 as §6 of MILESTONE_SUMMARY-v1.0.md or thin Phase 10.1 SUMMARY)."
-last_updated: "2026-04-28T19:47:25Z"
-last_activity: 2026-04-28 -- Phase 11 Plan 03 complete (G3 + G4 closure: indefinite human acceptance recorded on Phase 7 + Phase 9 VERIFICATION.md)
+status: complete
+stopped_at: "Phase 11 Plan 04 (G5 closure — MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure annotations) completed on `finally-gsd`. One atomic commit: `0498bb7` (docs(11-04): annotate MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure (G5 + G1-G4 paper trail)). Modified files: `.planning/reports/MILESTONE_SUMMARY-v1.0.md` (+5/-1: §6.1 closure annotation citing 11-01 backfills 05-VERIFICATION.md (G1) + 11-03 records human_acceptance: indefinite (G3+G4); §6.2 closure annotation citing 11-02 sweeps 15 drift IDs (G2 closed, 40/40 unchanged); §6.3 closing paragraph rewritten from `If a v1.1 / Phase 10.1 is desired...` to `Recorded as planning delta under Phase 11` citing 73abc58 + e79ad18 + canonical harness 21 passed x 2 / 0 failed / 0 flaky / Container test-appsvc-1 Healthy + G5 closed). All 11 acceptance grep predicates exit 0 (ALL_VERIFICATIONS_PASSED). §6.3 commit/fix table at lines 117-120 preserved verbatim. §6.4, §6.5, §1-§5, §7+ untouched. §6.x count grep returns 5 (no renumbering, no new section). Pitfall 4 mitigation confirmed: no Phase 10.1 stub created (test ! -e 10-10-PLAN.md returns NO_ROGUE_FILE). Doc-only execution: zero production source touched. Plan 11-04 SUMMARY created with `requirements-completed: [FE-01, FE-05, FE-06, APP-02]`. Phase 11 is now Complete (4/4 plans). Milestone v1.0: all 5 audit gaps (G1-G5) closed. Next: `/gsd-audit-milestone v1.0` re-run — expected verdict shifts from `tech_debt` to `passed` (or carries forward only G3/G4 Option B policy debt with explicit dated acceptance now grep-anchored in the files)."
+last_updated: "2026-04-28T19:53:30Z"
+last_activity: 2026-04-28 -- Phase 11 Plan 04 complete (G5 closure: MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure annotations); Phase 11 Complete (4/4); milestone v1.0 closure all 5 gaps closed
 progress:
   total_phases: 11
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 51
-  completed_plans: 50
-  percent: 98
+  completed_plans: 51
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 
 ## Current Position
 
-Phase: 11 (milestone-v1.0-closure) — EXECUTING
-Plan: 4 of 4 (Plans 11-01 G1 + 11-02 G2 + 11-03 G3+G4 closure complete on 2026-04-28; resume at Plan 11-04 G5 — §6 promotion of 73abc58 + e79ad18)
-Status: Executing Phase 11
-Last activity: 2026-04-28 -- Phase 11 Plan 03 complete (G3 + G4 closure: indefinite human acceptance recorded on Phase 7 + Phase 9 VERIFICATION.md)
+Phase: 11 (milestone-v1.0-closure) — COMPLETE
+Plan: 4 of 4 (Plans 11-01 G1 + 11-02 G2 + 11-03 G3+G4 + 11-04 G5 all complete on 2026-04-28)
+Status: Milestone v1.0 closed — all 5 audit gaps (G1-G5) carry explicit dated closure annotations
+Last activity: 2026-04-28 -- Phase 11 Plan 04 complete (G5 closure: MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure annotations); Phase 11 Complete (4/4); milestone v1.0 closure all 5 gaps closed
 
-Progress: [##########] Phase 10 complete (10/10). Phase 11: 3/4 plans complete (G1 + G2 + G3+G4 closed; only G5 remaining). ROADMAP Phase 10 SC#1/SC#2/SC#3 all met.
+Progress: [###########] Phase 11 complete (4/4). All phases complete (11/11). All plans complete (51/51 = 100%). Milestone v1.0 audit re-run unblocked.
 
 ## Performance Metrics
 
@@ -179,8 +179,8 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-04-27
-Stopped at: Phase 10 Plan 09 (Mode A re-diagnosis closure + Mode A.2 closure + WR-01 advisory bundle + canonical 21/21 reproducibility gate) executed sequentially on `finally-gsd`. Three atomic per-task commits: `e18de22` (test(10-09): explicit viewport 1440x900 per Playwright project), `b7ef281` (chore(10-09): mount /app/db as tmpfs on appsvc test service), `ff59954` (feat(10-09): format Heatmap tooltip weight as USD currency). Task 4 verification gate: TWO consecutive canonical-command runs from CONTEXT D-03, no inter-run cleanup, both exit 0 with `21 passed (24.6s)` / 0 failed / 0 flaky / `Container test-appsvc-1 Healthy`. Logs preserved at /tmp/phase10-final-harness.log + /tmp/phase10-final-harness-rerun.log. ROADMAP Phase 10 SC#3 met. 10-09-SUMMARY.md created (frontmatter + 4 key decisions + 3 patterns + harness-gate evidence with both `21 passed` and `Healthy` lines copied verbatim from both logs + Self-Check: PASSED). Cross-cutting verification green: `git diff --stat HEAD~3 HEAD` returns exactly 3 file paths (test/playwright.config.ts, test/docker-compose.test.yml, frontend/src/components/portfolio/Heatmap.tsx); `grep -c 'VOLUME /app/db' Dockerfile` outputs 1 (production unchanged); all 7 depends_on sanity-checks for 10-06/10-07/10-08 carry-forward green.
+Last session: 2026-04-28
+Stopped at: Phase 11 Plan 04 (G5 closure — MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure annotations) completed on `finally-gsd`. One atomic commit: `0498bb7` (docs(11-04): annotate MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure (G5 + G1-G4 paper trail)). Modified file: `.planning/reports/MILESTONE_SUMMARY-v1.0.md` (+5/-1: §6.1 closure annotation citing plans 11-01 + 11-03 (G1+G3+G4); §6.2 closure annotation citing plan 11-02 (G2 closed, 40/40 unchanged); §6.3 closing paragraph rewritten from deferred framing to `Recorded as planning delta under Phase 11` citing both commit SHAs `73abc58` + `e79ad18` and the canonical Phase 10 harness evidence — `21 passed x 2 consecutive runs, 0 failed, 0 flaky, Container test-appsvc-1 Healthy` — `G5 closed`). All 11 acceptance grep predicates exit 0 (`ALL_VERIFICATIONS_PASSED`). §6.3 commit/fix table at lines 117-120 preserved verbatim (table rows not in any Edit `old_string`; `0×0` and em-dashes in original content untouched). §6.x count grep returns 5 pre- and post-edit (no renumbering, no new section). §6.4, §6.5, §1-§5, §7+ byte-for-byte unchanged. Pitfall 4 mitigation confirmed: `test ! -e .planning/phases/10-e2e-validation/10-10-PLAN.md` returns `NO_ROGUE_FILE` (no Phase 10.1 stub created — would have broken ROADMAP Phase 10 plan count and STATE.md `completed_plans` invariants). Doc-only execution: zero production source touched. Plan 11-04 SUMMARY created with `requirements-completed: [FE-01, FE-05, FE-06, APP-02]`. Phase 11 is now Complete (4/4 plans landed in Wave 1: 11-01 G1 + 11-02 G2 + 11-03 G3+G4 + 11-04 G5). Milestone v1.0 closure: all 5 audit gaps from `.planning/v1.0-MILESTONE-AUDIT.md` carry explicit dated closure annotations grep-anchored in their respective files.
 
-Resume file: `.planning/phases/10-e2e-validation/10-VERIFICATION.md` (verifier owns the next pass)
-Next action: `/gsd-verify-phase 10` (or equivalent) to flip Phase 10 verification status from `gaps_found` to `verified` and tick TEST-03 / TEST-04 in REQUIREMENTS.md. After verifier pass: `/gsd-transition` to milestone close.
+Resume file: `.planning/v1.0-MILESTONE-AUDIT.md` (re-run target)
+Next action: `/gsd-audit-milestone v1.0` re-run — expected verdict shifts from `tech_debt` to `passed`, or carries forward only the consciously-accepted G3/G4 Option B policy debt (which is now explicit, dated, rationalized, and grep-anchored in `07-VERIFICATION.md` + `09-VERIFICATION.md` frontmatter via the `human_acceptance: indefinite` sibling key from plan 11-03). After verdict: `/gsd-archive-milestone v1.0` to move the milestone to `.planning/archive/`.

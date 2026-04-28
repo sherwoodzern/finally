@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Portfolio Visualization & Chat UI** - Heatmap, P&L chart, collapsible AI chat panel, demo polish, static frontend mounted into FastAPI, frontend component tests (completed 2026-04-26)
 - [x] **Phase 9: Dockerization & Packaging** - Multi-stage Dockerfile, canonical `docker run` invocation, start/stop scripts, `.env.example` (completed 2026-04-27)
 - [ ] **Phase 10: E2E Validation** - Playwright harness with `docker-compose.test.yml` and all §12 scenarios against the mocked-LLM image
-- [ ] **Phase 11: Milestone v1.0 Closure & Doc Sweep** - Backfill Phase 5 VERIFICATION.md (G1), sweep REQUIREMENTS.md status drift on 15 IDs (G2), record human-acceptance decision for Phase 7 + Phase 9 `human_needed` status (G3+G4), record post-milestone source commits 73abc58 + e79ad18 as planning delta (G5)
+- [x] **Phase 11: Milestone v1.0 Closure & Doc Sweep** - Backfill Phase 5 VERIFICATION.md (G1), sweep REQUIREMENTS.md status drift on 15 IDs (G2), record human-acceptance decision for Phase 7 + Phase 9 `human_needed` status (G3+G4), record post-milestone source commits 73abc58 + e79ad18 as planning delta (G5) (completed 2026-04-28)
 
 ## Phase Details
 
@@ -215,7 +215,7 @@ Plans:
 - [x] 11-01-PLAN.md — G1 closure: backfill `05-VERIFICATION.md` via `gsd-verifier` against Phase 5 SCs (CHAT-01..06, TEST-01) (completed 2026-04-28)
 - [x] 11-02-PLAN.md — G2 closure: sweep `REQUIREMENTS.md` — flip 19 stale rows to `Complete (NN-MM, ...)` with plan-ID evidence; coverage count unchanged at 40/40 (Pitfall 5 mitigation) (completed 2026-04-28)
 - [x] 11-03-PLAN.md — G3 + G4 closure: record indefinite human acceptance on Phase 7 + Phase 9 VERIFICATION.md frontmatter via Option B (preserve `status: human_needed` enum, ADD `human_acceptance: indefinite` + recorded date + multi-line rationale citing canonical Phase 10 harness 21 passed x 2 / Windows pwsh + browser auto-open + visual UI deferred); 6+4 human_verification lists untouched (completed 2026-04-28)
-- [ ] 11-04-PLAN.md — G5 closure: planning record for post-milestone commits 73abc58 + e79ad18 (§6 of MILESTONE_SUMMARY-v1.0.md or thin Phase 10.1 SUMMARY)
+- [x] 11-04-PLAN.md — G5 closure: §6 promotion of MILESTONE_SUMMARY-v1.0.md (3 closure annotations: §6.1 cites 11-01+11-03 for G1+G3+G4, §6.2 cites 11-02 for G2, §6.3 closing paragraph rewritten to `Recorded as planning delta under Phase 11` citing 73abc58 + e79ad18 + canonical harness 21 passed x 2; G5 closed; §6.3 commit/fix table preserved verbatim; Pitfall 4 mitigation: no Phase 10.1 stub created) (completed 2026-04-28)
 
 ## Progress
 
@@ -234,4 +234,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 8. Portfolio Visualization & Chat UI | 8/8 | Complete | 2026-04-26 |
 | 9. Dockerization & Packaging | 0/4 | Not started | - |
 | 10. E2E Validation | 10/10 | Complete | 2026-04-27 |
-| 11. Milestone v1.0 Closure & Doc Sweep | 3/4 | In progress | - |
+| 11. Milestone v1.0 Closure & Doc Sweep | 4/4 | Complete | 2026-04-28 |
