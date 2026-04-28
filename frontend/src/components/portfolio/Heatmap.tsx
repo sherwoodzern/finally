@@ -119,7 +119,7 @@ export function Heatmap() {
           <Treemap
             data={treeData}
             dataKey="weight"
-            stroke="#30363d"
+            stroke="#d0d7de"
             content={<HeatmapCell />}
             isAnimationActive
             animationDuration={300}

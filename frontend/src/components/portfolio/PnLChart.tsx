@@ -93,12 +93,12 @@ export function PnLChart() {
     <div className="h-[360px] w-full" data-testid="pnl-chart">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={snapshots}>
-          <CartesianGrid stroke="#30363d" strokeDasharray="2 2" />
-          <XAxis dataKey="recorded_at" stroke="#8b949e" tickFormatter={tickTime} />
-          <YAxis stroke="#8b949e" tickFormatter={tickMoney} domain={['auto', 'auto']} />
+          <CartesianGrid stroke="#d0d7de" strokeDasharray="2 2" />
+          <XAxis dataKey="recorded_at" stroke="#57606a" tickFormatter={tickTime} />
+          <YAxis stroke="#57606a" tickFormatter={tickMoney} domain={['auto', 'auto']} />
           <ReferenceLine
             y={10000}
-            stroke="#8b949e"
+            stroke="#57606a"
             strokeDasharray="4 4"
             strokeOpacity={0.4}
           />

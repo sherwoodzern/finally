@@ -1,16 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  /* Surfaces - PLAN.md section 2: "around #0d1117 or #1a1a2e", "muted gray borders", no pure black */
-  --color-surface:      #0d1117;
-  --color-surface-alt:  #1a1a2e;
-  --color-border-muted: #30363d;
+  /* Surfaces - light palette. GitHub-style off-white scheme for readable
+     contrast on a Bloomberg-terminal-density layout. */
+  --color-surface:      #ffffff;
+  --color-surface-alt:  #f6f8fa;
+  --color-border-muted: #d0d7de;
 
   /* Text */
-  --color-foreground:        #e6edf3;
-  --color-foreground-muted:  #8b949e;
+  --color-foreground:        #0d1117;
+  --color-foreground-muted:  #57606a;
 
-  /* Accents - PLAN.md section 2 exact values */
+  /* Accents - PLAN.md section 2 exact values, unchanged across themes. */
   --color-accent-yellow: #ecad0a;
   --color-accent-blue:   #209dd7;
   --color-accent-purple: #753991;
@@ -20,7 +21,6 @@
   --color-down: #ef5350;
 }
 
-/* D-10: Permanent dark. No light palette because we never toggle. */
 html, body {
   background-color: var(--color-surface);
   color: var(--color-foreground);
@@ -39,11 +39,11 @@ html, body {
  */
 :root {
   --color-accent-purple: #753991;
-  --color-surface-alt:   #1a1a2e;
-  --color-border-muted:  #30363d;
+  --color-surface-alt:   #f6f8fa;
+  --color-border-muted:  #d0d7de;
   --color-up:            #26a69a;   /* Phase 07 D-02 */
   --color-down:          #ef5350;   /* Phase 07 D-02 */
-  --color-foreground-muted: #8b949e;
+  --color-foreground-muted: #57606a;
 }
 
 /* Phase 8 — Action card pulse (D-12 agentic auto-trade flash; 800ms ease-out, runs once per fresh card). */

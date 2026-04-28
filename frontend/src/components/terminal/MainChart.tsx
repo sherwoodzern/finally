@@ -35,12 +35,12 @@ export function MainChart() {
     const chart = createChart(containerRef.current, {
       autoSize: true,
       layout: {
-        background: { type: 'solid', color: '#0d1117' } as never,
-        textColor: '#e6edf3',
+        background: { type: 'solid', color: '#ffffff' } as never,
+        textColor: '#0d1117',
       },
       grid: {
-        vertLines: { color: '#30363d' },
-        horzLines: { color: '#30363d' },
+        vertLines: { color: '#d0d7de' },
+        horzLines: { color: '#d0d7de' },
       },
     });
     const series = chart.addSeries(LineSeries, {

@@ -42,7 +42,7 @@ export function HeatmapCell(props: HeatmapCellProps) {
   const showLabel = width >= 60 && height >= 32;
   return (
     <g cursor="pointer">
-      <rect x={x} y={y} width={width} height={height} fill={fill} stroke="#30363d" />
+      <rect x={x} y={y} width={width} height={height} fill={fill} stroke="#d0d7de" />
       {showLabel && (
         <>
           <text
