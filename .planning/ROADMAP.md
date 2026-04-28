@@ -213,7 +213,7 @@ Plans:
 **Plans**: 4 plans (planned)
 Plans:
 - [x] 11-01-PLAN.md — G1 closure: backfill `05-VERIFICATION.md` via `gsd-verifier` against Phase 5 SCs (CHAT-01..06, TEST-01) (completed 2026-04-28)
-- [ ] 11-02-PLAN.md — G2 closure: sweep `REQUIREMENTS.md` — flip 15 stale rows to `Complete (Phase N)` with plan-ID evidence; update coverage count at top
+- [x] 11-02-PLAN.md — G2 closure: sweep `REQUIREMENTS.md` — flip 19 stale rows to `Complete (NN-MM, ...)` with plan-ID evidence; coverage count unchanged at 40/40 (Pitfall 5 mitigation) (completed 2026-04-28)
 - [ ] 11-03-PLAN.md — G3 + G4 closure: record acceptance decision (or human sign-off) for Phase 7 + Phase 9 `human_needed` status; bump or annotate accordingly
 - [ ] 11-04-PLAN.md — G5 closure: planning record for post-milestone commits 73abc58 + e79ad18 (§6 of MILESTONE_SUMMARY-v1.0.md or thin Phase 10.1 SUMMARY)
 
@@ -234,4 +234,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 8. Portfolio Visualization & Chat UI | 8/8 | Complete | 2026-04-26 |
 | 9. Dockerization & Packaging | 0/4 | Not started | - |
 | 10. E2E Validation | 10/10 | Complete | 2026-04-27 |
-| 11. Milestone v1.0 Closure & Doc Sweep | 1/4 | In progress | - |
+| 11. Milestone v1.0 Closure & Doc Sweep | 2/4 | In progress | - |

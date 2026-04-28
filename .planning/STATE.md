@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Closure & Doc Sweep
 status: executing
-stopped_at: "Phase 11 Plan 01 (G1 closure — gsd-verifier audit-trail backfill of 05-VERIFICATION.md for the AI Chat Integration phase) completed on `finally-gsd`. Two atomic commits: `ab73991` (docs(11-01): backfill 05-VERIFICATION.md via gsd-verifier — CHAT-01..06, TEST-01) and the SUMMARY metadata commit. New file: `.planning/phases/05-ai-chat-integration/05-VERIFICATION.md` (161 lines, canonical 04-VERIFICATION.md shape, status: passed, score: 7/7 success criteria verified, all 7 ratified REQ-IDs cited). All 8 acceptance grep checks pass: file exists, frontmatter phase + status + score, 7 REQ-ID coverage, canonical `295 passed` evidence, sign-off footer `Verifier: Claude (gsd-verifier)`, and the threat T-11-01 secret-leak grep negation (no `OPENROUTER_API_KEY=sk-or` literal anywhere in the file). Doc-only execution: zero production source touched. Plan 11-01 SUMMARY created with `requirements-completed: [CHAT-01, CHAT-02, CHAT-03, CHAT-04, CHAT-05, CHAT-06, TEST-01]`; the actual REQUIREMENTS.md table flip is scoped to Plan 11-02 (G2 sweep) per its Evidence Map. Next: Plan 11-02."
-last_updated: "2026-04-28T19:35:00Z"
-last_activity: 2026-04-28 -- Phase 11 Plan 01 complete (G1 closure: 05-VERIFICATION.md backfilled)
+stopped_at: "Phase 11 Plan 02 (G2 closure — REQUIREMENTS.md status-drift sweep) completed on `finally-gsd`. Two atomic commits: `787cbb7` (docs(11-02): sweep REQUIREMENTS.md — 19 rows to Complete (G2 closure)) and the SUMMARY metadata commit. Modified file: `.planning/REQUIREMENTS.md` (+20/-20: 19 row mutations from Pending/In progress to Complete (NN-MM, ...) per 11-RESEARCH.md Evidence Map + 1 footer line bumped to 2026-04-28 with Phase 11 framing). All 4 acceptance grep checks pass: 0 rows in {DB-01..03, PORT-05, WATCH-01..03, CHAT-01..06, FE-03/04/07/08/10, TEST-01} read Pending or In progress; all 19 IDs match `^\\| <ID> \\| Phase [0-9]+ \\| Complete \\(`; coverage count block unchanged at 40 total / 40 mapped (100%) / 0 unmapped (Pitfall 5 mitigation); footer bumped. Doc-only execution: zero production source touched. Plan 11-02 SUMMARY created with `requirements-completed: [DB-01, DB-02, DB-03, PORT-05, WATCH-01, WATCH-02, WATCH-03, FE-03, FE-04, FE-07, FE-08, FE-10]` (the 7 Phase-5 IDs CHAT-01..06 + TEST-01 are formally claimed by 11-01's frontmatter though their REQUIREMENTS.md rows were flipped in this sweep). Next: Plan 11-03 (G3 + G4 acceptance decision)."
+last_updated: "2026-04-28T19:43:00Z"
+last_activity: 2026-04-28 -- Phase 11 Plan 02 complete (G2 closure: REQUIREMENTS.md sweep — 19 rows to Complete)
 progress:
   total_phases: 11
   completed_phases: 10
   total_plans: 51
-  completed_plans: 48
-  percent: 94
+  completed_plans: 49
+  percent: 96
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 11 (milestone-v1.0-closure) — EXECUTING
-Plan: 2 of 4 (Plan 11-01 G1 closure complete on 2026-04-28; resume at Plan 11-02 G2 REQUIREMENTS.md sweep)
+Plan: 3 of 4 (Plans 11-01 G1 + 11-02 G2 closure complete on 2026-04-28; resume at Plan 11-03 G3+G4 acceptance decision)
 Status: Executing Phase 11
-Last activity: 2026-04-28 -- Phase 11 Plan 01 complete (G1 closure: 05-VERIFICATION.md backfilled)
+Last activity: 2026-04-28 -- Phase 11 Plan 02 complete (G2 closure: REQUIREMENTS.md sweep — 19 rows to Complete)
 
-Progress: [##########] Phase 10 complete (10/10). Phase 11: 1/4 plans complete (G1 closed; G2/G3+G4/G5 remaining). ROADMAP Phase 10 SC#1/SC#2/SC#3 all met.
+Progress: [##########] Phase 10 complete (10/10). Phase 11: 2/4 plans complete (G1 + G2 closed; G3+G4/G5 remaining). ROADMAP Phase 10 SC#1/SC#2/SC#3 all met.
 
 ## Performance Metrics
 
