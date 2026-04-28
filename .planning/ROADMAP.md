@@ -22,6 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 8: Portfolio Visualization & Chat UI** - Heatmap, P&L chart, collapsible AI chat panel, demo polish, static frontend mounted into FastAPI, frontend component tests (completed 2026-04-26)
 - [x] **Phase 9: Dockerization & Packaging** - Multi-stage Dockerfile, canonical `docker run` invocation, start/stop scripts, `.env.example` (completed 2026-04-27)
 - [ ] **Phase 10: E2E Validation** - Playwright harness with `docker-compose.test.yml` and all §12 scenarios against the mocked-LLM image
+- [ ] **Phase 11: Milestone v1.0 Closure & Doc Sweep** - Backfill Phase 5 VERIFICATION.md (G1), sweep REQUIREMENTS.md status drift on 15 IDs (G2), record human-acceptance decision for Phase 7 + Phase 9 `human_needed` status (G3+G4), record post-milestone source commits 73abc58 + e79ad18 as planning delta (G5)
 
 ## Phase Details
 
@@ -198,10 +199,28 @@ Plans:
 - [~] 10-08-PLAN.md — Gap closure (second iteration): production fix for Recharts heatmap tooltip pointer-events (Heatmap.tsx wrapperStyle) + drop $10,000.00 cash assertion in 01-fresh-start + expect.poll-stabilised postBuyQty snapshot in 04-sell + canonical-command 21/21 green gate (Wave 4) (Tasks 1-3 landed commits a149480/0a58eb9/c53810f — Modes B+C closed, 01-fresh-start 3/3 + 04-sell 3/3 + 0 flaky; Task 4 harness gate failed 18/21 because Mode A was misdiagnosed by 10-VERIFICATION.md — actual interceptor is Terminal.tsx right-column wrapper at viewport 1280×720 plus cross-run SQLite carry-over via persistent docker volume; corrective 10-09 plan needed)
 - [x] 10-09-PLAN.md — Gap closure (third iteration): per-project Playwright viewport bump 1280x720 -> 1440x900 (closes Mode A re-diagnosed as layout overlap) + tmpfs /app/db on appsvc service in docker-compose.test.yml (closes Mode A.2 cross-run SQLite carry-over) + WR-01 advisory bundle (Heatmap Tooltip formatter for USD-formatted weight) + canonical-command 21/21 green gate on two consecutive runs to prove the reproducibly clause (Wave 5) (completed 2026-04-27 — both canonical-command runs exit 0 with 21 passed / 0 failed / 0 flaky / appsvc Healthy; ROADMAP Phase 10 SC#3 met)
 
+### Phase 11: Milestone v1.0 Closure & Doc Sweep
+**Goal**: Move milestone v1.0 from `tech_debt` to a clean, archivable state by closing the 5 process gaps identified in `.planning/v1.0-MILESTONE-AUDIT.md` — without touching production source code. Runtime is already green (40/40 reqs functionally satisfied, 9/9 integration links pass, 7/7 E2E flows pass ×3 browsers ×2 consecutive runs).
+**Depends on**: Phase 10
+**Requirements**: None new — this phase ratifies existing satisfaction of CHAT-01..06, TEST-01, DB-01..03, PORT-05, WATCH-01..03, FE-03/04/07/08/10, OPS-02, OPS-03, FE-01, FE-05, FE-06, APP-02 by updating their planning records.
+**Gap Closure**: G1, G2, G3, G4, G5 from `v1.0-MILESTONE-AUDIT.md`.
+**Success Criteria** (what must be TRUE):
+  1. (**G1**) `.planning/phases/05-ai-chat-integration/05-VERIFICATION.md` exists and reflects Phase 5's functional pass (295/295 backend chat tests + `06-chat.spec.ts` green ×3 browsers ×2 runs), produced by `gsd-verifier` against the canonical SCs.
+  2. (**G2**) `.planning/REQUIREMENTS.md` traceability table reads `Complete (Phase N)` (with the specific plan IDs that landed each REQ-ID) for all 15 drift entries: DB-01..03, PORT-05, WATCH-01..03, CHAT-01..06, FE-03/04/07/08/10, TEST-01. The coverage count at the top of REQUIREMENTS.md reflects the corrected total.
+  3. (**G3 + G4**) A documented decision exists for Phase 7 and Phase 9 `human_needed` status — either (a) human acceptance recorded inline in each phase's VERIFICATION.md and status bumped to `passed`, or (b) `human_needed` accepted indefinitely with the rationale (demo-grade visual feel / Windows pwsh structural validation) noted in `.planning/reports/MILESTONE_SUMMARY-v1.0.md`. No more silent stuck status.
+  4. (**G5**) The two post-milestone source commits — `73abc58` (Heatmap + PnLChart deterministic-height fix for Recharts 3.8.1 + React 19 0×0 regression; adds SVG-presence assertions to `05-portfolio-viz.spec.ts`) and `e79ad18` (light theme switch) — have a planning record, either as a thin Phase 10.1 SUMMARY or as a §6 entry in `MILESTONE_SUMMARY-v1.0.md`. The runtime is already green under both commits; this is the paper trail.
+  5. Re-running `/gsd-audit-milestone v1.0` returns verdict `passed` (or only carries forward consciously accepted policy debt from G3/G4 with explicit acceptance recorded).
+**Plans**: 4 plans (planned)
+Plans:
+- [ ] 11-01-PLAN.md — G1 closure: backfill `05-VERIFICATION.md` via `gsd-verifier` against Phase 5 SCs (CHAT-01..06, TEST-01)
+- [ ] 11-02-PLAN.md — G2 closure: sweep `REQUIREMENTS.md` — flip 15 stale rows to `Complete (Phase N)` with plan-ID evidence; update coverage count at top
+- [ ] 11-03-PLAN.md — G3 + G4 closure: record acceptance decision (or human sign-off) for Phase 7 + Phase 9 `human_needed` status; bump or annotate accordingly
+- [ ] 11-04-PLAN.md — G5 closure: planning record for post-milestone commits 73abc58 + e79ad18 (§6 of MILESTONE_SUMMARY-v1.0.md or thin Phase 10.1 SUMMARY)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10 → 11
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -215,3 +234,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 8. Portfolio Visualization & Chat UI | 8/8 | Complete | 2026-04-26 |
 | 9. Dockerization & Packaging | 0/4 | Not started | - |
 | 10. E2E Validation | 10/10 | Complete | 2026-04-27 |
+| 11. Milestone v1.0 Closure & Doc Sweep | 0/4 | Not started | - |
