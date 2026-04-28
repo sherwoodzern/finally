@@ -1,10 +1,12 @@
 ---
-status: diagnosis-pending-final-evidence
+status: complete
 phase: 08-portfolio-visualization-chat-ui
 test: UAT 6 — G1 SSE dev fix end-to-end
 related_debug_session: ../../.planning/debug/uat-test6-next-dev-sse.md
 created: 2026-04-26
-mode: read-only investigation, no fix applied
+updated: 2026-04-28
+mode: read-only investigation, no code fix applied
+resolution: "Environmental — clean dev restart (rm -rf frontend/.next + npm run dev). On-disk Plan 08-01 patch (skipTrailingSlashRedirect: true) verified correct; running dev process held a stale routes manifest. Phase 8 UAT-6 subsequently passed (see 08-HUMAN-UAT.md test 6 result: pass)."
 ---
 
 ## Verdict

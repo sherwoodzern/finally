@@ -1,128 +1,108 @@
 # FinAlly — AI Trading Workstation
 
+## Current State
+
+**Shipped:** v1.0 MVP on 2026-04-28 (tag `v1.0`).
+
+A single-Docker-command Bloomberg-style AI trading workstation: live SSE price streaming for 10 default tickers, a simulated $10k portfolio with instant-fill market orders, a three-column terminal layout (watchlist · workspace · positions) plus a collapsible LLM chat copilot that auto-executes trades and watchlist changes via structured outputs. FastAPI serves the Next.js static export from `:8000` from a single multi-stage container. SQLite persists in a Docker volume. Canonical Playwright harness exits 0 reproducibly with `21 passed / 0 failed / 0 flaky` × 2 consecutive runs across 3 browsers.
+
+11 phases / 51 plans complete. 40/40 v1 requirements satisfied. Audit verdict: `passed`.
+
+## Next Milestone Goals
+
+To be defined via `/gsd-new-milestone`. Candidate themes from v1.0 deferred items and v2 backlog:
+
+- **v1.1 Polish & Coverage** — Promote 7 partial / 1 missing Nyquist phases to compliant; resolve Phase 7 + 9 indefinite-acceptance items via per-host human spot-check; clean up the 5-error TypeScript baseline in test files; write the recurring retrospective inline.
+- **v1.2 Auth & Multi-User (AUTH-01)** — Login + sessions + per-user data isolation. Schema is already `user_id`-keyed so it's a non-migration addition.
+- **v1.3 Streaming Chat (CHAT-07)** — Token-by-token LLM responses (deferred from v1.0 because Cerebras inference was fast enough that loading dots sufficed).
+- **v2.0 Cloud Deploy (DEPLOY-01)** — App Runner / Render / Fly.io with managed persistence replacing the Docker volume.
+
 ## What This Is
 
-FinAlly (Finance Ally) is a single-user, single-container AI trading workstation — a Bloomberg-style terminal that streams live prices, runs a simulated $10k portfolio, and pairs every screen with an LLM chat copilot that can analyze positions and execute trades on the user's behalf. It is the capstone project for an agentic AI coding course, built by orchestrated coding agents that interact through files in `.planning/`.
+FinAlly (Finance Ally) is a single-user, single-container AI trading workstation — a Bloomberg-style terminal that streams live prices, runs a simulated $10k portfolio, and pairs every screen with an LLM chat copilot that can analyze positions and execute trades on the user's behalf. It was the capstone project for an agentic AI coding course; the medium IS the message — orchestrated coding agents (interacting through files in `.planning/`) produced a production-looking full-stack application end-to-end.
 
 ## Core Value
 
-A user runs one Docker command, opens `http://localhost:8000`, and within seconds is watching live prices stream, buying shares, and asking an AI assistant to reshape the portfolio — with trades actually executing from the chat. If anything else fails, that core demo must still work.
+A user runs one Docker command, opens `http://localhost:8000`, and within seconds is watching live prices stream, buying shares, and asking an AI assistant to reshape the portfolio — with trades actually executing from the chat. **Validated in v1.0**: the canonical demo moment shipped intact and is exercised on every E2E run.
 
 ## Requirements
 
 ### Validated
 
-<!-- Shipped and confirmed valuable. Inherited from prior work on this repo. -->
+<!-- All 40 v1 requirements shipped in v1.0. Inherited validated items remain. -->
 
-- ✓ **MARKET-01**: Strategy-pattern market data layer with a single `MarketDataSource` ABC and two interchangeable implementations — `SimulatorDataSource` (correlated GBM with random events) and `MassiveDataSource` (Polygon REST poller) — selected at runtime by `MASSIVE_API_KEY` — `backend/app/market/` (existing)
-- ✓ **MARKET-02**: Thread-safe in-memory `PriceCache` with monotonic version counter driving change-detection for the streaming layer — `backend/app/market/cache.py` (existing)
-- ✓ **MARKET-03**: Immutable `PriceUpdate` dataclass with derived `change`, `change_percent`, and `direction` — `backend/app/market/models.py` (existing)
-- ✓ **MARKET-04**: FastAPI `APIRouter` factory `create_stream_router(cache)` that exposes the SSE `/api/stream/prices` generator — `backend/app/market/stream.py` (existing, not yet mounted)
-- ✓ **MARKET-05**: Dynamic ticker lifecycle (`add_ticker` / `remove_ticker` idempotent) with seed-price onboarding for unknown symbols — `backend/app/market/simulator.py`, `massive_client.py` (existing)
-- ✓ **MARKET-06**: Market-data test suite (73 tests, `pytest-asyncio`) covering math, concurrency, interface conformance, and cache semantics — `backend/tests/market/` (existing)
-- ✓ **APP-01**: FastAPI application instance with `lifespan` startup that initializes `PriceCache`, selects and starts the market data source, initializes SQLite, and exposes `/api/health` — Phase 1
-- ✓ **APP-03**: Unified configuration loading from `.env` (`OPENROUTER_API_KEY`, `MASSIVE_API_KEY`, `LLM_MOCK`) — Phase 1
-- ✓ **APP-04**: Browser-consumable SSE verified end-to-end — mounted `/api/stream/prices` delivers ticks to a real `EventSource` client — Phase 1
-- ✓ **DB-01**: SQLite schema for `users_profile`, `watchlist`, `positions`, `trades`, `portfolio_snapshots`, `chat_messages` with `user_id` columns defaulting to `"default"` — Phase 2
-- ✓ **DB-02**: Lazy initialization on startup — creates tables and seeds the default user and 10 default watchlist tickers if the DB is empty — Phase 2
-- ✓ **DB-03**: Volume-mounted SQLite file at `db/finally.db` persists across container restarts — Phase 2
-- ✓ **PORT-01**: `GET /api/portfolio` returns positions, cash, total value, and per-position unrealized P&L, reading live prices from the cache with graceful fallback — Phase 3
-- ✓ **PORT-02**: `POST /api/portfolio/trade` executes market orders (buy/sell, fractional), updates cash, positions, appends `trades` row — Phase 3
-- ✓ **PORT-03**: Trade validation — reject buys without sufficient cash, reject sells exceeding held quantity — Phase 3
-- ✓ **PORT-04**: `GET /api/portfolio/history` returns `portfolio_snapshots` time-series for the P&L chart — Phase 3
-- ✓ **PORT-05**: Snapshot recording on every trade, plus 60-second cadence piggybacked on the price-update loop — Phase 3
-- ✓ **WATCH-01**: `GET /api/watchlist` returns current watchlist with latest prices from the cache — Phase 4
-- ✓ **WATCH-02**: `POST /api/watchlist` adds a ticker; unknown symbols are onboarded into the market data source on the next tick — Phase 4
-- ✓ **WATCH-03**: `DELETE /api/watchlist/{ticker}` removes a ticker and stops tracking in the cache — Phase 4
-- ✓ **APP-02**: Static frontend mounting — FastAPI serves the Next.js `output: 'export'` build from `/` on the same port as the API — Phase 8 (08-01 mount + G1 dev SSE fix; 08-08 final build artifact)
-- ✓ **FE-05**: Portfolio heatmap / treemap — rectangles sized by position weight, colored by P&L — Phase 8 (08-03)
-- ✓ **FE-06**: P&L line chart driven by `/api/portfolio/history` (Recharts SVG) — Phase 8 (08-04)
-- ✓ **FE-09**: AI chat panel — docked/collapsible sidebar, scrolling history, send box, loading indicator, inline confirmations for executed trades + watchlist changes — Phase 8 (08-06 shell + 08-07 orchestration; XSS guarded)
-- ✓ **FE-11**: Demo-grade polish — smooth transitions, loading skeletons, chat-panel micro-interactions, visible trade-execution moments — Phase 8 (08-02/05/06/07/08 motion primitives + flash parity; perceptual feel items in 08-HUMAN-UAT.md)
-- ✓ **TEST-02**: Frontend component tests — price flash, watchlist CRUD, portfolio display, chat rendering + loading state — Phase 8 (111/111 Vitest across 19 files)
-- ✓ **OPS-01**: Multi-stage `Dockerfile` — Node 20 slim builds the Next.js static export, Python 3.12 slim installs the `uv`-managed backend and copies the frontend build into `/app/frontend/out/` — Phase 9 (09-01: cold build 162s, image 124 MB content)
-- ✓ **OPS-02**: Single-container run — `docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally` — Phase 9 (09-03 integration test: /api/health 1s, GET / 12,830 bytes HTML, SSE data: frames, volume persistence cash 10000 -> 9809.98 -> 9809.98 across stop+restart)
-- ✓ **OPS-03**: Idempotent start/stop scripts for macOS/Linux (`scripts/start_mac.sh`, `scripts/stop_mac.sh`) and Windows (`scripts/start_windows.ps1`, `scripts/stop_windows.ps1`) — Phase 9 (09-03; bash 3.2 portable; `--build` and `--no-open` flags; PowerShell 5.1+ mirror with `[switch]$Build`/`[switch]$NoOpen`)
-- ✓ **OPS-04**: `.env.example` committed with safe placeholders; `.env` gitignored at `.gitignore:141` — Phase 9 (09-02; cp .env.example .env boots simulator-mode demo with no edits)
-- ✓ **TEST-03**: Playwright E2E harness in `test/` with its own `docker-compose.test.yml` running the app container with `LLM_MOCK=true` alongside a Playwright container — Phase 10 (10-00..10-09; canonical command `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` exits 0 with `21 passed` reproducibly across two consecutive runs; logs at /tmp/phase10-final-harness.log + /tmp/phase10-final-harness-rerun.log)
-- ✓ **TEST-04**: All §12 E2E scenarios — fresh start, watchlist add/remove, buy/sell paths, heatmap + P&L chart rendering, mocked chat with trade execution, SSE reconnection — Phase 10 (7 specs × 3 browsers = 21 (spec, project) pairs all passing; Mode A layout overlap closed via per-project viewport 1440×900; Mode A.2 cross-run SQLite carry-over closed via tmpfs /app/db; production Dockerfile VOLUME /app/db preserved unchanged)
+**Inherited (pre-v1.0):**
+- ✓ MARKET-01..06 — Strategy-pattern market data layer + thread-safe `PriceCache` + immutable `PriceUpdate` + `create_stream_router` factory + dynamic ticker lifecycle + 73 tests — `backend/app/market/`
+
+**Shipped in v1.0:**
+- ✓ APP-01..04 — FastAPI lifespan + `.env` loading + `/api/health` + browser-consumable SSE — v1.0 (Phase 1, 8)
+- ✓ DB-01..03 — SQLite schema + lazy seed + volume-mounted persistence — v1.0 (Phase 2)
+- ✓ PORT-01..05 — `/api/portfolio` + `/api/portfolio/trade` + validation + history + 60s + post-trade snapshots — v1.0 (Phase 3)
+- ✓ WATCH-01..03 — `/api/watchlist` GET/POST/DELETE with idempotent ops + simulator onboarding — v1.0 (Phase 4)
+- ✓ CHAT-01..06 — `/api/chat` synchronous + LiteLLM/OpenRouter/Cerebras structured outputs + auto-execution + persistence + `LLM_MOCK=true` — v1.0 (Phase 5)
+- ✓ FE-01..11 — Next.js static export + EventSource + watchlist with sparklines + main chart + heatmap + P&L chart + chat drawer + positions table + trade bar + header + polish — v1.0 (Phase 6, 7, 8)
+- ✓ OPS-01..04 — Multi-stage Dockerfile + canonical `docker run` + cross-platform start/stop scripts + `.env.example` — v1.0 (Phase 9)
+- ✓ TEST-01..04 — Backend pytest + frontend Vitest (111/111) + Playwright canonical harness (21/21 × 2 runs × 3 browsers) — v1.0 (Phase 5, 8, 10)
 
 ### Active
 
-<!-- v1 scope. Hypotheses until shipped and validated. Organized by subsystem. -->
+<!-- v1.1+ candidates. Empty for now — populated by /gsd-new-milestone. -->
 
-**AI chat**
-- [ ] **CHAT-01**: `POST /api/chat` — synchronous (non-streaming) request/response flow. Returns the complete LLM reply plus executed actions in one JSON payload
-- [ ] **CHAT-02**: LLM call via LiteLLM → OpenRouter to `openrouter/openai/gpt-oss-120b` with Cerebras as the inference provider, using structured outputs matching the schema in `planning/PLAN.md` §9
-- [ ] **CHAT-03**: Prompt construction — system prompt ("FinAlly, AI trading assistant"), live portfolio context (cash, positions with P&L, watchlist with live prices, total value), recent chat history from `chat_messages`
-- [ ] **CHAT-04**: Auto-execution of `trades[]` and `watchlist_changes[]` from the structured response, each going through the same validation path as manual trades. Failures are surfaced back to the LLM/user, not silently dropped
-- [ ] **CHAT-05**: Persistence of user and assistant messages in `chat_messages`, including the executed `actions` JSON on the assistant turn
-- [ ] **CHAT-06**: Deterministic mock LLM mode gated by `LLM_MOCK=true` for tests and key-less development
-
-**Frontend (Next.js, static export)**
-- [ ] **FE-01**: Next.js TypeScript project configured for `output: 'export'`, Tailwind with the project's dark theme and accent colors (yellow `#ecad0a`, blue `#209dd7`, purple `#753991`)
-- [ ] **FE-02**: `EventSource`-based SSE client to `/api/stream/prices` that updates a local ticker-keyed price store
-- [ ] **FE-03**: Watchlist panel — ticker, live price with green/red flash animation on tick, daily-change % computed from each event's session-start price, and a progressive sparkline accumulated from SSE since page load (Lightweight Charts)
-- [ ] **FE-04**: Main chart area showing the currently selected ticker (Lightweight Charts canvas). Clicking a watchlist row selects the ticker
-- [ ] **FE-07**: Positions table — ticker, qty, avg cost, current price, unrealized P&L, %
-- [ ] **FE-08**: Trade bar — ticker + qty + buy/sell buttons, market-only, instant fill, no confirmation dialog
-- [ ] **FE-10**: Header — live-updating total portfolio value, cash balance, and a connection-status dot (green connected / yellow reconnecting / red disconnected)
-
-**Packaging & ops**
-- (all OPS-01..OPS-04 validated in Phase 9 — see Validated section above)
-
-**Testing**
-- [ ] **TEST-01**: Backend unit tests extending the existing pytest suite — portfolio math, trade execution, trade validation, LLM response parsing, API routes, LLM mock mode
-- (TEST-03 + TEST-04 validated in Phase 10 — see Validated section above)
+(No active requirements — start the next milestone with `/gsd-new-milestone`.)
 
 ### Out of Scope
 
-<!-- Explicit boundaries with reasoning. -->
+<!-- Boundaries that held through v1.0 and reasoning still applies. -->
 
-- **Authentication / multi-user** — single-user, `user_id="default"` hardcoded. Schema is user-keyed so a future migration is minimal, but auth is not v1.
-- **Limit orders, stop orders, order book, partial fills** — market orders only. Eliminates order-matching complexity.
-- **Fees, commissions, slippage, borrow costs** — instant fill at the cached mid price.
-- **Real money / brokerage integration** — simulated portfolio, fake money, no broker connectivity.
-- **Token-by-token LLM streaming** — Cerebras inference is fast enough that a loading indicator suffices. The chat endpoint returns one complete JSON payload.
-- **WebSockets** — SSE is one-way server→client push, which is all the price stream needs.
-- **Postgres / external DB server** — single-file SQLite with a Docker volume. No database service to run.
-- **Cloud deploy in v1** — localhost-Docker only. Terraform/App Runner/Render are stretch goals, not capstone requirements.
-- **Production-grade responsive / accessibility pass** — desktop-first, demo-grade polish. Tablet works, phone is not a target.
-- **Trade confirmation dialogs** — deliberately omitted so AI-driven trade execution feels immediate and agentic.
-- **Order history UI beyond what's implied by the positions table** — `trades` is persisted but no dedicated trade-history view is in v1.
+- **Authentication / multi-user** — single-user, `user_id="default"` hardcoded for v1.0. Schema is user-keyed, so AUTH-01 is a non-migration addition for a future milestone.
+- **Limit orders, stop orders, order book, partial fills** — market orders only. Eliminates order-matching complexity. *Reasoning still valid.*
+- **Fees, commissions, slippage, borrow costs** — instant fill at the cached mid price. *Reasoning still valid.*
+- **Real money / brokerage integration** — simulated portfolio, fake money. *Reasoning still valid.*
+- **Token-by-token LLM streaming (CHAT-07)** — deferred. Cerebras inference proved fast enough in v1.0 that loading dots sufficed; canonical harness validates the synchronous-payload approach. CHAT-07 is a v1.x candidate if user feedback demands it.
+- **WebSockets** — SSE one-way push proved sufficient through v1.0. *Reasoning still valid.*
+- **Postgres / external DB server** — single-file SQLite + Docker volume worked for v1.0. *Reasoning still valid.*
+- **Cloud deploy (DEPLOY-01)** — deferred. Container is cloud-ready; deployment is a future milestone.
+- **Production-grade responsive / accessibility (POLISH-01)** — desktop-first demo-grade was the v1.0 target. v1.x candidate if scope expands beyond capstone.
+- **Trade confirmation dialogs** — deliberately omitted; AI-driven execution feels immediate and agentic. Validated by demo. *Reasoning still valid.*
+- **Trade history UI (HIST-01)** — `trades` is persisted but no dedicated view in v1.0. v1.x candidate.
 
 ## Context
 
-- **Capstone for an agentic AI coding course.** The product itself is the medium — the demonstration is that orchestrated coding agents (through files in `.planning/`) can produce a production-looking full-stack application.
-- **Brownfield starting point.** One vertical slice exists and is solid: the market-data subsystem under `backend/app/market/` with 73 passing tests, including a ready-to-mount SSE router. The rest of the stack (FastAPI app instance, DB, portfolio/chat services, frontend, Docker) is unbuilt.
-- **Pre-existing spec.** `planning/PLAN.md` is an extremely detailed specification that this project adopts wholesale as v1, with minor re-validation during the `/gsd-new-project` questioning pass (April 2026). It is the canonical reference for endpoint shapes, schema, SSE event contents, and the LLM structured-output schema.
-- **User expectations for the demo.** The "one Docker command → Bloomberg terminal + AI copilot" moment is what sells the agentic-AI story, so demo-grade polish and inline AI-driven trade execution are non-negotiable. Everything else bends around that.
-- **Codebase map.** Current architecture, stack, structure, conventions, testing posture, integrations, and known concerns are captured in `.planning/codebase/*.md` (analysis date 2026-04-19). Consult these before planning.
-- **Known concerns to watch.** No `.env.example` yet; no FastAPI app entry point; `asyncio.to_thread` write path in `MassiveDataSource` is the reason `PriceCache` uses a `threading.Lock`; SSE generator polls at 500 ms and skips when `cache.version` is unchanged.
+- **Capstone for an agentic AI coding course — shipped.** The product itself is the medium. Orchestrated coding agents (through files in `.planning/`) produced 11 phases / 51 plans / 364 commits / 14,365 LOC source code in 9 days (2026-04-19 → 2026-04-28).
+- **Codebase as of v1.0 close:** 7,721 LOC Python (backend + 295/295 backend chat tests + 158/158 portfolio tests + 73 inherited market tests), 4,292 LOC TypeScript/TSX (frontend + 111/111 Vitest tests across 19 files), 2,352 LOC test code (Playwright + Vitest). 418 files modified across the milestone.
+- **Tech stack at v1.0:** Python 3.12 + FastAPI + uvicorn + SQLite (stdlib) + LiteLLM + python-dotenv (backend); Next.js 16 + TypeScript + React 19 + Tailwind v4 (CSS-first @theme) + Zustand 5 + TanStack Query + Lightweight Charts (canvas) + Recharts (SVG) + Vitest 4 (frontend); Playwright + docker-compose.test.yml + tmpfs `/app/db` (E2E).
+- **Runtime contract proven:** canonical `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` exits 0 with `21 passed / 0 failed / 0 flaky` reproducibly across two consecutive runs (no inter-run cleanup) at viewport 1440×900 across chromium/firefox/webkit.
+- **Known deferred items (accepted policy debt):** Phase 7 visual feel (price-flash, sparklines, main-chart, reconnect-dot in dev) — `human_acceptance: indefinite` recorded 2026-04-28 per G3. Phase 9 Windows pwsh runtime + macOS/Linux browser auto-open + cross-arch buildx — `human_acceptance: indefinite` recorded 2026-04-28 per G4. See `.planning/STATE.md` ## Deferred Items.
+- **Known technical debt (non-blocking):** Nyquist coverage 3 compliant / 7 partial / 1 missing — functionally compensated by canonical harness; promotion is a v1.1 candidate. 5-error TypeScript baseline in `MainChart.test.tsx` + `Sparkline.test.tsx` (tuple-index errors) — production `next build` excludes test files. Several Phase 7 plan SUMMARYs lack `requirements-completed` frontmatter — superseded by REQUIREMENTS.md sweep in Plan 11-02.
+- **Pre-existing spec.** `planning/PLAN.md` is the canonical reference for endpoint shapes, schema, SSE event contents, and the LLM structured-output schema. v1.0 adopted it wholesale.
+- **Codebase map.** `.planning/codebase/*.md` (analysis date 2026-04-19) — pre-v1.0 architecture snapshot. Now superseded by shipped code; refresh before next milestone.
 
 ## Constraints
 
 - **Tech stack (backend)**: Python 3.12+, FastAPI, `uv` for package management (project rule: `uv run xxx`, never `python3`; `uv add xxx`, never `pip install`), uvicorn, SQLite via stdlib `sqlite3`, LiteLLM, NumPy, Massive SDK.
-- **Tech stack (frontend)**: Next.js with TypeScript in `output: 'export'` mode, Tailwind CSS, Lightweight Charts (main chart + sparklines), Recharts (P&L line chart).
+- **Tech stack (frontend)**: Next.js with TypeScript in `output: 'export'` mode, Tailwind v4 CSS-first @theme, Lightweight Charts (main chart + sparklines), Recharts (heatmap + P&L), Zustand price store, TanStack Query for REST.
 - **Tech stack (LLM)**: LiteLLM → OpenRouter to `openrouter/openai/gpt-oss-120b` with Cerebras as inference provider. Structured outputs for trade/watchlist actions. Invoke via the `cerebras` skill.
 - **Runtime**: Single Docker container on port 8000. One Python process. No compose file in production. Multi-stage Dockerfile (Node 20 → Python 3.12 slim).
 - **Persistence**: SQLite file at `db/finally.db`, volume-mounted to `/app/db`. No migrations — lazy schema creation on first startup.
 - **Transport**: REST under `/api/*`, SSE under `/api/stream/*`, same origin as static frontend. No CORS configuration.
-- **Code style (project)**: No over-engineering, no defensive programming, exception managers only when needed. Short modules and functions. Clear docstrings, sparing comments. No emojis in code or logs. Latest library APIs.
+- **Code style**: No over-engineering, no defensive programming, exception managers only when needed. Short modules and functions. Clear docstrings, sparing comments. No emojis in code or logs. Latest library APIs.
 - **Process**: Work incrementally — small steps, validate each one. For any bug or unexpected behavior, prove the root cause before fixing.
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Adopt `planning/PLAN.md` wholesale as v1 scope | Spec is already extremely detailed, internally consistent, and aligned with the capstone demo. No redesign needed. | — Pending |
-| Full feature set in v1 (chat + heatmap + P&L chart all included) | Capstone demo requires the "wow" moment of AI-driven trade execution against a polished terminal UI. | — Pending |
-| Keep LiteLLM + OpenRouter + `openrouter/openai/gpt-oss-120b` (Cerebras) | Matches the existing `cerebras` skill, Cerebras inference is fast enough to skip token streaming, and OpenRouter abstracts provider. | — Pending |
-| No authentication in v1, `user_id="default"` hardcoded | Single-user demo on localhost. Schema is user-keyed so auth is a non-migration addition later. | — Pending |
-| Localhost Docker only (no cloud deploy in v1) | Capstone is a local demo; the container is self-contained and can deploy later without code changes. | — Pending |
-| Market-data subsystem treated as Validated | 73 tests already green and the architecture is sound — only gap is browser-level SSE integration (captured as APP-04). | — Pending |
-| Demo-grade polish target (not production-grade responsive/a11y) | Desktop-first capstone demo. Production-grade responsive/a11y is weeks of extra work for no demo value. | — Pending |
-| All §12 E2E scenarios pursued with `LLM_MOCK=true` in a separate `docker-compose.test.yml` | The E2E pack is what proves the whole stack works end-to-end, which is exactly what the capstone must show. | — Pending |
+| Adopt `planning/PLAN.md` wholesale as v1 scope | Spec extremely detailed, internally consistent, aligned with capstone demo. | ✓ Good — shipped 40/40 requirements with no scope churn. |
+| Full feature set in v1 (chat + heatmap + P&L chart all included) | Capstone demo requires the "wow" of AI-driven trade execution against a polished terminal UI. | ✓ Good — demo moment landed; canonical harness validates end-to-end. |
+| LiteLLM + OpenRouter + `openrouter/openai/gpt-oss-120b` (Cerebras) | Matches `cerebras` skill, Cerebras inference fast enough to skip token streaming, OpenRouter abstracts provider. | ✓ Good — synchronous payload pattern proved sufficient; CHAT-07 streaming deferred without complaint. |
+| No auth in v1, `user_id="default"` hardcoded | Single-user demo on localhost. Schema user-keyed so auth is a non-migration addition. | ✓ Good — schema is ready for AUTH-01 in a future milestone. |
+| Localhost Docker only (no cloud deploy in v1) | Capstone is a local demo; container is self-contained. | ✓ Good — DEPLOY-01 deferred cleanly. |
+| Market-data subsystem treated as Validated | 73 tests already green; only gap was browser-level SSE integration (captured as APP-04). | ✓ Good — APP-04 closed in Phase 1; subsystem still 73 tests. |
+| Demo-grade polish target (not production-grade responsive/a11y) | Desktop-first capstone demo. | ✓ Good — POLISH-01 deferred; visual feel signed off via Phase 7 indefinite acceptance. |
+| All §12 E2E scenarios with `LLM_MOCK=true` in a separate `docker-compose.test.yml` | E2E pack proves the whole stack end-to-end. | ✓ Good — 21/21 green × 2 consecutive runs validates the contract. |
+| Per-project Playwright viewport 1440×900 (Plan 10-09) | Aligned test env with `planning/PLAN.md §10` desktop-first contract; avoids spurious 1280×720 layout-overlap failures. | ✓ Good — Mode A misdiagnosis (Plan 10-08) corrected; harness reproducibly green. |
+| `tmpfs:/app/db` on test-side appsvc (Plan 10-09) | Gives canonical command's `reproducibly` clause teeth without changing the command, without `down -v` wrapper, without test-only reset endpoint. | ✓ Good — production `Dockerfile:57 VOLUME /app/db` preserved; only test compose overrides. |
+| Option B for `human_needed` closure (Plan 11-03 G3+G4) | Preserve enum, ADD `human_acceptance: indefinite` sibling key with dated rationale. | ✓ Good — milestone audit verdict shifted from `tech_debt` to `passed`; honest paper trail. |
 
 ## Evolution
 
@@ -142,4 +122,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-27 after Phase 10 (E2E Validation) — TEST-03, TEST-04 validated; v1.0 milestone complete*
+*Last updated: 2026-04-28 after v1.0 milestone close — all 40 v1 requirements moved to Validated; Active section emptied for v1.1; Out of Scope retained with v1.x routing notes.*

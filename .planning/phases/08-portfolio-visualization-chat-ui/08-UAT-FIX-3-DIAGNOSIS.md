@@ -1,8 +1,17 @@
+---
+status: complete
+phase: 08-portfolio-visualization-chat-ui
+test: UAT 3 — chat agentic auto-execute (HTTP 422)
+created: 2026-04-26
+updated: 2026-04-28
+resolution: "Fix shipped in commit c2a2c88 — frontend/src/lib/api/chat.ts postChat body field renamed content -> message; ChatThread.tsx caller updated. Phase 8 UAT test-3 subsequently passed (see 08-HUMAN-UAT.md test 3 result: pass)."
+---
+
 # Phase 8 UAT Fix-3 — Root Cause Diagnosis
 
 **UAT test:** test-3 (chat agentic auto-execute)
 **Symptom:** POST `/api/chat` returns HTTP 422; NVDA buy and PYPL watchlist-add never execute.
-**Status:** Root cause proven on direct evidence. Fix not applied (read-only investigation).
+**Status:** Root cause proven on direct evidence. Fix shipped in commit c2a2c88; UAT test-3 subsequently passed.
 
 ---
 

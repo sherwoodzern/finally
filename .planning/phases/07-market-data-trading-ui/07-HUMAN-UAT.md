@@ -1,9 +1,17 @@
 ---
-status: complete_with_deferred
+status: complete
 phase: 07-market-data-trading-ui
 source: [07-VERIFICATION.md]
 started: 2026-04-25
-updated: 2026-04-25
+updated: 2026-04-28
+deferred_items_resolved_by: |
+  G1 (SSE redirect chain in dev) was resolved in Phase 8 plan 08-01
+  (skipTrailingSlashRedirect: true; FastAPI static mount makes prod
+  same-origin). Visual feel for UAT 1/2/3/5 in dev is downstream-covered
+  by Phase 10 canonical harness (21 passed x 2 consecutive runs in
+  containerized prod-equivalent build) and explicitly accepted as
+  indefinite policy debt in v1.0-MILESTONE-AUDIT.md (G3 closure,
+  Phase 11 plan 11-03).
 ---
 
 ## Note on URL

@@ -1,8 +1,10 @@
 ---
-status: investigating
+status: resolved
 trigger: "fail - the prices no longer appear in the watchlist (Next dev :3000 + backend :8000)"
 created: 2026-04-26T00:00:00Z
-updated: 2026-04-26T00:00:00Z
+updated: 2026-04-28T00:00:00Z
+closed: 2026-04-28
+resolution: "Environmental — clean dev restart (rm -rf frontend/.next + npm run dev). On-disk Plan 08-01 patch (skipTrailingSlashRedirect: true) verified correct; running dev process held a stale routes manifest. Phase 8 UAT-6 subsequently passed. No code change required. The production path (FastAPI static mount) was always unaffected."
 ---
 
 ## Current Focus

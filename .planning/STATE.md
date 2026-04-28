@@ -1,11 +1,11 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: Closure & Doc Sweep
-status: complete
-stopped_at: "Phase 11 Plan 04 (G5 closure — MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure annotations) completed on `finally-gsd`. One atomic commit: `0498bb7` (docs(11-04): annotate MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure (G5 + G1-G4 paper trail)). Modified files: `.planning/reports/MILESTONE_SUMMARY-v1.0.md` (+5/-1: §6.1 closure annotation citing 11-01 backfills 05-VERIFICATION.md (G1) + 11-03 records human_acceptance: indefinite (G3+G4); §6.2 closure annotation citing 11-02 sweeps 15 drift IDs (G2 closed, 40/40 unchanged); §6.3 closing paragraph rewritten from `If a v1.1 / Phase 10.1 is desired...` to `Recorded as planning delta under Phase 11` citing 73abc58 + e79ad18 + canonical harness 21 passed x 2 / 0 failed / 0 flaky / Container test-appsvc-1 Healthy + G5 closed). All 11 acceptance grep predicates exit 0 (ALL_VERIFICATIONS_PASSED). §6.3 commit/fix table at lines 117-120 preserved verbatim. §6.4, §6.5, §1-§5, §7+ untouched. §6.x count grep returns 5 (no renumbering, no new section). Pitfall 4 mitigation confirmed: no Phase 10.1 stub created (test ! -e 10-10-PLAN.md returns NO_ROGUE_FILE). Doc-only execution: zero production source touched. Plan 11-04 SUMMARY created with `requirements-completed: [FE-01, FE-05, FE-06, APP-02]`. Phase 11 is now Complete (4/4 plans). Milestone v1.0: all 5 audit gaps (G1-G5) closed. Next: `/gsd-audit-milestone v1.0` re-run — expected verdict shifts from `tech_debt` to `passed` (or carries forward only G3/G4 Option B policy debt with explicit dated acceptance now grep-anchored in the files)."
-last_updated: "2026-04-28T19:53:30Z"
-last_activity: 2026-04-28 -- Phase 11 Plan 04 complete (G5 closure: MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure annotations); Phase 11 Complete (4/4); milestone v1.0 closure all 5 gaps closed
+milestone_name: MVP — AI Trading Workstation
+status: shipped
+stopped_at: "Milestone v1.0 closed and archived on 2026-04-28. Tag `v1.0`. Audit verdict `passed` (40/40 reqs; 9/9 integration; 7/7 E2E flows × 3 browsers × 2 consecutive runs). Archives at .planning/milestones/{v1.0-ROADMAP.md, v1.0-REQUIREMENTS.md, v1.0-MILESTONE-AUDIT.md}. ROADMAP.md collapsed to milestone-grouped index. REQUIREMENTS.md removed (fresh for next milestone). PROJECT.md evolved to brownfield format with Current State + Next Milestone Goals. Next: `/gsd-new-milestone` to begin v1.1+."
+last_updated: "2026-04-28T20:30:00Z"
+last_activity: 2026-04-28 -- Milestone v1.0 closed and tagged. ROADMAP/REQUIREMENTS archived. PROJECT.md evolved. Ready for /gsd-new-milestone.
 progress:
   total_phases: 11
   completed_phases: 11
@@ -18,19 +18,19 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-19)
+See: .planning/PROJECT.md (updated 2026-04-28 after v1.0 milestone close)
 
-**Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf.
-**Current focus:** Phase 11 — milestone-v1.0-closure
+**Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf. **Validated in v1.0.**
+**Current focus:** Planning next milestone — start with `/gsd-new-milestone`.
 
 ## Current Position
 
-Phase: 11 (milestone-v1.0-closure) — COMPLETE
-Plan: 4 of 4 (Plans 11-01 G1 + 11-02 G2 + 11-03 G3+G4 + 11-04 G5 all complete on 2026-04-28)
-Status: Milestone v1.0 closed — all 5 audit gaps (G1-G5) carry explicit dated closure annotations
-Last activity: 2026-04-28 -- Phase 11 Plan 04 complete (G5 closure: MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure annotations); Phase 11 Complete (4/4); milestone v1.0 closure all 5 gaps closed
+Milestone: v1.0 — SHIPPED 2026-04-28 (tag `v1.0`)
+Phases: 11/11 complete | Plans: 51/51 complete | Requirements: 40/40 satisfied
+Audit verdict: `passed`
+Last activity: 2026-04-28 -- Milestone v1.0 closed and archived. ROADMAP/REQUIREMENTS archived to .planning/milestones/. PROJECT.md evolved. Tag v1.0 created.
 
-Progress: [###########] Phase 11 complete (4/4). All phases complete (11/11). All plans complete (51/51 = 100%). Milestone v1.0 audit re-run unblocked.
+Progress: [###########] All v1.0 phases complete (11/11). Ready for next milestone.
 
 ## Performance Metrics
 
@@ -171,16 +171,17 @@ From codebase analysis (`.planning/codebase/CONCERNS.md`) — carry into Phase 1
 
 ## Deferred Items
 
-Items acknowledged and carried forward from previous milestone close:
+Items acknowledged at v1.0 milestone close on 2026-04-28:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| *(none)* | | | |
+| verification | Phase 07 (07-VERIFICATION.md) | human_needed (indefinite acceptance per v1.0-MILESTONE-AUDIT G3 closure; visual feel deferred — canonical Phase 10 harness covers automated SCs) | 2026-04-28 |
+| verification | Phase 09 (09-VERIFICATION.md) | human_needed (indefinite acceptance per v1.0-MILESTONE-AUDIT G4 closure; Windows pwsh + browser auto-open + cross-arch buildx deferred to per-host human spot-check) | 2026-04-28 |
 
 ## Session Continuity
 
 Last session: 2026-04-28
-Stopped at: Phase 11 Plan 04 (G5 closure — MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure annotations) completed on `finally-gsd`. One atomic commit: `0498bb7` (docs(11-04): annotate MILESTONE_SUMMARY-v1.0.md §6.1/§6.2/§6.3 closure (G5 + G1-G4 paper trail)). Modified file: `.planning/reports/MILESTONE_SUMMARY-v1.0.md` (+5/-1: §6.1 closure annotation citing plans 11-01 + 11-03 (G1+G3+G4); §6.2 closure annotation citing plan 11-02 (G2 closed, 40/40 unchanged); §6.3 closing paragraph rewritten from deferred framing to `Recorded as planning delta under Phase 11` citing both commit SHAs `73abc58` + `e79ad18` and the canonical Phase 10 harness evidence — `21 passed x 2 consecutive runs, 0 failed, 0 flaky, Container test-appsvc-1 Healthy` — `G5 closed`). All 11 acceptance grep predicates exit 0 (`ALL_VERIFICATIONS_PASSED`). §6.3 commit/fix table at lines 117-120 preserved verbatim (table rows not in any Edit `old_string`; `0×0` and em-dashes in original content untouched). §6.x count grep returns 5 pre- and post-edit (no renumbering, no new section). §6.4, §6.5, §1-§5, §7+ byte-for-byte unchanged. Pitfall 4 mitigation confirmed: `test ! -e .planning/phases/10-e2e-validation/10-10-PLAN.md` returns `NO_ROGUE_FILE` (no Phase 10.1 stub created — would have broken ROADMAP Phase 10 plan count and STATE.md `completed_plans` invariants). Doc-only execution: zero production source touched. Plan 11-04 SUMMARY created with `requirements-completed: [FE-01, FE-05, FE-06, APP-02]`. Phase 11 is now Complete (4/4 plans landed in Wave 1: 11-01 G1 + 11-02 G2 + 11-03 G3+G4 + 11-04 G5). Milestone v1.0 closure: all 5 audit gaps from `.planning/v1.0-MILESTONE-AUDIT.md` carry explicit dated closure annotations grep-anchored in their respective files.
+Stopped at: Milestone v1.0 closed and archived. Audit verdict `passed`. Tag `v1.0`. ROADMAP collapsed to milestone-grouped index with link to `.planning/milestones/v1.0-ROADMAP.md`. REQUIREMENTS.md archived to `.planning/milestones/v1.0-REQUIREMENTS.md` and removed from `.planning/` root (fresh for next milestone). PROJECT.md evolved to brownfield format (Current State + Next Milestone Goals + Validated section with all 40 v1 reqs + Active emptied). 2 deferred verification items recorded under STATE.md ## Deferred Items (Phase 7+9 indefinite acceptance per G3/G4). RETROSPECTIVE.md created and committed.
 
-Resume file: `.planning/v1.0-MILESTONE-AUDIT.md` (re-run target)
-Next action: `/gsd-audit-milestone v1.0` re-run — expected verdict shifts from `tech_debt` to `passed`, or carries forward only the consciously-accepted G3/G4 Option B policy debt (which is now explicit, dated, rationalized, and grep-anchored in `07-VERIFICATION.md` + `09-VERIFICATION.md` frontmatter via the `human_acceptance: indefinite` sibling key from plan 11-03). After verdict: `/gsd-archive-milestone v1.0` to move the milestone to `.planning/archive/`.
+Resume file: `.planning/PROJECT.md` (next milestone seed) + `.planning/MILESTONES.md` (history)
+Next action: `/gsd-new-milestone` — questioning → research → requirements → roadmap for v1.1 (or skip ahead).

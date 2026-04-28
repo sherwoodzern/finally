@@ -1,8 +1,10 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "Phase 8 UAT test-3: chat returns HTTP 422; NVDA buy + PYPL watchlist add fail."
 created: 2026-04-26
-updated: 2026-04-26
+updated: 2026-04-28
+closed: 2026-04-28
+resolution: "Fix applied in commit c2a2c88 — frontend/src/lib/api/chat.ts postChat body field renamed content -> message; ChatThread.tsx caller updated. Phase 8 UAT test-3 subsequently passed. Verified 2026-04-28 against current HEAD (chat.ts:63 reads `body: { message: string }`; ChatThread.tsx:81 calls `mutation.mutate({ message: text })`)."
 ---
 
 ## Current Focus
