@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Closure & Doc Sweep
 status: executing
-stopped_at: "Phase 11 Plan 02 (G2 closure — REQUIREMENTS.md status-drift sweep) completed on `finally-gsd`. Two atomic commits: `787cbb7` (docs(11-02): sweep REQUIREMENTS.md — 19 rows to Complete (G2 closure)) and the SUMMARY metadata commit. Modified file: `.planning/REQUIREMENTS.md` (+20/-20: 19 row mutations from Pending/In progress to Complete (NN-MM, ...) per 11-RESEARCH.md Evidence Map + 1 footer line bumped to 2026-04-28 with Phase 11 framing). All 4 acceptance grep checks pass: 0 rows in {DB-01..03, PORT-05, WATCH-01..03, CHAT-01..06, FE-03/04/07/08/10, TEST-01} read Pending or In progress; all 19 IDs match `^\\| <ID> \\| Phase [0-9]+ \\| Complete \\(`; coverage count block unchanged at 40 total / 40 mapped (100%) / 0 unmapped (Pitfall 5 mitigation); footer bumped. Doc-only execution: zero production source touched. Plan 11-02 SUMMARY created with `requirements-completed: [DB-01, DB-02, DB-03, PORT-05, WATCH-01, WATCH-02, WATCH-03, FE-03, FE-04, FE-07, FE-08, FE-10]` (the 7 Phase-5 IDs CHAT-01..06 + TEST-01 are formally claimed by 11-01's frontmatter though their REQUIREMENTS.md rows were flipped in this sweep). Next: Plan 11-03 (G3 + G4 acceptance decision)."
-last_updated: "2026-04-28T19:43:00Z"
-last_activity: 2026-04-28 -- Phase 11 Plan 02 complete (G2 closure: REQUIREMENTS.md sweep — 19 rows to Complete)
+stopped_at: "Phase 11 Plan 03 (G3 + G4 closure — Phase 7 + Phase 9 VERIFICATION.md indefinite human acceptance via Option B from 11-RESEARCH.md Pattern 3) completed on `finally-gsd`. One atomic commit: `b0ae5a9` (docs(11-03): record indefinite human acceptance on Phase 7 + Phase 9 VERIFICATION.md (G3+G4 closure)). Modified files: `07-VERIFICATION.md` (+10/-0: 3 sibling keys human_acceptance: indefinite + recorded date + multi-line rationale citing canonical Phase 10 harness 21 passed x 2) and `09-VERIFICATION.md` (+11/-0: same 3 keys with Phase-9-specific rationale citing Windows pwsh + browser auto-open + visual UI + cross-arch buildx as deferred). All 12 acceptance grep checks pass (6 per task): both files have new keys, status: human_needed enum unchanged on both (Pitfall 3 — closed enum {passed, gaps_found, human_needed}), human_verification: lists intact (Phase 7: 6 items; Phase 9: 4 items), file bodies untouched. Doc-only execution: zero production source touched. Plan 11-03 SUMMARY created with `requirements-completed: [OPS-02, OPS-03]`. Next: Plan 11-04 (G5 closure — planning record for post-milestone commits 73abc58 + e79ad18 as §6 of MILESTONE_SUMMARY-v1.0.md or thin Phase 10.1 SUMMARY)."
+last_updated: "2026-04-28T19:47:25Z"
+last_activity: 2026-04-28 -- Phase 11 Plan 03 complete (G3 + G4 closure: indefinite human acceptance recorded on Phase 7 + Phase 9 VERIFICATION.md)
 progress:
   total_phases: 11
   completed_phases: 10
   total_plans: 51
-  completed_plans: 49
-  percent: 96
+  completed_plans: 50
+  percent: 98
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-04-19)
 ## Current Position
 
 Phase: 11 (milestone-v1.0-closure) — EXECUTING
-Plan: 3 of 4 (Plans 11-01 G1 + 11-02 G2 closure complete on 2026-04-28; resume at Plan 11-03 G3+G4 acceptance decision)
+Plan: 4 of 4 (Plans 11-01 G1 + 11-02 G2 + 11-03 G3+G4 closure complete on 2026-04-28; resume at Plan 11-04 G5 — §6 promotion of 73abc58 + e79ad18)
 Status: Executing Phase 11
-Last activity: 2026-04-28 -- Phase 11 Plan 02 complete (G2 closure: REQUIREMENTS.md sweep — 19 rows to Complete)
+Last activity: 2026-04-28 -- Phase 11 Plan 03 complete (G3 + G4 closure: indefinite human acceptance recorded on Phase 7 + Phase 9 VERIFICATION.md)
 
-Progress: [##########] Phase 10 complete (10/10). Phase 11: 2/4 plans complete (G1 + G2 closed; G3+G4/G5 remaining). ROADMAP Phase 10 SC#1/SC#2/SC#3 all met.
+Progress: [##########] Phase 10 complete (10/10). Phase 11: 3/4 plans complete (G1 + G2 + G3+G4 closed; only G5 remaining). ROADMAP Phase 10 SC#1/SC#2/SC#3 all met.
 
 ## Performance Metrics
 
