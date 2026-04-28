@@ -44,6 +44,8 @@ A user runs one Docker command, opens `http://localhost:8000`, and within second
 - ✓ **OPS-02**: Single-container run — `docker run -v finally-data:/app/db -p 8000:8000 --env-file .env finally` — Phase 9 (09-03 integration test: /api/health 1s, GET / 12,830 bytes HTML, SSE data: frames, volume persistence cash 10000 -> 9809.98 -> 9809.98 across stop+restart)
 - ✓ **OPS-03**: Idempotent start/stop scripts for macOS/Linux (`scripts/start_mac.sh`, `scripts/stop_mac.sh`) and Windows (`scripts/start_windows.ps1`, `scripts/stop_windows.ps1`) — Phase 9 (09-03; bash 3.2 portable; `--build` and `--no-open` flags; PowerShell 5.1+ mirror with `[switch]$Build`/`[switch]$NoOpen`)
 - ✓ **OPS-04**: `.env.example` committed with safe placeholders; `.env` gitignored at `.gitignore:141` — Phase 9 (09-02; cp .env.example .env boots simulator-mode demo with no edits)
+- ✓ **TEST-03**: Playwright E2E harness in `test/` with its own `docker-compose.test.yml` running the app container with `LLM_MOCK=true` alongside a Playwright container — Phase 10 (10-00..10-09; canonical command `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` exits 0 with `21 passed` reproducibly across two consecutive runs; logs at /tmp/phase10-final-harness.log + /tmp/phase10-final-harness-rerun.log)
+- ✓ **TEST-04**: All §12 E2E scenarios — fresh start, watchlist add/remove, buy/sell paths, heatmap + P&L chart rendering, mocked chat with trade execution, SSE reconnection — Phase 10 (7 specs × 3 browsers = 21 (spec, project) pairs all passing; Mode A layout overlap closed via per-project viewport 1440×900; Mode A.2 cross-run SQLite carry-over closed via tmpfs /app/db; production Dockerfile VOLUME /app/db preserved unchanged)
 
 ### Active
 
@@ -71,8 +73,7 @@ A user runs one Docker command, opens `http://localhost:8000`, and within second
 
 **Testing**
 - [ ] **TEST-01**: Backend unit tests extending the existing pytest suite — portfolio math, trade execution, trade validation, LLM response parsing, API routes, LLM mock mode
-- [ ] **TEST-03**: Playwright E2E harness in `test/` with its own `docker-compose.test.yml` running the app container with `LLM_MOCK=true` alongside a Playwright container
-- [ ] **TEST-04**: All §12 E2E scenarios — fresh start, watchlist add/remove, buy/sell paths, heatmap + P&L chart rendering, mocked chat with trade execution, SSE reconnection
+- (TEST-03 + TEST-04 validated in Phase 10 — see Validated section above)
 
 ### Out of Scope
 
@@ -141,4 +142,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-26 after Phase 8 (Portfolio Visualization & Chat UI) — APP-02, FE-05, FE-06, FE-09, FE-11, TEST-02 validated*
+*Last updated: 2026-04-27 after Phase 10 (E2E Validation) — TEST-03, TEST-04 validated; v1.0 milestone complete*

@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: "Phase 10 Plan 09 (Mode A re-diagnosis closure + Mode A.2 closure + WR-01 advisory bundle + 21/21 reproducibility gate) executed sequentially on `finally-gsd`. Three atomic per-task commits land the gap closure: `e18de22` (test(10-09): explicit viewport 1440x900 per Playwright project — closes Mode A by aligning the test environment with planning/PLAN.md §10's desktop-first wide-screens contract; the right-column PositionsTable cell no longer overlaps tab-pnl across chromium/firefox/webkit), `b7ef281` (chore(10-09): mount /app/db as tmpfs on appsvc test service — closes Mode A.2 by giving each `compose up` a fresh in-memory SQLite directory; production Dockerfile VOLUME /app/db preserved unchanged for OPS-02), `ff59954` (feat(10-09): format Heatmap tooltip weight as USD currency — closes WR-01 advisory; 10-08's wrapperStyle pointerEvents preserved unchanged; Rule 1 fix during build verification widened formatter signature to accept Recharts 3.x's ValueType | undefined). Task 4 verification gate proved the canonical command from CONTEXT D-03 — `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` — exits 0 on TWO consecutive runs with NO inter-run cleanup: both runs report `21 passed (24.6s)` / 0 failed / 0 flaky / `Container test-appsvc-1 Healthy`. Logs captured at /tmp/phase10-final-harness.log (40,647 bytes) and /tmp/phase10-final-harness-rerun.log (38,828 bytes). ROADMAP Phase 10 SC#3 (single command finishes green reproducibly) is now MET. 10-09-SUMMARY.md created and self-checked. TEST-03 and TEST-04 will be ticked in REQUIREMENTS.md by the verifier on its next pass."
-last_updated: "2026-04-27T23:30:00.000Z"
-last_activity: 2026-04-27 -- Phase 10 Plan 09 executed; canonical 21/21 reproducibility gate met
+status: complete
+stopped_at: "Phase 10 (E2E Validation) verified `passed` and marked complete on 2026-04-27. Plan 10-09 closed the last two gap items (Mode A — layout overlap fixed by per-project viewport 1440×900 in `test/playwright.config.ts`; Mode A.2 — cross-run SQLite carry-over fixed by `tmpfs: - /app/db` on the appsvc service in `test/docker-compose.test.yml`) and bundled the WR-01 advisory polish (Recharts Tooltip USD `formatter` on `Heatmap.tsx`). The canonical command `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` exits 0 with `21 passed (24.6s)` / 0 failed / 0 flaky / `Container test-appsvc-1 Healthy` on TWO consecutive runs with NO inter-run cleanup (logs at /tmp/phase10-final-harness.log + /tmp/phase10-final-harness-rerun.log) — proving both clauses of ROADMAP Phase 10 SC#3 (single canonical command, reproducibly). Verifier ticked TEST-03 and TEST-04 in REQUIREMENTS.md and overwrote 10-VERIFICATION.md with status: passed. Code review refreshed: status `clean` (0 critical / 0 warning / 2 info; prior WR-01 closed). Production `Dockerfile:57 VOLUME /app/db` preserved unchanged. v1.0 milestone scope is now fully validated end-to-end."
+last_updated: "2026-04-27T23:55:00.000Z"
+last_activity: 2026-04-27 -- Phase 10 verified passed; v1.0 milestone E2E gate green
 progress:
   total_phases: 10
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 47
   completed_plans: 47
   percent: 100
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-19)
 
 **Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf.
-**Current focus:** Phase 10 — e2e-validation
+**Current focus:** v1.0 milestone complete — Phase 10 verified `passed`
 
 ## Current Position
 
-Phase: 10 (e2e-validation) — GATE GREEN, awaiting verifier pass
-Plan: 9 of 10 executed (10-09 lands the gap-closure trio + 21/21 reproducibility gate)
-Status: ROADMAP Phase 10 SC#3 met on two consecutive canonical-command runs
-Last activity: 2026-04-27 -- Phase 10 Plan 09 executed; canonical 21/21 reproducibility gate met
+Phase: 10 (e2e-validation) — COMPLETE (verified passed 2026-04-27)
+Plan: 10 of 10 executed
+Status: v1.0 milestone fully validated; canonical E2E harness green twice in a row
+Last activity: 2026-04-27 -- Phase 10 verified passed; TEST-03 + TEST-04 ticked in REQUIREMENTS.md
 
-Progress: [##########] 9 of 10 Phase 10 plans executed (10-08 marked superseded by 10-09 / partial closure of Modes B+C). Phase 10 SC#3 met. Verifier pass next: tick TEST-03 / TEST-04 in REQUIREMENTS.md and move Phase 10 verification status to `verified`.
+Progress: [##########] 10 of 10 Phase 10 plans complete. ROADMAP Phase 10 SC#1/SC#2/SC#3 all met. v1.0 milestone complete.
 
 ## Performance Metrics
 

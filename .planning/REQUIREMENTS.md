@@ -81,8 +81,8 @@ Requirements for the initial release. Each maps to a roadmap phase.
 
 - [ ] **TEST-01**: Backend unit tests extending the existing pytest suite — portfolio math, trade execution, trade validation, LLM structured-output parsing, API routes, LLM mock mode
 - [x] **TEST-02**: Frontend component tests — price flash animation, watchlist CRUD, portfolio display calculations, chat rendering and loading state _(111/111 Vitest tests across 19 files; Heatmap+HeatmapCell calc tests, PnLChart tooltip+stroke-flip tests, ChatThread XSS-guard test, ChatInput keyboard contract tests, PositionRow price-flash + trade-flash regression tests — Plans 08-02..08-08)_
-- [ ] **TEST-03**: Playwright E2E harness under `test/` with its own `docker-compose.test.yml` running the app container (`LLM_MOCK=true`) alongside a Playwright container
-- [ ] **TEST-04**: All E2E scenarios from `planning/PLAN.md` §12 — fresh start, watchlist add/remove, buy/sell, heatmap + P&L chart rendering, mocked chat with trade execution, SSE reconnection
+- [x] **TEST-03**: Playwright E2E harness under `test/` with its own `docker-compose.test.yml` running the app container (`LLM_MOCK=true`) alongside a Playwright container _(test/docker-compose.test.yml + test/playwright.config.ts; appsvc Healthy + 21/21 green on canonical D-03 command across two consecutive runs — Phase 10)_
+- [x] **TEST-04**: All E2E scenarios from `planning/PLAN.md` §12 — fresh start, watchlist add/remove, buy/sell, heatmap + P&L chart rendering, mocked chat with trade execution, SSE reconnection _(7 specs × 3 browsers = 21 (spec, project) pairs; 0 failed / 0 flaky on two consecutive canonical runs with no inter-run cleanup — Phase 10)_
 
 ## v2 Requirements
 
@@ -165,8 +165,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 | OPS-04 | Phase 9 | Complete (09-02 .env.example with safe placeholders; .gitignore:141 preserves .env ignore) |
 | TEST-01 | Phase 5 | Pending |
 | TEST-02 | Phase 8 | Complete (111/111 Vitest across 19 files) |
-| TEST-03 | Phase 10 | Pending |
-| TEST-04 | Phase 10 | Pending |
+| TEST-03 | Phase 10 | Complete (10-01 harness foundation; 10-09 closes SC#3 reproducibility gate) |
+| TEST-04 | Phase 10 | Complete (10-02..10-05 spec authoring; 10-06..10-09 stabilisation; 21/21 green × 2 consecutive runs) |
 
 **Coverage:**
 - v1 requirements: 40 total
