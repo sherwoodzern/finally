@@ -1,17 +1,17 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.0
-milestone_name: milestone
-status: complete
-stopped_at: "Phase 10 (E2E Validation) verified `passed` and marked complete on 2026-04-27. Plan 10-09 closed the last two gap items (Mode A — layout overlap fixed by per-project viewport 1440×900 in `test/playwright.config.ts`; Mode A.2 — cross-run SQLite carry-over fixed by `tmpfs: - /app/db` on the appsvc service in `test/docker-compose.test.yml`) and bundled the WR-01 advisory polish (Recharts Tooltip USD `formatter` on `Heatmap.tsx`). The canonical command `docker compose -f test/docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from playwright` exits 0 with `21 passed (24.6s)` / 0 failed / 0 flaky / `Container test-appsvc-1 Healthy` on TWO consecutive runs with NO inter-run cleanup (logs at /tmp/phase10-final-harness.log + /tmp/phase10-final-harness-rerun.log) — proving both clauses of ROADMAP Phase 10 SC#3 (single canonical command, reproducibly). Verifier ticked TEST-03 and TEST-04 in REQUIREMENTS.md and overwrote 10-VERIFICATION.md with status: passed. Code review refreshed: status `clean` (0 critical / 0 warning / 2 info; prior WR-01 closed). Production `Dockerfile:57 VOLUME /app/db` preserved unchanged. v1.0 milestone scope is now fully validated end-to-end."
-last_updated: "2026-04-27T23:55:00.000Z"
-last_activity: 2026-04-27 -- Phase 10 verified passed; v1.0 milestone E2E gate green
+milestone_name: Closure & Doc Sweep
+status: executing
+stopped_at: "Phase 11 Plan 01 (G1 closure — gsd-verifier audit-trail backfill of 05-VERIFICATION.md for the AI Chat Integration phase) completed on `finally-gsd`. Two atomic commits: `ab73991` (docs(11-01): backfill 05-VERIFICATION.md via gsd-verifier — CHAT-01..06, TEST-01) and the SUMMARY metadata commit. New file: `.planning/phases/05-ai-chat-integration/05-VERIFICATION.md` (161 lines, canonical 04-VERIFICATION.md shape, status: passed, score: 7/7 success criteria verified, all 7 ratified REQ-IDs cited). All 8 acceptance grep checks pass: file exists, frontmatter phase + status + score, 7 REQ-ID coverage, canonical `295 passed` evidence, sign-off footer `Verifier: Claude (gsd-verifier)`, and the threat T-11-01 secret-leak grep negation (no `OPENROUTER_API_KEY=sk-or` literal anywhere in the file). Doc-only execution: zero production source touched. Plan 11-01 SUMMARY created with `requirements-completed: [CHAT-01, CHAT-02, CHAT-03, CHAT-04, CHAT-05, CHAT-06, TEST-01]`; the actual REQUIREMENTS.md table flip is scoped to Plan 11-02 (G2 sweep) per its Evidence Map. Next: Plan 11-02."
+last_updated: "2026-04-28T19:35:00Z"
+last_activity: 2026-04-28 -- Phase 11 Plan 01 complete (G1 closure: 05-VERIFICATION.md backfilled)
 progress:
-  total_phases: 10
+  total_phases: 11
   completed_phases: 10
-  total_plans: 47
-  completed_plans: 47
-  percent: 100
+  total_plans: 51
+  completed_plans: 48
+  percent: 94
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-19)
 
 **Core value:** One Docker command opens a Bloomberg-style terminal where prices stream live, trades execute instantly, and an AI copilot can analyze the portfolio and execute trades on the user's behalf.
-**Current focus:** v1.0 milestone complete — Phase 10 verified `passed`
+**Current focus:** Phase 11 — milestone-v1.0-closure
 
 ## Current Position
 
-Phase: 10 (e2e-validation) — COMPLETE (verified passed 2026-04-27)
-Plan: 10 of 10 executed
-Status: v1.0 milestone fully validated; canonical E2E harness green twice in a row
-Last activity: 2026-04-27 -- Phase 10 verified passed; TEST-03 + TEST-04 ticked in REQUIREMENTS.md
+Phase: 11 (milestone-v1.0-closure) — EXECUTING
+Plan: 2 of 4 (Plan 11-01 G1 closure complete on 2026-04-28; resume at Plan 11-02 G2 REQUIREMENTS.md sweep)
+Status: Executing Phase 11
+Last activity: 2026-04-28 -- Phase 11 Plan 01 complete (G1 closure: 05-VERIFICATION.md backfilled)
 
-Progress: [##########] 10 of 10 Phase 10 plans complete. ROADMAP Phase 10 SC#1/SC#2/SC#3 all met. v1.0 milestone complete.
+Progress: [##########] Phase 10 complete (10/10). Phase 11: 1/4 plans complete (G1 closed; G2/G3+G4/G5 remaining). ROADMAP Phase 10 SC#1/SC#2/SC#3 all met.
 
 ## Performance Metrics
 
